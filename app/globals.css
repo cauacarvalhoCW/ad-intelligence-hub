@@ -1,0 +1,483 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* 🎨 TEMAS - HEADERS COLORIDOS E IDENTIDADES VISUAIS */
+
+/* Estilos específicos para headers por tema - baseados nas imagens reais */
+
+/* InfinitePay - Header com faixa verde neon como no site */
+.theme-infinitepay header {
+  background: #9AFF00; /* Verde neon sólido como na imagem */
+  color: #000000;
+  border-bottom: 1px solid #8b5cf6;
+}
+
+.theme-infinitepay header h1 {
+  color: #000000 !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+.theme-infinitepay header p {
+  color: #8b5cf6 !important; /* Descrição em roxo */
+}
+
+/* CloudWalk - Header com gradiente quente como antes */
+.theme-cloudwalk header {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 30%, #ec4899 70%, #8b5cf6 100%);
+  color: #ffffff;
+  border-bottom: 1px solid #f97316;
+}
+
+.theme-cloudwalk header h1 {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+.theme-cloudwalk header p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* JIM - Header roxo como antes */
+.theme-jim header {
+  background: #8b5cf6; /* Roxo sólido */
+  color: #ffffff;
+  border-bottom: 1px solid #7c3aed;
+}
+
+.theme-jim header h1 {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+.theme-jim header p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 💚 INFINITEPAY - Verde neon + Roxo em TODA interface */
+.theme-infinitepay .ad-card {
+  border-left: 4px solid #9AFF00; /* Verde neon */
+  background: linear-gradient(135deg, rgba(154, 255, 0, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border: 1px solid rgba(154, 255, 0, 0.2);
+}
+
+.theme-infinitepay .ad-card:hover {
+  border-left-color: #8b5cf6; /* Roxo no hover */
+  background: linear-gradient(135deg, rgba(154, 255, 0, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+}
+
+/* Botões InfinitePay */
+.theme-infinitepay .bg-primary {
+  background: linear-gradient(135deg, #9AFF00 0%, #8b5cf6 100%) !important;
+  color: #000000 !important;
+}
+
+.theme-infinitepay .bg-secondary {
+  background-color: #8b5cf6 !important;
+  color: #ffffff !important;
+}
+
+.theme-infinitepay .border-primary {
+  border-color: #9AFF00 !important;
+}
+
+/* Estados ativos InfinitePay */
+.theme-infinitepay .bg-accent {
+  background: linear-gradient(135deg, rgba(154, 255, 0, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+  border-left: 3px solid #9AFF00 !important;
+}
+
+/* 🌍 CLOUDWALK - Gradiente quente como antes */
+.theme-cloudwalk .ad-card {
+  border-left: 4px solid #f59e0b; /* Borda dourada */
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.theme-cloudwalk .ad-card:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+  border-left-color: #f97316;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
+}
+
+/* Botões CloudWalk */
+.theme-cloudwalk .bg-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%) !important;
+  color: #ffffff !important;
+}
+
+.theme-cloudwalk .bg-secondary {
+  background-color: #f97316 !important;
+  color: #ffffff !important;
+}
+
+/* 🟣 JIM - Tema original de fábrica */
+.theme-jim .ad-card {
+  background: #1e1b2e !important; /* Fundo escuro roxo */
+  color: #ffffff !important; /* Texto branco */
+  border: 1px solid #2d2a3e;
+  border-left: 4px solid #8b5cf6; /* Borda roxa */
+}
+
+/* FORÇAR TODOS OS TEXTOS DOS CARDS BRANCOS */
+.theme-jim .ad-card * {
+  color: #ffffff !important; /* TODOS OS TEXTINHOS BRANCOS */
+}
+
+.theme-jim .ad-card:hover {
+  background: #252233 !important; /* Mais escuro no hover */
+  border-left-color: #7c3aed; /* Roxo mais intenso */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.theme-jim .bg-primary {
+  background-color: #8b5cf6 !important; /* Roxo */
+  color: #ffffff !important;
+}
+
+.theme-jim .bg-secondary {
+  background-color: #1e1b2e !important; /* Fundo escuro */
+  color: #ffffff !important;
+}
+
+/* 🌙 DARK - Tema escuro decente e moderno */
+.theme-dark {
+  --background: 17 24 39; /* Fundo escuro suave */
+  --foreground: 248 250 252; /* Texto claro */
+  --card: 30 41 59; /* Cards contrastantes */
+  --card-foreground: 248 250 252;
+  --primary: 99 102 241; /* Indigo moderno */
+  --primary-foreground: 255 255 255;
+  --secondary: 51 65 85; /* Cinza azulado */
+  --secondary-foreground: 226 232 240;
+  --muted: 71 85 105;
+  --muted-foreground: 148 163 184;
+  --accent: 99 102 241;
+  --accent-foreground: 248 250 252;
+  --border: 51 65 85;
+  --input: 30 41 59;
+  --ring: 99 102 241;
+}
+
+.theme-dark header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%); /* Gradiente sutil */
+  color: #f1f5f9;
+  border-bottom: 1px solid #475569;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.theme-dark header h1 {
+  color: #f1f5f9 !important;
+  font-weight: 600;
+}
+
+.theme-dark header p {
+  color: #cbd5e1 !important;
+}
+
+.theme-dark .ad-card {
+  background: #1e293b !important; /* Fundo escuro suave */
+  color: #f1f5f9 !important; /* Texto claro */
+  border: 1px solid #374151;
+  border-left: 4px solid #6366f1; /* Borda indigo */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .ad-card:hover {
+  background: #334155 !important; /* Mais claro no hover */
+  border-left-color: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+}
+
+.theme-dark .ad-card h3,
+.theme-dark .ad-card h4,
+.theme-dark .ad-card p {
+  color: #f1f5f9 !important;
+}
+
+.theme-dark .ad-card .text-muted-foreground {
+  color: #94a3b8 !important;
+}
+
+.theme-dark .bg-primary {
+  background-color: #6366f1 !important; /* Indigo moderno */
+  color: #ffffff !important;
+}
+
+.theme-dark .bg-secondary {
+  background-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Badges no tema escuro */
+.theme-dark .badge {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #a5b4fc !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+}
+
+/* 💚 INFINITEPAY - Mais elementos da interface */
+.theme-infinitepay .badge {
+  background: linear-gradient(135deg, #9AFF00 0%, #8b5cf6 100%);
+  color: #000000;
+  border: none;
+}
+
+.theme-infinitepay .rate-highlight {
+  background: linear-gradient(135deg, #9AFF00 0%, #8b5cf6 100%);
+  color: #000000;
+  font-weight: bold;
+}
+
+/* Filtros e inputs InfinitePay */
+.theme-infinitepay input:focus,
+.theme-infinitepay select:focus {
+  border-color: #9AFF00 !important;
+  box-shadow: 0 0 0 2px rgba(154, 255, 0, 0.2) !important;
+}
+
+.theme-infinitepay .bg-accent {
+  background: linear-gradient(135deg, rgba(154, 255, 0, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+  border-left: 3px solid #9AFF00 !important;
+}
+
+/* 🌍 CLOUDWALK - Badges e elementos */
+.theme-cloudwalk .rate-highlight {
+  background-color: #8b5cf6 !important; /* Roxo */
+  color: #ffffff;
+}
+
+.theme-cloudwalk .badge {
+  background-color: #8b5cf6 !important;
+  color: #ffffff;
+}
+
+/* 🟣 JIM - Badges e elementos */
+.theme-jim .bg-primary {
+  background-color: #8b5cf6 !important; /* Botões roxos no JIM */
+}
+
+.theme-jim .rate-highlight {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #ffffff;
+}
+
+.theme-jim .badge {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #ffffff;
+}
+
+
+
+
+
+
+
+/* 💚 FILTROS INFINITEPAY - Roxo padrão, verde no focus/hover */
+.theme-infinitepay input[type="text"],
+.theme-infinitepay input[type="search"],
+.theme-infinitepay .search-input,
+.theme-infinitepay textbox {
+  border: 2px solid #8b5cf6 !important; /* Roxo padrão */
+  background: #ffffff !important;
+  color: #000000 !important;
+  transition: all 0.3s ease !important;
+}
+
+.theme-infinitepay input[type="text"]:focus,
+.theme-infinitepay input[type="search"]:focus,
+.theme-infinitepay .search-input:focus,
+.theme-infinitepay textbox:focus,
+.theme-infinitepay input[type="text"]:hover,
+.theme-infinitepay input[type="search"]:hover,
+.theme-infinitepay .search-input:hover,
+.theme-infinitepay textbox:hover {
+  border-color: #9AFF00 !important; /* Verde neon no focus/hover */
+  box-shadow: 0 0 0 3px rgba(154, 255, 0, 0.1) !important;
+  outline: none !important;
+}
+
+.theme-infinitepay select,
+.theme-infinitepay .select-trigger,
+.theme-infinitepay [role="combobox"] {
+  border: 2px solid #8b5cf6 !important; /* Roxo padrão */
+  background: #ffffff !important;
+  color: #000000 !important;
+  transition: all 0.3s ease !important;
+}
+
+.theme-infinitepay select:focus,
+.theme-infinitepay .select-trigger:focus,
+.theme-infinitepay [role="combobox"]:focus,
+.theme-infinitepay select:hover,
+.theme-infinitepay .select-trigger:hover,
+.theme-infinitepay [role="combobox"]:hover {
+  border-color: #9AFF00 !important; /* Verde neon no focus/hover */
+  box-shadow: 0 0 0 3px rgba(154, 255, 0, 0.1) !important;
+}
+
+/* 📊 TABS INFINITEPAY - Roxo padrão, verde no hover/ativo */
+.theme-infinitepay [role="tab"] {
+  border-bottom: 2px solid transparent !important;
+  transition: all 0.3s ease !important;
+  color: #8b5cf6 !important; /* Roxo padrão */
+}
+
+.theme-infinitepay [role="tab"]:hover {
+  border-bottom-color: #9AFF00 !important; /* Verde no hover */
+  color: #9AFF00 !important;
+}
+
+.theme-infinitepay [role="tab"][aria-selected="true"] {
+  border-bottom-color: #9AFF00 !important; /* Verde quando ativo */
+  color: #9AFF00 !important;
+  font-weight: 600 !important;
+}
+
+/* Adding hover and transition effects for cards */
+.ad-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.ad-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.ad-card:active {
+  transform: translateY(-2px);
+}
