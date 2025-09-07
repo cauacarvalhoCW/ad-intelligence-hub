@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServer } from '@/lib/supabase/server'
+import { createSupabaseServer } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,8 +11,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Criar cliente Supabase
+    const supabase = await createSupabaseServer()
+
     // Buscar todos os competidores
-    const { data: competitors, error } = await supabaseServer
+    const { data: competitors, error } = await supabase
       .from('competitors')
       .select('id, name, home_url, created_at')
       .order('name')

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -8,12 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExternalLink, BarChart3, TrendingUp, Target } from "lucide-react"
 import { AdFilters, type FilterState } from "@/components/ad-filters"
 import { AdAnalytics } from "@/components/ad-analytics"
+import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 import { CompetitiveAnalysis } from "@/components/competitive-analysis"
+import { CompetitiveDashboard } from "@/components/competitive-dashboard"
 import { TrendAnalysis } from "@/components/trend-analysis"
 import { RateExtractor } from "@/components/rate-extractor"
 import { AdCard } from "@/components/ads/AdCard"
 import { useAds } from "@/hooks/useAds"
 import { useCompetitors } from "@/hooks/useCompetitors"
+import { useAnalytics } from "@/hooks/useAnalytics"
 import { useTheme } from "@/components/theme-provider"
 import type { Ad } from "@/lib/types"
 
@@ -75,38 +78,59 @@ function formatAdAnalysis(analysis: string | any): React.ReactElement {
 export function AdDashboard() {
   const [filters, setFilters] = useState<FilterState>({
     searchTerm: "",
-    selectedCompetitor: "all",
+    selectedCompetitors: [], // Array em vez de string
     selectedPlatform: "all",
     selectedAdType: "all",
     dateRange: "all",
+    dateFrom: "",
+    dateTo: "",
     tags: [],
   })
 
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
   
   // Usar dados reais do Supabase
   const { currentTheme } = useTheme()
-  const { ads, loading: adsLoading, error: adsError } = useAds({
+  // Criar opções dinâmicas que sempre refletem o estado atual
+  const adsOptions = useMemo(() => ({
     perspective: currentTheme as any,
-    limit: 50
-  })
+    page: currentPage,
+    limit: 24,
+    filters: {
+      search: filters.searchTerm || undefined,
+      competitors: filters.selectedCompetitors.length > 0 ? filters.selectedCompetitors : undefined,
+      assetTypes: filters.selectedAdType !== "all" ? [filters.selectedAdType] : undefined,
+      dateRange: filters.dateFrom || filters.dateTo ? {
+        start: filters.dateFrom ? new Date(filters.dateFrom) : null,
+        end: filters.dateTo ? new Date(filters.dateTo) : null
+      } : undefined
+    }
+  }), [currentTheme, currentPage, filters])
+
+  const { ads, loading: adsLoading, error: adsError, pagination, refetch } = useAds(adsOptions)
   const { competitors, loading: competitorsLoading } = useCompetitors()
+  
+  // Analytics com os mesmos filtros, mas sem paginação
+  const analyticsOptions = useMemo(() => ({
+    perspective: currentTheme as any,
+    filters: {
+      search: filters.searchTerm || undefined,
+      competitors: filters.selectedCompetitors.length > 0 ? filters.selectedCompetitors : undefined,
+      assetTypes: filters.selectedAdType !== "all" ? [filters.selectedAdType] : undefined,
+      dateRange: filters.dateFrom || filters.dateTo ? {
+        start: filters.dateFrom ? new Date(filters.dateFrom) : null,
+        end: filters.dateTo ? new Date(filters.dateTo) : null
+      } : undefined
+    }
+  }), [currentTheme, filters])
 
-  const filteredAds = useMemo(() => {
-    return ads.filter((ad) => {
-      const searchText = filters.searchTerm.toLowerCase()
-      const matchesSearch = !searchText || 
-        ad.product?.toLowerCase().includes(searchText) ||
-        ad.transcription?.toLowerCase().includes(searchText) ||
-        ad.image_description?.toLowerCase().includes(searchText) ||
-        ad.tags?.toLowerCase().includes(searchText)
+  const { data: analyticsData, loading: analyticsLoading, error: analyticsError } = useAnalytics(analyticsOptions)
 
-      const matchesCompetitor = filters.selectedCompetitor === "all" || ad.competitor_id === filters.selectedCompetitor
-      const matchesAssetType = filters.selectedAdType === "all" || ad.asset_type === filters.selectedAdType
+  // Usar ads diretamente da API (já filtrados)
+  const filteredAds = ads
 
-      return matchesSearch && matchesCompetitor && matchesAssetType
-    })
-  }, [ads, filters])
+  // useAds agora reage automaticamente às mudanças de adsOptions
 
   // Loading state
   if (adsLoading || competitorsLoading) {
@@ -142,19 +166,31 @@ export function AdDashboard() {
           <p className="text-muted-foreground">Análise de anúncios de concorrentes em tempo real</p>
           <div className="flex items-center gap-4 mt-2">
             <Badge variant="secondary">
-              {ads.length} anúncios
+              {analyticsData?.metrics.total_ads || pagination?.total || ads.length} anúncios filtrados
             </Badge>
             <Badge variant="outline">
-              {competitors.length} competidores
+              {analyticsData?.metrics.by_competitor.length || competitors.length} competidores
             </Badge>
             <Badge variant="outline">
               Tema: {currentTheme}
             </Badge>
+            {analyticsData && (
+              <Badge variant="outline" className="text-xs">
+                📊 Análise: {analyticsData.metrics.total_ads} anúncios
+              </Badge>
+            )}
           </div>
         </div>
       </div>
 
-      <AdFilters competitors={competitors} onFiltersChange={setFilters} />
+      <AdFilters 
+        competitors={competitors} 
+        currentPerspective={currentTheme}
+        onFiltersChange={(newFilters) => {
+          setFilters(newFilters)
+          // O refetch será chamado automaticamente quando adsOptions mudar
+        }} 
+      />
 
       <Tabs defaultValue="ads" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
@@ -184,6 +220,68 @@ export function AdDashboard() {
             ))}
           </div>
 
+          {/* Paginação */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              {/* Primeira página */}
+              {currentPage > 3 && (
+                <>
+                  <Button 
+                    variant={1 === currentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(1)}
+                  >
+                    1
+                  </Button>
+                  {currentPage > 4 && <span className="text-muted-foreground">...</span>}
+                </>
+              )}
+
+              {/* Páginas ao redor da atual */}
+              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                let pageNum;
+                if (pagination.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= pagination.totalPages - 2) {
+                  pageNum = pagination.totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                if (pageNum < 1 || pageNum > pagination.totalPages) return null;
+                if (currentPage > 3 && pageNum === 1) return null;
+                if (currentPage < pagination.totalPages - 2 && pageNum === pagination.totalPages) return null;
+
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={pageNum === currentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+
+              {/* Última página */}
+              {currentPage < pagination.totalPages - 2 && (
+                <>
+                  {currentPage < pagination.totalPages - 3 && <span className="text-muted-foreground">...</span>}
+                  <Button 
+                    variant={pagination.totalPages === currentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pagination.totalPages)}
+                  >
+                    {pagination.totalPages}
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+
           {filteredAds.length === 0 && (
             <Card>
               <CardContent className="text-center py-8">
@@ -194,14 +292,18 @@ export function AdDashboard() {
         </TabsContent>
 
         <TabsContent value="analytics">
-          <AdAnalytics ads={filteredAds} competitors={competitors} />
+          <AnalyticsDashboard 
+            analyticsData={analyticsData}
+            loading={analyticsLoading}
+            error={analyticsError}
+          />
         </TabsContent>
 
         <TabsContent value="competitive">
-          <CompetitiveAnalysis
-            ads={filteredAds}
-            competitors={competitors}
-            selectedCompetitor={filters.selectedCompetitor !== "all" ? filters.selectedCompetitor : undefined}
+          <CompetitiveDashboard 
+            analyticsData={analyticsData}
+            loading={analyticsLoading}
+            error={analyticsError}
           />
         </TabsContent>
 

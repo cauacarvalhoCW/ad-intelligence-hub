@@ -67,10 +67,14 @@ export function useAds(options: UseAdsOptions = {}): UseAdsResult {
         params.set('search', options.filters.search)
       }
       if (options.filters?.dateRange?.start) {
-        params.set('dateFrom', options.filters.dateRange.start.toISOString())
+        // Converter para formato YYYY-MM-DD
+        const startDate = options.filters.dateRange.start.toISOString().split('T')[0]
+        params.set('dateFrom', startDate)
       }
       if (options.filters?.dateRange?.end) {
-        params.set('dateTo', options.filters.dateRange.end.toISOString())
+        // Converter para formato YYYY-MM-DD
+        const endDate = options.filters.dateRange.end.toISOString().split('T')[0]
+        params.set('dateTo', endDate)
       }
 
       const response = await fetch(`/api/ads?${params.toString()}`)
@@ -108,9 +112,15 @@ export function useAds(options: UseAdsOptions = {}): UseAdsResult {
     options.limit
   ])
 
+  // Fazer fetch quando as opções mudarem (mas evitar loop infinito)
   useEffect(() => {
     fetchAds()
-  }, [fetchAds])
+  }, [
+    options.perspective,
+    options.page,
+    options.limit,
+    JSON.stringify(options.filters) // Usar JSON.stringify para comparar objetos
+  ])
 
   return {
     ads,

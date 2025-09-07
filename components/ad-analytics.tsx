@@ -7,9 +7,35 @@ import { Progress } from "@/components/ui/progress"
 import { BarChart3, TrendingUp, Target, Eye } from "lucide-react"
 import type { Ad, Competitor } from "@/lib/types"
 
+interface AnalyticsResponse {
+  applied: {
+    perspective: string
+    competitors: string[]
+    platform?: string
+    ad_types: string[]
+    date_from?: string
+    date_to?: string
+    q?: string
+  }
+  metrics: {
+    total_ads: number
+    by_competitor: Array<{ competitor_name: string; count: number }>
+    by_asset_type: Array<{ asset_type: string; count: number }>
+    weekly: Array<{ week_start: string; total: number }>
+    top_tags: Array<{ tag: string; count: number }>
+    fees: Array<{ label: string; ads_com_taxa: number; matches: number; min: number; median: number; max: number }>
+    offers: Array<{ label: string; ads_com_taxa: number; matches: number; min: number; median: number; max: number }>
+    platform: Array<{ label: string; value: number }>
+  }
+  base_ads_count: number
+}
+
 interface AdAnalyticsProps {
   ads: Ad[]
   competitors: Competitor[]
+  analyticsData?: AnalyticsResponse | null
+  loading?: boolean
+  error?: string | null
 }
 
 interface AnalyticsData {
@@ -24,7 +50,34 @@ interface AnalyticsData {
   }
 }
 
-export function AdAnalytics({ ads, competitors }: AdAnalyticsProps) {
+export function AdAnalytics({ ads, competitors, analyticsData, loading, error }: AdAnalyticsProps) {
+  // Se há erro, mostrar mensagem
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <p className="text-red-500 mb-2">❌ Erro ao carregar analytics</p>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Se está carregando, mostrar skeleton
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map(i => (
+          <Card key={i}>
+            <CardHeader className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+            </CardHeader>
+          </Card>
+        ))}
+      </div>
+    )
+  }
   const analytics = useMemo((): AnalyticsData => {
     const platformDist: Record<string, number> = {}
     const competitorDist: Record<string, { count: number; name: string }> = {}

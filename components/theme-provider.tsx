@@ -1,7 +1,6 @@
 "use client"
 
 import type * as React from "react"
-import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from "next-themes"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { ThemeType } from "@/lib/types"
 import { applyTheme, getSavedTheme, themes } from "@/lib/themes" // Added themes import
@@ -39,39 +38,44 @@ export function useTheme() {
 }
 
 function CorporateThemeProvider({ children }: { children: React.ReactNode }) {
-  // Inicializar com null para evitar hidratação mismatch
-  const [corporateTheme, setCorporateThemeState] = useState<ThemeType | null>(null)
+  // Inicializar com tema padrão para evitar hidratação mismatch
+  const [corporateTheme, setCorporateThemeState] = useState<ThemeType>("default")
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const { trackThemeChange } = useThemeAnalytics()
 
   useEffect(() => {
-    // Só executar no cliente
+    // Marcar como montado
+    setIsMounted(true)
+    
+    // Só executar no cliente após montagem
     const savedTheme = getSavedTheme()
     setCorporateThemeState(savedTheme)
-    applyTheme(savedTheme)
-    setIsLoading(false)
+    
+    // Aplicar tema apenas após a hidratação
+    setTimeout(() => {
+      applyTheme(savedTheme)
+      setIsLoading(false)
+    }, 0)
   }, [])
 
-  // Se ainda não carregou, usar tema padrão
-  const currentTheme = corporateTheme || "default"
-
   const setCorporateTheme = (theme: ThemeType) => {
+    if (!isMounted) return // Não aplicar se ainda não montou
+    
     setCorporateThemeState(theme)
     applyTheme(theme)
     trackThemeChange(theme)
   }
 
   return (
-    <CorporateThemeContext.Provider value={{ corporateTheme: currentTheme, setCorporateTheme, isLoading }}>
+    <CorporateThemeContext.Provider value={{ corporateTheme, setCorporateTheme, isLoading }}>
       {children}
     </CorporateThemeContext.Provider>
   )
 }
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
-    <NextThemesProvider {...props}>
-      <CorporateThemeProvider>{children}</CorporateThemeProvider>
-    </NextThemesProvider>
+    <CorporateThemeProvider>{children}</CorporateThemeProvider>
   )
 }

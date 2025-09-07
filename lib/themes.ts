@@ -86,21 +86,24 @@ export const themes: Record<ThemeType, ThemeConfig> = {
 }
 
 export function applyTheme(theme: ThemeType) {
+  // Verificar se estamos no cliente
+  if (typeof window === "undefined") return
+  
   const config = themes[theme]
   
-  // Remove previous theme classes
-  document.body.classList.remove("theme-cloudwalk", "theme-infinitepay", "theme-jim", "theme-dark")
-  
-  // Apply new theme class if not default
-  if (theme !== "default") {
-    document.body.classList.add(`theme-${theme}`)
-  }
+  // Usar requestAnimationFrame para evitar problemas de hidratação
+  requestAnimationFrame(() => {
+    // Remove previous theme classes
+    document.body.classList.remove("theme-cloudwalk", "theme-infinitepay", "theme-jim", "theme-dark")
+    
+    // Apply new theme class if not default
+    if (theme !== "default") {
+      document.body.classList.add(`theme-${theme}`)
+    }
 
-  // Manter as cores originais - apenas aplicar classes para headers
-  // Não modificar as CSS variables - deixar como estavam originalmente
-
-  // Store current theme in localStorage for persistence
-  localStorage.setItem("edge-intelligence-theme", theme)
+    // Store current theme in localStorage for persistence
+    localStorage.setItem("edge-intelligence-theme", theme)
+  })
 }
 
 function adjustColorOpacity(color: string, opacity: number): string {
