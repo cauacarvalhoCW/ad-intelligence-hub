@@ -7,9 +7,35 @@ import { Progress } from "@/components/ui/progress"
 import { BarChart3, TrendingUp, Target, Eye } from "lucide-react"
 import type { Ad, Competitor } from "@/lib/types"
 
+interface AnalyticsResponse {
+  applied: {
+    perspective: string
+    competitors: string[]
+    platform?: string
+    ad_types: string[]
+    date_from?: string
+    date_to?: string
+    q?: string
+  }
+  metrics: {
+    total_ads: number
+    by_competitor: Array<{ competitor_name: string; count: number }>
+    by_asset_type: Array<{ asset_type: string; count: number }>
+    weekly: Array<{ week_start: string; total: number }>
+    top_tags: Array<{ tag: string; count: number }>
+    fees: Array<{ label: string; ads_com_taxa: number; matches: number; min: number; median: number; max: number }>
+    offers: Array<{ label: string; ads_com_taxa: number; matches: number; min: number; median: number; max: number }>
+    platform: Array<{ label: string; value: number }>
+  }
+  base_ads_count: number
+}
+
 interface AdAnalyticsProps {
   ads: Ad[]
   competitors: Competitor[]
+  analyticsData?: AnalyticsResponse | null
+  loading?: boolean
+  error?: string | null
 }
 
 interface AnalyticsData {
@@ -24,7 +50,34 @@ interface AnalyticsData {
   }
 }
 
-export function AdAnalytics({ ads, competitors }: AdAnalyticsProps) {
+export function AdAnalytics({ ads, competitors, analyticsData, loading, error }: AdAnalyticsProps) {
+  // Se há erro, mostrar mensagem
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <p className="text-red-500 mb-2">❌ Erro ao carregar analytics</p>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Se está carregando, mostrar skeleton
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map(i => (
+          <Card key={i}>
+            <CardHeader className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+            </CardHeader>
+          </Card>
+        ))}
+      </div>
+    )
+  }
   const analytics = useMemo((): AnalyticsData => {
     const platformDist: Record<string, number> = {}
     const competitorDist: Record<string, { count: number; name: string }> = {}
@@ -35,11 +88,12 @@ export function AdAnalytics({ ads, competitors }: AdAnalyticsProps) {
     let adsWithRates = 0
 
     ads.forEach((ad) => {
-      // Platform distribution
-      platformDist[ad.platform] = (platformDist[ad.platform] || 0) + 1
+      // Platform distribution (usando Meta como padrão)
+      const platform = ad.source?.includes('facebook') || ad.source?.includes('meta') ? 'Meta' : 'Outros'
+      platformDist[platform] = (platformDist[platform] || 0) + 1
 
       // Competitor distribution
-      const competitor = competitors.find((c) => c.id === ad.competitor_id)
+      const competitor = ad.competitor || competitors.find((c) => c.id === ad.competitor_id)
       if (competitor) {
         competitorDist[ad.competitor_id] = {
           count: (competitorDist[ad.competitor_id]?.count || 0) + 1,
@@ -47,18 +101,25 @@ export function AdAnalytics({ ads, competitors }: AdAnalyticsProps) {
         }
       }
 
-      // Ad type distribution
-      adTypeDist[ad.ad_type] = (adTypeDist[ad.ad_type] || 0) + 1
+      // Ad type distribution (usando asset_type)
+      adTypeDist[ad.asset_type] = (adTypeDist[ad.asset_type] || 0) + 1
 
-      // Tag analysis
-      ad.tags.forEach((tag) => {
-        tagCount[tag] = (tagCount[tag] || 0) + 1
-      })
+      // Tag analysis (processando string de tags)
+      if (ad.tags) {
+        ad.tags.split(/[,;]/).forEach((tag) => {
+          const cleanTag = tag.trim()
+          if (cleanTag) {
+            tagCount[cleanTag] = (tagCount[cleanTag] || 0) + 1
+          }
+        })
+      }
 
-      // Rate analysis
-      if (ad.detected_rates && ad.detected_rates.length > 0) {
+      // Rate analysis (extraindo de transcription e image_description)
+      const textContent = `${ad.transcription || ''} ${ad.image_description || ''}`
+      const rateMatches = textContent.match(/\d+[,.]?\d*%|\d+[,.]?\d*\s*reais?/gi)
+      if (rateMatches && rateMatches.length > 0) {
         adsWithRates++
-        ad.detected_rates.forEach((rate) => {
+        rateMatches.forEach((rate) => {
           rateCount[rate] = (rateCount[rate] || 0) + 1
         })
       }

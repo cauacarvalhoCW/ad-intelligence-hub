@@ -1,16 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTheme } from "@/components/theme-provider"
 import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./theme-toggle"
 
 export function Header() {
-  const { currentTheme, setTheme, themes } = useTheme()
+  const { currentTheme, setTheme, themes, isLoading } = useTheme()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   
-  const currentThemeConfig = themes[currentTheme]
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+  
+  // Durante a hidratação, usar tema padrão para evitar mismatch
+  const safeTheme = isMounted ? currentTheme : "default"
+  const currentThemeConfig = themes[safeTheme]
   
   const themeOptions = [
     { id: 'default', name: 'Padrão', icon: '🏠', config: themes.default },
@@ -29,12 +36,16 @@ export function Header() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity p-2 rounded-lg hover:bg-secondary/50"
           >
-            {currentThemeConfig.logo && (
+            {isMounted && currentThemeConfig.logo ? (
               <img 
                 src={currentThemeConfig.logo} 
                 alt={currentThemeConfig.name}
                 className="h-8 w-8 object-contain rounded"
               />
+            ) : (
+              <div className="h-8 w-8 bg-muted rounded flex items-center justify-center text-xs">
+                🏠
+              </div>
             )}
             <div className="text-left">
               <h1 className="font-semibold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -63,10 +74,10 @@ export function Header() {
                     }}
                     className={`
                       w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors
-                      ${currentTheme === option.id ? 'bg-primary/10 border border-primary/20' : ''}
+                      ${safeTheme === option.id ? 'bg-primary/10 border border-primary/20' : ''}
                     `}
                   >
-                    {option.config.logo ? (
+                    {isMounted && option.config.logo ? (
                       <img 
                         src={option.config.logo} 
                         alt={option.name}

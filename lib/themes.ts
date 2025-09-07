@@ -37,7 +37,7 @@ export const themes: Record<ThemeType, ThemeConfig> = {
   },
   jim: {
     name: "JIM",
-    logo: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e9/62/3f/e9623f41-4863-8796-6387-f63cae9098e9/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/1200x600wa.png",
+    logo: "/logos/competitors/jim.jpg",
     colors: {
       primary: "#8b5cf6",    // Roxo vibrante (botões)
       secondary: "#f9fafb",  // Cinza muito claro (background)
@@ -86,21 +86,24 @@ export const themes: Record<ThemeType, ThemeConfig> = {
 }
 
 export function applyTheme(theme: ThemeType) {
+  // Verificar se estamos no cliente
+  if (typeof window === "undefined") return
+  
   const config = themes[theme]
   
-  // Remove previous theme classes
-  document.body.classList.remove("theme-cloudwalk", "theme-infinitepay", "theme-jim", "theme-dark")
-  
-  // Apply new theme class if not default
-  if (theme !== "default") {
-    document.body.classList.add(`theme-${theme}`)
-  }
+  // Usar requestAnimationFrame para evitar problemas de hidratação
+  requestAnimationFrame(() => {
+    // Remove previous theme classes
+    document.body.classList.remove("theme-cloudwalk", "theme-infinitepay", "theme-jim", "theme-dark")
+    
+    // Apply new theme class if not default
+    if (theme !== "default") {
+      document.body.classList.add(`theme-${theme}`)
+    }
 
-  // Manter as cores originais - apenas aplicar classes para headers
-  // Não modificar as CSS variables - deixar como estavam originalmente
-
-  // Store current theme in localStorage for persistence
-  localStorage.setItem("edge-intelligence-theme", theme)
+    // Store current theme in localStorage for persistence
+    localStorage.setItem("edge-intelligence-theme", theme)
+  })
 }
 
 function adjustColorOpacity(color: string, opacity: number): string {

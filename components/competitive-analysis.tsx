@@ -39,7 +39,7 @@ export function CompetitiveAnalysis({ ads, competitors, selectedCompetitor }: Co
       let aggressiveScore = 0
 
       competitorAds.forEach((ad) => {
-        const text = `${ad.title} ${ad.description}`.toLowerCase()
+        const text = `${ad.product || ''} ${ad.transcription || ''} ${ad.image_description || ''}`.toLowerCase()
         positiveKeywords.forEach((keyword) => {
           if (text.includes(keyword)) sentimentScore += 1
         })
@@ -51,9 +51,14 @@ export function CompetitiveAnalysis({ ads, competitors, selectedCompetitor }: Co
       // Analyze content themes
       const themeCount: Record<string, number> = {}
       competitorAds.forEach((ad) => {
-        ad.tags.forEach((tag) => {
-          themeCount[tag] = (themeCount[tag] || 0) + 1
-        })
+        if (ad.tags) {
+          ad.tags.split(/[,;]/).forEach((tag) => {
+            const cleanTag = tag.trim()
+            if (cleanTag) {
+              themeCount[cleanTag] = (themeCount[cleanTag] || 0) + 1
+            }
+          })
+        }
       })
 
       const contentThemes = Object.entries(themeCount)
@@ -67,7 +72,15 @@ export function CompetitiveAnalysis({ ads, competitors, selectedCompetitor }: Co
       else if (sentimentScore > competitorAds.length * 0.5) marketPosition = "conservative"
 
       // Rate competitiveness analysis
-      const ratesOffered = competitorAds.flatMap((ad) => ad.detected_rates || [])
+      const ratesOffered: string[] = []
+      competitorAds.forEach((ad) => {
+        const textContent = `${ad.transcription || ''} ${ad.image_description || ''}`
+        const rateMatches = textContent.match(/\d+[,.]?\d*%|\d+[,.]?\d*\s*reais?/gi)
+        if (rateMatches) {
+          ratesOffered.push(...rateMatches)
+        }
+      })
+      
       const hasZeroRates = ratesOffered.some((rate) => rate.includes("0%") || rate.includes("zero"))
       const hasCashback = ratesOffered.some((rate) => rate.includes("cashback"))
 

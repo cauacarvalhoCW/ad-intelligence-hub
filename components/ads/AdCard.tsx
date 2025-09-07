@@ -1,139 +1,192 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ExternalLink, Eye, MousePointer } from "lucide-react"
-import { RatesDisplay } from "./RatesDisplay"
-import { ProductBadge } from "./ProductBadge"
-import { extractMainMessage } from "@/lib/utils/ratesExtractor"
-import type { Ad } from "@/lib/types"
+import { useState } from 'react'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Calendar, ExternalLink, Play, Image as ImageIcon } from 'lucide-react'
+import { Ad } from '@/lib/types'
 
 interface AdCardProps {
   ad: Ad
+  recencyActiveDays?: number
   onClick?: (ad: Ad) => void
-  isSelected?: boolean
 }
 
-export function AdCard({ ad, onClick, isSelected = false }: AdCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
-  const mainMessage = extractMainMessage(ad)
+export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
+  const [imageError, setImageError] = useState(false)
+  const [videoError, setVideoError] = useState(false)
+
+  // Calcular se o anúncio é recente/ativo
+  const isRecent = ad.start_date 
+    ? new Date(ad.start_date) >= new Date(Date.now() - recencyActiveDays * 24 * 60 * 60 * 1000)
+    : false
+
+  // Gerar slug do competidor para logo
+  const competitorSlug = ad.competitor?.name
+    ?.toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+
+  // Processar tags
+  const tags = ad.tags
+    ?.split(/[,;]/)
+    .map((tag: string) => tag.trim())
+    .filter(Boolean)
+    .slice(0, 3) || []
+
+  // Gerar título com fallbacks
+  const getTitle = () => {
+    if (ad.product) return ad.product
+    
+    if (ad.transcription) {
+      return ad.transcription.split(' ').slice(0, 10).join(' ') + '...'
+    }
+    
+    if (ad.image_description) {
+      return ad.image_description.split(' ').slice(0, 10).join(' ') + '...'
+    }
+    
+    return 'Anúncio sem título'
+  }
+
+  // Verificar se source é mídia direta
+  const isDirectMedia = (url: string) => {
+    return url.includes('.mp4') || url.includes('.mov') || url.includes('.webm') ||
+           url.includes('.jpg') || url.includes('.jpeg') || url.includes('.png') || url.includes('.webp')
+  }
+
+  // Verificar se é plataforma Meta
+  const isMetaPlatform = ad.source?.includes('facebook') || ad.source?.includes('meta')
+
+  // Formatar data
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return '–'
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      timeZone: 'America/Sao_Paulo'
+    })
+  }
+
+  // URL para Meta Ads Library
+  const metaAdsUrl = `https://www.facebook.com/ads/library/?id=${ad.ad_id}`
 
   return (
     <Card 
-      className={`
-        h-full ad-card transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer
-        ${isHovered ? 'scale-[1.02] shadow-xl' : ''}
-        ${isSelected ? 'ring-2 ring-primary shadow-lg' : ''}
-        border-2 hover:border-primary/50 relative overflow-hidden
-      `}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
       onClick={() => onClick?.(ad)}
     >
-      {/* Header com Competidor e Data */}
-      <CardHeader className="pb-3">
+      {/* Header com Logo e Info */}
+      <div className="p-4 border-b">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              {ad.competitor?.logo_url && (
-                <img 
-                  src={ad.competitor.logo_url} 
-                  alt={`${ad.competitor.name} logo`}
-                  className="w-6 h-6 object-contain rounded"
-                />
-              )}
-              <h3 className="font-semibold text-lg text-foreground">
-                {ad.competitor?.name || 'Competidor'}
-              </h3>
+          <div className="flex items-center gap-3">
+            <img
+              src={`/logos/competitors/${competitorSlug}.jpg`}
+              alt={ad.competitor?.name || 'Competidor'}
+            className="w-8 h-8 rounded"
+              onError={(e) => {
+                e.currentTarget.src = '/placeholder-logo.svg'
+              }}
+            />
+            <div>
+              <h3 className="font-semibold text-sm">{ad.competitor?.name}</h3>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Calendar className="w-3 h-3" />
+                {formatDate(ad.start_date)}
+              </div>
             </div>
-            <ProductBadge ad={ad} />
           </div>
           
-          <div className="flex flex-col items-end gap-1">
+          {/* Badges */}
+          <div className="flex flex-col gap-1">
             <Badge variant="outline" className="text-xs">
-              {new Date(ad.created_at).toLocaleDateString('pt-BR')}
+              {ad.asset_type === 'video' ? (
+                <><Play className="w-3 h-3 mr-1" /> Vídeo</>
+              ) : (
+                <><ImageIcon className="w-3 h-3 mr-1" /> Imagem</>
+              )}
             </Badge>
-            {isHovered && (
-              <div className="opacity-100 transition-opacity">
-                <Eye className="h-4 w-4 text-muted-foreground" />
-              </div>
+            {isMetaPlatform && (
+              <Badge variant="secondary" className="text-xs">Meta</Badge>
+            )}
+            {isRecent && (
+              <Badge variant="default" className="text-xs bg-green-500">Ativo</Badge>
             )}
           </div>
         </div>
-      </CardHeader>
+      </div>
 
-      {/* Conteúdo Principal */}
-      <CardContent className="space-y-4">
-        {/* Título do Anúncio */}
-        <div>
-          <h4 className="font-medium text-primary mb-2 line-clamp-2">
-            {ad.title}
-          </h4>
-        </div>
-
-        {/* Taxas - Destaque Principal */}
-        <RatesDisplay ad={ad} />
-
-        {/* Comunicação Principal */}
-        <div className="p-3 bg-accent/10 rounded-lg border-l-4 border-accent">
-          <p className="text-sm font-medium text-accent-foreground">
-            💬 "{mainMessage}"
-          </p>
-        </div>
-
-        {/* Descrição */}
-        <div>
-          <p className="text-sm text-muted-foreground line-clamp-3">
-            {ad.description}
-          </p>
-        </div>
-
-        {/* Tags */}
-        {ad.tags && ad.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {ad.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                #{tag}
-              </Badge>
-            ))}
-            {ad.tags.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{ad.tags.length - 3} mais
-              </Badge>
-            )}
-          </div>
-        )}
-      </CardContent>
-
-      {/* Footer com Ações */}
-      <div className="p-4 pt-0 flex items-center justify-between border-t mt-auto">
-        <span className="text-xs text-muted-foreground flex items-center gap-1">
-          <MousePointer className="h-3 w-3" />
-          Clique para expandir
-        </span>
-        
-        {ad.landing_page_url && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs h-6 px-2 hover:bg-primary/10"
-            onClick={(e) => {
-              e.stopPropagation()
-              window.open(ad.landing_page_url, "_blank")
-            }}
+      {/* Mídia - Tamanho padronizado */}
+      <div className="relative bg-gray-100 aspect-video h-48">
+        {ad.asset_type === 'video' && isRecent && ad.source && isDirectMedia(ad.source) && !videoError ? (
+          <video
+            controls
+            className="w-full h-full object-cover"
+            onError={() => setVideoError(true)}
+            poster="/placeholder.jpg"
           >
-            <ExternalLink className="h-3 w-3 mr-1" />
-            Ver
-          </Button>
+            <source src={ad.source} type="video/mp4" />
+            Seu navegador não suporta vídeo.
+          </video>
+        ) : ad.asset_type === 'image' && ad.source && isDirectMedia(ad.source) && !imageError ? (
+          <img
+            src={ad.source}
+            alt={getTitle()}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+            <div className="text-center">
+              {ad.asset_type === 'video' ? (
+                <Play className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+              ) : (
+                <ImageIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+              )}
+              <p className="text-sm text-gray-500">
+                {ad.asset_type === 'video' ? 'Vídeo' : 'Imagem'} não disponível
+              </p>
+            </div>
+          </div>
         )}
       </div>
 
-      {/* Hover Overlay com Gradiente do Tema */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 rounded-lg pointer-events-none" />
-      )}
+      {/* Conteúdo */}
+      <div className="p-4">
+        {/* Título */}
+        <h4 className="font-medium text-sm mb-2 line-clamp-2">
+          {getTitle()}
+        </h4>
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {tags.map((tag: string, index: number) => (
+              <Badge key={index} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+            {ad.tags && ad.tags.split(/[,;]/).length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{ad.tags.split(/[,;]/).length - 3}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Botão Meta Ads Library */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full"
+          onClick={(e) => {
+            e.stopPropagation()
+            window.open(metaAdsUrl, '_blank')
+          }}
+        >
+          <ExternalLink className="w-4 h-4 mr-2" />
+          Ver na Meta Ads Library
+        </Button>
+      </div>
     </Card>
   )
 }

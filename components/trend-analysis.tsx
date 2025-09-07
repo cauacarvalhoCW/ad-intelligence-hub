@@ -33,7 +33,7 @@ export function TrendAnalysis({ ads }: TrendAnalysisProps) {
     const platformData: Record<string, number[]> = {}
 
     ads.forEach((ad) => {
-      const date = new Date(ad.created_at)
+      const date = ad.start_date ? new Date(ad.start_date) : new Date(ad.created_at)
       const weekStart = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay())
       const weekKey = weekStart.toISOString().split("T")[0]
 
@@ -47,19 +47,26 @@ export function TrendAnalysis({ ads }: TrendAnalysisProps) {
       }
 
       weeklyData[weekKey].count += 1
-      weeklyData[weekKey].platforms[ad.platform] = (weeklyData[weekKey].platforms[ad.platform] || 0) + 1
+      
+      // Platform baseado no source
+      const platform = ad.source?.includes('facebook') || ad.source?.includes('meta') ? 'Meta' : 'Outros'
+      weeklyData[weekKey].platforms[platform] = (weeklyData[weekKey].platforms[platform] || 0) + 1
 
-      if (ad.detected_rates && ad.detected_rates.length > 0) {
+      // Extrair taxas do conteúdo
+      const textContent = `${ad.transcription || ''} ${ad.image_description || ''}`
+      const rateMatches = textContent.match(/\d+[,.]?\d*%|\d+[,.]?\d*\s*reais?/gi)
+      
+      if (rateMatches && rateMatches.length > 0) {
         weeklyData[weekKey].rateAds += 1
 
-        ad.detected_rates.forEach((rate) => {
+        rateMatches.forEach((rate) => {
           if (!rateFrequency[rate]) rateFrequency[rate] = []
           rateFrequency[rate].push(date.getTime())
         })
       }
 
-      if (!platformData[ad.platform]) platformData[ad.platform] = []
-      platformData[ad.platform].push(date.getTime())
+      if (!platformData[platform]) platformData[platform] = []
+      platformData[platform].push(date.getTime())
     })
 
     const timelineTrends = Object.values(weeklyData)
