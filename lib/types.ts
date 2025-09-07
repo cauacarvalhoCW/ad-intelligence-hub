@@ -1,31 +1,31 @@
 export interface Ad {
-  id: string
-  competitor_id: string
-  title: string
-  description: string
-  image_url?: string
-  landing_page_url?: string
-  platform: "facebook" | "google" | "instagram" | "linkedin" | "tiktok"
-  ad_type: "image" | "video" | "carousel" | "text"
-  detected_rates?: string[]
-  extracted_text?: string
-  tags: string[]
+  ad_id: string                    // PK do Supabase
+  competitor_id: string            // FK para competitors
+  source?: string | null           // URL externa (pode ficar indisponível)
+  asset_type: 'video' | 'image'    // Tipo do asset
+  product?: string | null          // Produto sendo anunciado
+  ad_analysis?: any | null         // JSONB com análise
+  start_date?: string | null       // Data real do Facebook (ISO string)
+  year?: number | null
+  week?: number | null
+  display_format?: string | null   // "video", "DCO", etc.
+  tags?: string | null             // Tags separadas por vírgula
+  image_description?: string | null // Descrição da imagem/vídeo
+  transcription?: string | null    // Transcrição do áudio
   created_at: string
-  updated_at: string
+  updated_at?: string
+  
+  // Dados relacionados (joins)
   competitor?: Competitor
+  variations_count?: number
 }
 
 export interface Competitor {
-  id: string
-  name: string
-  website_url?: string
-  industry: string
-  description?: string
-  logo_url?: string
-  primary_color?: string
-  secondary_color?: string
+  id: string                       // UUID do Supabase
+  name: string                     // Nome único do competidor
+  home_url: string                 // URL da página do Facebook
   created_at: string
-  updated_at: string
+  updated_at?: string
 }
 
 export interface Tag {
@@ -66,4 +66,17 @@ export interface ThemeAnalytics {
   mostPopularTheme: ThemeType
   themeChangeFrequency: number
   lastThemeChange: string
+}
+
+export interface FilterState {
+  competitors?: string[]           // UUIDs dos competidores selecionados
+  dateRange?: {
+    start: Date | null
+    end: Date | null
+  }
+  assetTypes?: string[]           // Tipos de asset
+  products?: string[]             // Produtos específicos
+  search?: string                 // Busca full-text
+  hasVariations?: boolean         // Apenas anúncios com variações
+  hasAnalysis?: boolean           // Apenas anúncios com ad_analysis
 }

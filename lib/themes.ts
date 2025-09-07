@@ -37,7 +37,7 @@ export const themes: Record<ThemeType, ThemeConfig> = {
   },
   jim: {
     name: "JIM",
-    logo: "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e9/62/3f/e9623f41-4863-8796-6387-f63cae9098e9/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/1200x600wa.png",
+    logo: "/logos/competitors/jim.jpg",
     colors: {
       primary: "#8b5cf6",    // Roxo vibrante (botões)
       secondary: "#f9fafb",  // Cinza muito claro (background)

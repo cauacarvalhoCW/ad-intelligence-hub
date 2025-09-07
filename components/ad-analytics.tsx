@@ -35,11 +35,12 @@ export function AdAnalytics({ ads, competitors }: AdAnalyticsProps) {
     let adsWithRates = 0
 
     ads.forEach((ad) => {
-      // Platform distribution
-      platformDist[ad.platform] = (platformDist[ad.platform] || 0) + 1
+      // Platform distribution (usando Meta como padrão)
+      const platform = ad.source?.includes('facebook') || ad.source?.includes('meta') ? 'Meta' : 'Outros'
+      platformDist[platform] = (platformDist[platform] || 0) + 1
 
       // Competitor distribution
-      const competitor = competitors.find((c) => c.id === ad.competitor_id)
+      const competitor = ad.competitor || competitors.find((c) => c.id === ad.competitor_id)
       if (competitor) {
         competitorDist[ad.competitor_id] = {
           count: (competitorDist[ad.competitor_id]?.count || 0) + 1,
@@ -47,18 +48,25 @@ export function AdAnalytics({ ads, competitors }: AdAnalyticsProps) {
         }
       }
 
-      // Ad type distribution
-      adTypeDist[ad.ad_type] = (adTypeDist[ad.ad_type] || 0) + 1
+      // Ad type distribution (usando asset_type)
+      adTypeDist[ad.asset_type] = (adTypeDist[ad.asset_type] || 0) + 1
 
-      // Tag analysis
-      ad.tags.forEach((tag) => {
-        tagCount[tag] = (tagCount[tag] || 0) + 1
-      })
+      // Tag analysis (processando string de tags)
+      if (ad.tags) {
+        ad.tags.split(/[,;]/).forEach((tag) => {
+          const cleanTag = tag.trim()
+          if (cleanTag) {
+            tagCount[cleanTag] = (tagCount[cleanTag] || 0) + 1
+          }
+        })
+      }
 
-      // Rate analysis
-      if (ad.detected_rates && ad.detected_rates.length > 0) {
+      // Rate analysis (extraindo de transcription e image_description)
+      const textContent = `${ad.transcription || ''} ${ad.image_description || ''}`
+      const rateMatches = textContent.match(/\d+[,.]?\d*%|\d+[,.]?\d*\s*reais?/gi)
+      if (rateMatches && rateMatches.length > 0) {
         adsWithRates++
-        ad.detected_rates.forEach((rate) => {
+        rateMatches.forEach((rate) => {
           rateCount[rate] = (rateCount[rate] || 0) + 1
         })
       }
