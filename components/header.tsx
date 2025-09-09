@@ -5,6 +5,14 @@ import { useTheme } from "@/components/theme-provider"
 import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./theme-toggle"
+import { 
+  SignedIn, 
+  SignedOut, 
+  SignInButton, 
+  SignUpButton, 
+  UserButton,
+  useUser 
+} from "@clerk/nextjs"
 
 export function Header() {
   const { currentTheme, setTheme, themes, isLoading } = useTheme()
@@ -102,7 +110,7 @@ export function Header() {
           )}
         </div>
 
-        {/* Indicadores de Status e Toggle */}
+        {/* Status Indicators, Toggle and Authentication */}
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
             <span>Tema ativo:</span>
@@ -115,10 +123,37 @@ export function Header() {
             </div>
           </div>
 
-          
           {/* Toggle Dark/Light - em TODOS os temas */}
           <div className="ml-4">
             <ThemeToggle />
+          </div>
+
+          {/* Clerk Authentication */}
+          <div className="flex items-center gap-3 ml-4 border-l border-border/40 pl-4">
+            <SignedOut>
+              <SignInButton mode="redirect">
+                <Button variant="ghost" size="sm">
+                  Entrar
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="redirect">
+                <Button size="sm">
+                  Cadastrar
+                </Button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "w-8 h-8",
+                    userButtonPopoverCard: "shadow-lg border",
+                    userButtonPopoverActionButton: "hover:bg-accent",
+                  }
+                }}
+                afterSignOutUrl="/"
+              />
+            </SignedIn>
           </div>
 
         </div>

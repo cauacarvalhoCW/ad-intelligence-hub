@@ -4,8 +4,10 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
+import { ClerkProvider } from "@clerk/nextjs"
+import { Header } from "@/components/header"
 import "./globals.css"
-import { Suspense } from "react" // Added Suspense import
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: "Edge Intelligence Hub",
@@ -19,17 +21,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <ThemeProvider>
-          <Suspense fallback={<div>Loading...</div>}>
-            {" "}
-            {/* Wrapped children with Suspense */}
+    <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
+    >
+      <html lang="en">
+        <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+          <ThemeProvider>
             {children}
-          </Suspense>
-        </ThemeProvider>
-        <Analytics />
-      </body>
-    </html>
+          </ThemeProvider>
+          <Analytics />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
