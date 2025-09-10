@@ -3,154 +3,180 @@
  * Defines interfaces, schemas, and utility types for chat functionality
  */
 
-import { z } from 'zod'
+import { z } from "zod";
 
 // Core type definitions
 
 export interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant' | 'system'
-  content: string
-  timestamp: Date
-  sessionId: string
+  id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: Date;
+  sessionId: string;
 }
 
 export interface ChatSession {
-  id: string
-  userId?: string
-  messages: ChatMessage[]
-  createdAt: Date
-  updatedAt: Date
-  metadata?: SessionMetadata
+  id: string;
+  userId?: string;
+  messages: ChatMessage[];
+  createdAt: Date;
+  updatedAt: Date;
+  metadata?: SessionMetadata;
 }
 
 export interface SessionMetadata {
-  userAgent?: string
-  ip?: string
-  referrer?: string
-  totalMessages?: number
-  lastActivity?: Date
+  userAgent?: string;
+  ip?: string;
+  referrer?: string;
+  totalMessages?: number;
+  lastActivity?: Date;
 }
 
 // API communication types
 
 export interface ChatRequest {
-  message: string
-  sessionId?: string
-  userId?: string
-  context?: RequestContext
+  message: string;
+  sessionId?: string;
+  userId?: string;
+  context?: RequestContext;
 }
 
 export interface RequestContext {
-  page?: string
-  referrer?: string
-  userAgent?: string
+  page?: string;
+  referrer?: string;
+  userAgent?: string;
 }
 
 export interface ChatResponse {
-  response: string
-  sessionId: string
-  messageId: string
-  timestamp: Date
-  metadata?: ResponseMetadata
+  response: string;
+  sessionId: string;
+  messageId: string;
+  timestamp: Date;
+  metadata?: ResponseMetadata;
 }
 
 export interface ResponseMetadata {
-  model: string
-  tokensUsed?: number
-  processingTime?: number
-  finishReason?: 'stop' | 'length' | 'content_filter'
+  model: string;
+  tokensUsed?: number;
+  processingTime?: number;
+  finishReason?: "stop" | "length" | "content_filter";
+  toolCalls?: number;
+  agentVersion?: string;
 }
 
 export interface ChatError {
-  code: ChatbotErrorCode
-  message: string
-  sessionId?: string
-  timestamp: Date
-  details?: Record<string, unknown>
+  code: ChatbotErrorCode;
+  message: string;
+  sessionId?: string;
+  timestamp: Date;
+  details?: Record<string, unknown>;
 }
 
 // LangChain integration types
 
 export interface LangChainMessage {
-  role: 'user' | 'assistant' | 'system'
-  content: string
+  role: "user" | "assistant" | "system";
+  content: string;
 }
 
 export interface LangChainResponse {
-  content: string
+  content: string;
   metadata?: {
-    model: string
-    tokens?: number
-    finishReason?: string
-  }
+    model: string;
+    tokens?: number;
+    finishReason?: string;
+  };
+}
+
+// Tool and Agent types
+
+export interface AgentResponse {
+  response: string;
+  toolResults?: any[];
+  metadata: {
+    sessionId: string;
+    userId?: string;
+    processingTime: number;
+    toolCalls: number;
+    model: string;
+    timestamp: Date;
+  };
 }
 
 // Configuration types
 
 export interface ChatbotConfig {
-  model: string
-  temperature: number
-  maxTokens?: number
-  systemPrompt?: string
-  enableStreaming?: boolean
-  enableMemory?: boolean
+  model: string;
+  temperature: number;
+  maxTokens?: number;
+  systemPrompt?: string;
+  enableStreaming?: boolean;
+  enableMemory?: boolean;
 }
 
 // Zod validation schemas
 
 export const chatRequestSchema = z.object({
-  message: z.string()
-    .min(1, 'Message cannot be empty')
-    .max(2000, 'Message too long (maximum 2000 characters)')
+  message: z
+    .string()
+    .min(1, "Message cannot be empty")
+    .max(2000, "Message too long (maximum 2000 characters)")
     .refine(
       (msg) => !/<script|<iframe|<object|<embed/i.test(msg),
-      'Forbidden content detected'
+      "Forbidden content detected",
     ),
 
-  sessionId: z.string()
+  sessionId: z
+    .string()
     .optional()
-    .default(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`),
+    .default(
+      () =>
+        `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    ),
 
   userId: z.string().optional(),
 
-  context: z.object({
-    page: z.string().optional(),
-    referrer: z.string().optional(),
-    userAgent: z.string().optional(),
-  }).optional()
-})
+  context: z
+    .object({
+      page: z.string().optional(),
+      referrer: z.string().optional(),
+      userAgent: z.string().optional(),
+    })
+    .optional(),
+});
 
 export const chatResponseSchema = z.object({
   response: z.string().min(1),
   sessionId: z.string(),
   messageId: z.string(),
   timestamp: z.date(),
-  metadata: z.object({
-    model: z.string(),
-    processingTime: z.number().positive().optional(),
-    tokensUsed: z.number().positive().optional(),
-    finishReason: z.enum(['stop', 'length', 'content_filter']).optional()
-  }).optional()
-})
+  metadata: z
+    .object({
+      model: z.string(),
+      processingTime: z.number().positive().optional(),
+      tokensUsed: z.number().positive().optional(),
+      finishReason: z.enum(["stop", "length", "content_filter"]).optional(),
+    })
+    .optional(),
+});
 
 export const chatMessageSchema = z.object({
   id: z.string(),
-  role: z.enum(['user', 'assistant', 'system']),
+  role: z.enum(["user", "assistant", "system"]),
   content: z.string(),
   timestamp: z.date(),
   sessionId: z.string(),
-})
+});
 
 // Error handling types
 
 export enum ChatbotErrorCode {
-  INVALID_REQUEST = 'INVALID_REQUEST',
-  OPENAI_ERROR = 'OPENAI_ERROR',
-  RATE_LIMIT = 'RATE_LIMIT',
-  SESSION_ERROR = 'SESSION_ERROR',
-  INTERNAL_ERROR = 'INTERNAL_ERROR',
-  VALIDATION_ERROR = 'VALIDATION_ERROR'
+  INVALID_REQUEST = "INVALID_REQUEST",
+  OPENAI_ERROR = "OPENAI_ERROR",
+  RATE_LIMIT = "RATE_LIMIT",
+  SESSION_ERROR = "SESSION_ERROR",
+  INTERNAL_ERROR = "INTERNAL_ERROR",
+  VALIDATION_ERROR = "VALIDATION_ERROR",
 }
 
 export class ChatbotError extends Error {
@@ -158,17 +184,17 @@ export class ChatbotError extends Error {
     public readonly code: ChatbotErrorCode,
     message: string,
     public readonly sessionId?: string,
-    public readonly details?: Record<string, unknown>
+    public readonly details?: Record<string, unknown>,
   ) {
-    super(message)
-    this.name = 'ChatbotError'
+    super(message);
+    this.name = "ChatbotError";
   }
 }
 
 // Default configuration constants
 
 export const CHATBOT_CONFIG = {
-  MODEL: 'gpt-4o-mini',
+  MODEL: "gpt-4o-mini",
   TEMPERATURE: 0.2,
   MAX_TOKENS: 1000,
   MAX_HISTORY_LENGTH: 50,
@@ -177,18 +203,18 @@ export const CHATBOT_CONFIG = {
 Você ajuda usuários a entenderem estratégias de anúncios, analisar campanhas e fornecer insights sobre o mercado de anúncios.
 
 Sempre responda em português brasileiro, seja útil, preciso e profissional.
-Use dados e exemplos quando apropriado, mas mantenha as respostas concisas e relevantes.`
-} as const
+Use dados e exemplos quando apropriado, mas mantenha as respostas concisas e relevantes.`,
+} as const;
 
 // Exported utility types
 
-export type ChatRequestInput = z.infer<typeof chatRequestSchema>
-export type ChatResponseOutput = z.infer<typeof chatResponseSchema>
-export type ChatMessageData = z.infer<typeof chatMessageSchema>
+export type ChatRequestInput = z.infer<typeof chatRequestSchema>;
+export type ChatResponseOutput = z.infer<typeof chatResponseSchema>;
+export type ChatMessageData = z.infer<typeof chatMessageSchema>;
 
 // Additional utility types
 
-export type MessageRole = ChatMessage['role']
-export type SessionId = string
-export type MessageId = string
-export type UserId = string
+export type MessageRole = ChatMessage["role"];
+export type SessionId = string;
+export type MessageId = string;
+export type UserId = string;
