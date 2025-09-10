@@ -5,10 +5,14 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ClerkProvider } from "@clerk/nextjs"
+import { QueryProvider } from "@/components/providers/QueryProvider"
+import { ChatWidget } from "@/components/chat/ChatWidget"
 import { Header } from "@/components/header"
 import "./globals.css"
+import "@/components/chat/styles.css"
 import { Suspense } from "react"
 
+// App metadata for SEO and social sharing
 export const metadata: Metadata = {
   title: "Edge Intelligence Hub",
   description: "Análise de Anúncios Concorrentes",
@@ -27,11 +31,18 @@ export default function RootLayout({
       signInFallbackRedirectUrl="/"
       signUpFallbackRedirectUrl="/"
     >
-      <html lang="en">
+      <html lang="pt-BR" suppressHydrationWarning={true}>
         <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider>
+              {children}
+
+              {/* Lazy load chat widget to prevent hydration issues */}
+              <Suspense fallback={null}>
+                <ChatWidget />
+              </Suspense>
+            </ThemeProvider>
+          </QueryProvider>
           <Analytics />
         </body>
       </html>
