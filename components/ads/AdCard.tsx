@@ -16,6 +16,7 @@ interface AdCardProps {
 export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
   const [imageError, setImageError] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
 
   // Calcular se o anúncio é recente/ativo
   const isRecent = ad.start_date
@@ -82,7 +83,7 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
 
   return (
     <Card
-      className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer group"
       onClick={() => onClick?.(ad)}
     >
       {/* Header com Logo e Info */}
@@ -140,15 +141,44 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
         ad.source &&
         isDirectMedia(ad.source) &&
         !videoError ? (
-          <video
-            controls
-            className="w-full h-full object-cover"
-            onError={() => setVideoError(true)}
-            poster="/placeholder.jpg"
-          >
-            <source src={ad.source} type="video/mp4" />
-            Seu navegador não suporta vídeo.
-          </video>
+          showVideo ? (
+            <video
+              controls
+              autoPlay
+              className="w-full h-full object-cover"
+              onError={() => setVideoError(true)}
+              poster="/placeholder.jpg"
+            >
+              <source src={ad.source} type="video/mp4" />
+              Seu navegador não suporta vídeo.
+            </video>
+          ) : (
+            <button
+              type="button"
+              className="relative w-full h-full group"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowVideo(true);
+              }}
+              aria-label="Reproduzir vídeo"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/placeholder.jpg"
+                alt="Prévia do vídeo"
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "/placeholder.jpg";
+                }}
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="rounded-full bg-black/60 p-3 shadow-md">
+                  <Play className="w-7 h-7 text-white" />
+                </div>
+              </div>
+            </button>
+          )
         ) : ad.asset_type === "image" &&
           ad.source &&
           isDirectMedia(ad.source) &&
@@ -161,15 +191,23 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-            <div className="text-center">
+            <div className="text-center px-3">
               {ad.asset_type === "video" ? (
                 <Play className="w-12 h-12 mx-auto mb-2 text-gray-400" />
               ) : (
                 <ImageIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
               )}
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-600 font-medium">
                 {ad.asset_type === "video" ? "Vídeo" : "Imagem"} não disponível
               </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Mídia indisponível na Meta Ads Library.
+              </p>
+              {(ad.transcription || ad.image_description) && (
+                <p className="text-xs text-primary mt-2 underline-offset-2 group-hover:underline">
+                  Clique no card para ver {ad.transcription && ad.asset_type === "video" ? "a transcrição" : ad.image_description && ad.asset_type === "image" ? "a descrição" : "os detalhes"}.
+                </p>
+              )}
             </div>
           </div>
         )}
