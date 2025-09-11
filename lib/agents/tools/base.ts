@@ -35,6 +35,12 @@ export interface ToolResult<T = any> {
     executionTime?: number;
     toolName?: string;
     timestamp?: Date;
+    // Optional period metadata for time-bounded queries
+    period?: {
+      fromIso?: string;
+      toIso?: string;
+      timezone?: string;
+    };
   };
   error?: string;
 }
