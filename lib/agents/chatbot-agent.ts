@@ -81,17 +81,26 @@ export class ChatbotAgent {
     return graph;
   }
 
-  private shouldContinue(state: any): string {
+  // Use arrow function to preserve 'this' in callbacks
+  private shouldContinue = (state: any): string => {
     const lastMessage = state.messages[state.messages.length - 1];
 
-    // Check if the last message has tool calls
+    // Guard: stop if tool call budget exceeded
+    const totalToolCalls = state.messages
+      .filter((m: any) => Array.isArray(m?.tool_calls))
+      .reduce((acc: number, m: any) => acc + m.tool_calls.length, 0);
+    if (totalToolCalls >= this.config.limits.toolCalls) {
+      return END;
+    }
+
+    // Continue to tools if the last message requests them
     if (lastMessage?.tool_calls && lastMessage.tool_calls.length > 0) {
       return "tools";
     }
 
     // Otherwise, end the conversation
     return END;
-  }
+  };
 
   /**
    * Initialize tools based on configuration
@@ -165,21 +174,24 @@ export class ChatbotAgent {
       const initialMessages = [systemMessage, ...history, userMessage];
 
       // Execute the graph
-      const result = await this.graph.compile().invoke({
-        messages: initialMessages,
-        metadata: {
-          sessionId,
-          userId,
-          processingTime: 0,
-          toolCalls: 0,
+      const result = await this.graph.compile().invoke(
+        {
+          messages: initialMessages,
+          metadata: {
+            sessionId,
+            userId,
+            processingTime: 0,
+            toolCalls: 0,
+          },
         },
-      });
+        { recursionLimit: this.config.limits.recursion },
+      );
 
       const processingTime = Date.now() - startTime;
 
       // Extract the final response
       const finalMessage = result.messages[result.messages.length - 1];
-      const response = finalMessage.content || "";
+      let response = finalMessage.content || "";
 
       // Count tool calls
       const toolCalls = result.messages
@@ -194,6 +206,11 @@ export class ChatbotAgent {
           result: msg.content,
           timestamp: new Date(),
         }));
+
+      // Friendly fallback if response is empty or tool budget hit
+      if (!response || response.trim().length === 0) {
+        response = this.buildFriendlyFallback(toolCalls, processingTime);
+      }
 
       return {
         response,
@@ -210,18 +227,36 @@ export class ChatbotAgent {
     } catch (error) {
       const processingTime = Date.now() - startTime;
 
+      // Detect LangGraph recursion limit errors and return an elegant message
+      const msg = error instanceof Error ? error.message : String(error);
+      const isRecursion = /Recursion limit/i.test(msg);
+
+      const friendly = isRecursion
+        ? "Precisei de passos demais para chegar a uma resposta segura e parei para evitar loops. Pode reformular a pergunta com um período e um competidor específicos (ex.: 'nos últimos 30 dias, Mercado Pago')?"
+        : `Desculpe, ocorreu um erro ao processar sua mensagem: ${msg}`;
+
       return {
-        response: `Desculpe, ocorreu um erro ao processar sua mensagem: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+        response: friendly,
         metadata: {
           sessionId,
           userId,
           processingTime,
           toolCalls: 0,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: msg,
           timestamp: new Date(),
         },
       };
     }
+  }
+
+  private buildFriendlyFallback(
+    toolCalls: number,
+    processingTime: number,
+  ): string {
+    if (toolCalls >= this.config.limits.toolCalls) {
+      return "Interrompi a pesquisa para evitar muitas chamadas de ferramenta. Tente especificar concorrente, período (ex.: últimos 30 dias) e o tipo de dado que deseja (lista, contagem ou ranking).";
+    }
+    return "Não consegui gerar uma resposta clara. Pode detalhar melhor o período (ex.: ontem/últimos 7 dias) e o competidor?";
   }
 
   /**

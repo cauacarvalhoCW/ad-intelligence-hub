@@ -12,10 +12,16 @@ export { DateTimeTool, datetimeTool } from "./datetime";
 // Tool registry setup
 import { ToolRegistry } from "./base";
 import { datetimeTool } from "./datetime";
+import { adsQueryTool } from "./supabase-ads";
+import { adsAnalyticsTool } from "./supabase-analytics";
+import { calcTool } from "./calc";
 
 // Initialize registry with available tools
 const toolRegistry = ToolRegistry.getInstance();
 toolRegistry.register(datetimeTool);
+toolRegistry.register(adsQueryTool);
+toolRegistry.register(adsAnalyticsTool);
+toolRegistry.register(calcTool);
 
 export { toolRegistry };
 
