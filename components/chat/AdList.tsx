@@ -71,7 +71,7 @@ function AdCard({ item }: { item: AdItem }) {
         )}
       </div>
 
-      {href && (
+      {href && !titleLabel.startsWith("Ver anúncio") && (
         <div>
           <a
             href={href}
@@ -91,13 +91,14 @@ export function AdList({ data }: { data: ParsedAds }) {
   return (
     <div className="space-y-4">
       {data.intro && (
-        <div className="rounded-xl border bg-muted/20 px-4 py-3">
-          <div className="text-sm font-medium">{data.intro}</div>
-        </div>
+        <div className="text-sm text-muted-foreground px-1">{data.intro}</div>
       )}
       {data.items.map((item, idx) => (
         <AdCard key={`${item.adId || "item"}-${idx}`} item={item} />
       ))}
+      {data.footer && (
+        <div className="text-sm text-muted-foreground px-1">{data.footer}</div>
+      )}
     </div>
   );
 }

@@ -21,6 +21,19 @@ interface ChatMessageProps {
 
 // Message formatting utilities for rich text rendering
 
+// Simple feature flag: enable/disable rich formatting in chat.
+// Set to `false` to render raw agent messages without parsing/styling.
+export const ENABLE_RICH_CHAT_RENDER = true;
+
+function looksLikeAdContent(text: string): boolean {
+  const t = text.toLowerCase();
+  if (t.includes("ads/library")) return true;
+  if (/ad[ _-]?id\s*[:#-]?\s*\d{6,}/i.test(text)) return true;
+  const lines = text.split("\n");
+  const numbered = lines.filter((l) => /^\s*\d+(\.|\s*$)/.test(l)).length;
+  return numbered >= 2; // heurística leve
+}
+
 function formatTime(date: Date): string {
   return date.toLocaleTimeString("pt-BR", {
     hour: "2-digit",
@@ -826,16 +839,21 @@ export const ChatMessage = memo<ChatMessageProps>(({ message, isLast = false, cl
               isUser ? "text-primary-foreground" : "text-foreground",
             )}
           >
-            {
-              // Prefer a simple, robust ad list renderer first
-              (() => {
+            {(() => {
+              // When rich rendering is disabled, show raw agent text (preserving breaks)
+              if (!ENABLE_RICH_CHAT_RENDER) {
+                return <div className="whitespace-pre-wrap">{message.content}</div>;
+              }
+
+              // Prefer structured ad rendering when content looks like an ad list
+              if (looksLikeAdContent(message.content)) {
                 const parsed = parseAdsFromText(message.content);
-                if (parsed.items.length > 0) {
-                  return <AdList data={parsed} />;
-                }
-                return formatMessageContent(message.content);
-              })()
-            }
+                if (parsed.items.length > 0) return <AdList data={parsed} />;
+              }
+
+              // Otherwise fall back to lightweight inline formatter
+              return formatMessageContent(message.content);
+            })()}
           </div>
         </div>
 
