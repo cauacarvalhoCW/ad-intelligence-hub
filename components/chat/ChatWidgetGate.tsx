@@ -14,11 +14,7 @@ export function ChatWidgetGate() {
   const pathname = usePathname();
 
   // Pages where the widget should never appear
-  const blockedPaths = [
-    "/access-denied",
-    "/sign-in",
-    "/sign-up",
-  ];
+  const blockedPaths = ["/access-denied", "/sign-in", "/sign-up"];
 
   const isBlocked = blockedPaths.some((p) => pathname?.startsWith(p));
   if (isBlocked) return null;
@@ -31,4 +27,3 @@ export function ChatWidgetGate() {
 }
 
 export default ChatWidgetGate;
-

@@ -306,7 +306,9 @@ function resolveDateRange(input: AdsQueryInput): {
 
 export const adsQueryTool = new SupabaseAdsTool();
 
-function interpretPeriod(input: { period_text?: string }): { date_preset?: AdsQueryInput["date_preset"] } {
+function interpretPeriod(input: { period_text?: string }): {
+  date_preset?: AdsQueryInput["date_preset"];
+} {
   const t = (input.period_text || "").toLowerCase();
   if (!t) return {};
   if (/(ontem|yesterday)/.test(t)) return { date_preset: "yesterday" };
