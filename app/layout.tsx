@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { QueryProvider } from "@/components/providers/QueryProvider";
-import { ChatWidget } from "@/components/chat/ChatWidget";
+import { ChatWidgetGate } from "@/components/chat/ChatWidgetGate";
 import { Header } from "@/components/header";
 import "./globals.css";
 import "@/components/chat/styles.css";
@@ -39,9 +39,9 @@ export default function RootLayout({
             <ThemeProvider>
               {children}
 
-              {/* Lazy load chat widget to prevent hydration issues */}
+              {/* Lazy load chat widget (only for signed-in users and allowed pages) */}
               <Suspense fallback={null}>
-                <ChatWidget />
+                <ChatWidgetGate />
               </Suspense>
             </ThemeProvider>
           </QueryProvider>

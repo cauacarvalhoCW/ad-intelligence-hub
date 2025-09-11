@@ -426,7 +426,7 @@ export function ChatWidget({
         <Card
           ref={chatRef}
           className={cn(
-            "fixed flex flex-col bg-background/95 backdrop-blur-sm border-2",
+            "fixed flex flex-col bg-background/95 backdrop-blur-sm border-2 overflow-hidden",
             "shadow-2xl transition-all duration-300 ease-in-out",
             isMobile
               ? "top-4 left-4 right-4 bottom-4"
@@ -506,7 +506,7 @@ export function ChatWidget({
 
           {/* System status */}
           {!isSystemReady && (
-            <Alert className="m-4 mb-0">
+            <Alert className="mx-4 mt-3 mb-0">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 Sistema não configurado. Verifique a configuração da API.
