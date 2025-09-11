@@ -129,7 +129,7 @@
 
 /* InfinitePay - Header com faixa verde neon como no site */
 .theme-infinitepay header {
-  background: #9AFF00; /* Verde neon sólido como na imagem */
+  background: #9aff00; /* Verde neon sólido como na imagem */
   color: #000000;
   border-bottom: 1px solid #8b5cf6;
 }
@@ -147,7 +147,13 @@
 
 /* CloudWalk - Header com gradiente quente como antes */
 .theme-cloudwalk header {
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 30%, #ec4899 70%, #8b5cf6 100%);
+  background: linear-gradient(
+    135deg,
+    #f59e0b 0%,
+    #f97316 30%,
+    #ec4899 70%,
+    #8b5cf6 100%
+  );
   color: #ffffff;
   border-bottom: 1px solid #f97316;
 }
@@ -183,14 +189,22 @@
 
 /* 💚 INFINITEPAY - Verde neon + Roxo em TODA interface */
 .theme-infinitepay .ad-card {
-  border-left: 4px solid #9AFF00; /* Verde neon */
-  background: linear-gradient(135deg, rgba(154, 255, 0, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border-left: 4px solid #9aff00; /* Verde neon */
+  background: linear-gradient(
+    135deg,
+    rgba(154, 255, 0, 0.05) 0%,
+    rgba(139, 92, 246, 0.05) 100%
+  );
   border: 1px solid rgba(154, 255, 0, 0.2);
 }
 
 .theme-infinitepay .ad-card:hover {
   border-left-color: #8b5cf6; /* Roxo no hover */
-  background: linear-gradient(135deg, rgba(154, 255, 0, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(154, 255, 0, 0.1) 0%,
+    rgba(139, 92, 246, 0.1) 100%
+  );
   border-color: rgba(139, 92, 246, 0.3);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
@@ -198,7 +212,7 @@
 
 /* Botões InfinitePay */
 .theme-infinitepay .bg-primary {
-  background: linear-gradient(135deg, #9AFF00 0%, #8b5cf6 100%) !important;
+  background: linear-gradient(135deg, #9aff00 0%, #8b5cf6 100%) !important;
   color: #000000 !important;
 }
 
@@ -208,24 +222,36 @@
 }
 
 .theme-infinitepay .border-primary {
-  border-color: #9AFF00 !important;
+  border-color: #9aff00 !important;
 }
 
 /* Estados ativos InfinitePay */
 .theme-infinitepay .bg-accent {
-  background: linear-gradient(135deg, rgba(154, 255, 0, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
-  border-left: 3px solid #9AFF00 !important;
+  background: linear-gradient(
+    135deg,
+    rgba(154, 255, 0, 0.1) 0%,
+    rgba(139, 92, 246, 0.1) 100%
+  ) !important;
+  border-left: 3px solid #9aff00 !important;
 }
 
 /* 🌍 CLOUDWALK - Gradiente quente como antes */
 .theme-cloudwalk .ad-card {
   border-left: 4px solid #f59e0b; /* Borda dourada */
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.05) 0%,
+    rgba(236, 72, 153, 0.05) 100%
+  );
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .theme-cloudwalk .ad-card:hover {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.1) 0%,
+    rgba(236, 72, 153, 0.1) 100%
+  );
   border-left-color: #f97316;
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
@@ -292,7 +318,11 @@
 }
 
 .theme-dark header {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%); /* Gradiente sutil */
+  background: linear-gradient(
+    135deg,
+    #1e293b 0%,
+    #334155 100%
+  ); /* Gradiente sutil */
   color: #f1f5f9;
   border-bottom: 1px solid #475569;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -351,13 +381,13 @@
 
 /* 💚 INFINITEPAY - Mais elementos da interface */
 .theme-infinitepay .badge {
-  background: linear-gradient(135deg, #9AFF00 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #9aff00 0%, #8b5cf6 100%);
   color: #000000;
   border: none;
 }
 
 .theme-infinitepay .rate-highlight {
-  background: linear-gradient(135deg, #9AFF00 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #9aff00 0%, #8b5cf6 100%);
   color: #000000;
   font-weight: bold;
 }
@@ -365,13 +395,17 @@
 /* Filtros e inputs InfinitePay */
 .theme-infinitepay input:focus,
 .theme-infinitepay select:focus {
-  border-color: #9AFF00 !important;
+  border-color: #9aff00 !important;
   box-shadow: 0 0 0 2px rgba(154, 255, 0, 0.2) !important;
 }
 
 .theme-infinitepay .bg-accent {
-  background: linear-gradient(135deg, rgba(154, 255, 0, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
-  border-left: 3px solid #9AFF00 !important;
+  background: linear-gradient(
+    135deg,
+    rgba(154, 255, 0, 0.1) 0%,
+    rgba(139, 92, 246, 0.1) 100%
+  ) !important;
+  border-left: 3px solid #9aff00 !important;
 }
 
 /* 🌍 CLOUDWALK - Badges e elementos */
@@ -400,12 +434,6 @@
   color: #ffffff;
 }
 
-
-
-
-
-
-
 /* 💚 FILTROS INFINITEPAY - Roxo padrão, verde no focus/hover */
 .theme-infinitepay input[type="text"],
 .theme-infinitepay input[type="search"],
@@ -425,7 +453,7 @@
 .theme-infinitepay input[type="search"]:hover,
 .theme-infinitepay .search-input:hover,
 .theme-infinitepay textbox:hover {
-  border-color: #9AFF00 !important; /* Verde neon no focus/hover */
+  border-color: #9aff00 !important; /* Verde neon no focus/hover */
   box-shadow: 0 0 0 3px rgba(154, 255, 0, 0.1) !important;
   outline: none !important;
 }
@@ -445,7 +473,7 @@
 .theme-infinitepay select:hover,
 .theme-infinitepay .select-trigger:hover,
 .theme-infinitepay [role="combobox"]:hover {
-  border-color: #9AFF00 !important; /* Verde neon no focus/hover */
+  border-color: #9aff00 !important; /* Verde neon no focus/hover */
   box-shadow: 0 0 0 3px rgba(154, 255, 0, 0.1) !important;
 }
 
@@ -457,13 +485,13 @@
 }
 
 .theme-infinitepay [role="tab"]:hover {
-  border-bottom-color: #9AFF00 !important; /* Verde no hover */
-  color: #9AFF00 !important;
+  border-bottom-color: #9aff00 !important; /* Verde no hover */
+  color: #9aff00 !important;
 }
 
 .theme-infinitepay [role="tab"][aria-selected="true"] {
-  border-bottom-color: #9AFF00 !important; /* Verde quando ativo */
-  color: #9AFF00 !important;
+  border-bottom-color: #9aff00 !important; /* Verde quando ativo */
+  color: #9aff00 !important;
   font-weight: 600 !important;
 }
 
@@ -475,7 +503,9 @@
 
 .ad-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .ad-card:active {

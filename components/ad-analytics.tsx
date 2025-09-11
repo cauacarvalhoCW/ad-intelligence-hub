@@ -1,56 +1,76 @@
-"use client"
+"use client";
 
-import { useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { BarChart3, TrendingUp, Target, Eye } from "lucide-react"
-import type { Ad, Competitor } from "@/lib/types"
+import { useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { BarChart3, TrendingUp, Target, Eye } from "lucide-react";
+import type { Ad, Competitor } from "@/lib/types";
 
 interface AnalyticsResponse {
   applied: {
-    perspective: string
-    competitors: string[]
-    platform?: string
-    ad_types: string[]
-    date_from?: string
-    date_to?: string
-    q?: string
-  }
+    perspective: string;
+    competitors: string[];
+    platform?: string;
+    ad_types: string[];
+    date_from?: string;
+    date_to?: string;
+    q?: string;
+  };
   metrics: {
-    total_ads: number
-    by_competitor: Array<{ competitor_name: string; count: number }>
-    by_asset_type: Array<{ asset_type: string; count: number }>
-    weekly: Array<{ week_start: string; total: number }>
-    top_tags: Array<{ tag: string; count: number }>
-    fees: Array<{ label: string; ads_com_taxa: number; matches: number; min: number; median: number; max: number }>
-    offers: Array<{ label: string; ads_com_taxa: number; matches: number; min: number; median: number; max: number }>
-    platform: Array<{ label: string; value: number }>
-  }
-  base_ads_count: number
+    total_ads: number;
+    by_competitor: Array<{ competitor_name: string; count: number }>;
+    by_asset_type: Array<{ asset_type: string; count: number }>;
+    weekly: Array<{ week_start: string; total: number }>;
+    top_tags: Array<{ tag: string; count: number }>;
+    fees: Array<{
+      label: string;
+      ads_com_taxa: number;
+      matches: number;
+      min: number;
+      median: number;
+      max: number;
+    }>;
+    offers: Array<{
+      label: string;
+      ads_com_taxa: number;
+      matches: number;
+      min: number;
+      median: number;
+      max: number;
+    }>;
+    platform: Array<{ label: string; value: number }>;
+  };
+  base_ads_count: number;
 }
 
 interface AdAnalyticsProps {
-  ads: Ad[]
-  competitors: Competitor[]
-  analyticsData?: AnalyticsResponse | null
-  loading?: boolean
-  error?: string | null
+  ads: Ad[];
+  competitors: Competitor[];
+  analyticsData?: AnalyticsResponse | null;
+  loading?: boolean;
+  error?: string | null;
 }
 
 interface AnalyticsData {
-  totalAds: number
-  platformDistribution: Record<string, number>
-  competitorDistribution: Record<string, { count: number; name: string }>
-  adTypeDistribution: Record<string, number>
-  topTags: Array<{ tag: string; count: number }>
+  totalAds: number;
+  platformDistribution: Record<string, number>;
+  competitorDistribution: Record<string, { count: number; name: string }>;
+  adTypeDistribution: Record<string, number>;
+  topTags: Array<{ tag: string; count: number }>;
   rateAnalysis: {
-    adsWithRates: number
-    commonRates: Array<{ rate: string; count: number }>
-  }
+    adsWithRates: number;
+    commonRates: Array<{ rate: string; count: number }>;
+  };
 }
 
-export function AdAnalytics({ ads, competitors, analyticsData, loading, error }: AdAnalyticsProps) {
+export function AdAnalytics({
+  ads,
+  competitors,
+  analyticsData,
+  loading,
+  error,
+}: AdAnalyticsProps) {
   // Se há erro, mostrar mensagem
   if (error) {
     return (
@@ -60,14 +80,14 @@ export function AdAnalytics({ ads, competitors, analyticsData, loading, error }:
           <p className="text-sm text-muted-foreground">{error}</p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   // Se está carregando, mostrar skeleton
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map(i => (
+        {[1, 2, 3, 4].map((i) => (
           <Card key={i}>
             <CardHeader className="animate-pulse">
               <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -76,64 +96,70 @@ export function AdAnalytics({ ads, competitors, analyticsData, loading, error }:
           </Card>
         ))}
       </div>
-    )
+    );
   }
   const analytics = useMemo((): AnalyticsData => {
-    const platformDist: Record<string, number> = {}
-    const competitorDist: Record<string, { count: number; name: string }> = {}
-    const adTypeDist: Record<string, number> = {}
-    const tagCount: Record<string, number> = {}
-    const rateCount: Record<string, number> = {}
+    const platformDist: Record<string, number> = {};
+    const competitorDist: Record<string, { count: number; name: string }> = {};
+    const adTypeDist: Record<string, number> = {};
+    const tagCount: Record<string, number> = {};
+    const rateCount: Record<string, number> = {};
 
-    let adsWithRates = 0
+    let adsWithRates = 0;
 
     ads.forEach((ad) => {
       // Platform distribution (usando Meta como padrão)
-      const platform = ad.source?.includes('facebook') || ad.source?.includes('meta') ? 'Meta' : 'Outros'
-      platformDist[platform] = (platformDist[platform] || 0) + 1
+      const platform =
+        ad.source?.includes("facebook") || ad.source?.includes("meta")
+          ? "Meta"
+          : "Outros";
+      platformDist[platform] = (platformDist[platform] || 0) + 1;
 
       // Competitor distribution
-      const competitor = ad.competitor || competitors.find((c) => c.id === ad.competitor_id)
+      const competitor =
+        ad.competitor || competitors.find((c) => c.id === ad.competitor_id);
       if (competitor) {
         competitorDist[ad.competitor_id] = {
           count: (competitorDist[ad.competitor_id]?.count || 0) + 1,
           name: competitor.name,
-        }
+        };
       }
 
       // Ad type distribution (usando asset_type)
-      adTypeDist[ad.asset_type] = (adTypeDist[ad.asset_type] || 0) + 1
+      adTypeDist[ad.asset_type] = (adTypeDist[ad.asset_type] || 0) + 1;
 
       // Tag analysis (processando string de tags)
       if (ad.tags) {
         ad.tags.split(/[,;]/).forEach((tag) => {
-          const cleanTag = tag.trim()
+          const cleanTag = tag.trim();
           if (cleanTag) {
-            tagCount[cleanTag] = (tagCount[cleanTag] || 0) + 1
+            tagCount[cleanTag] = (tagCount[cleanTag] || 0) + 1;
           }
-        })
+        });
       }
 
       // Rate analysis (extraindo de transcription e image_description)
-      const textContent = `${ad.transcription || ''} ${ad.image_description || ''}`
-      const rateMatches = textContent.match(/\d+[,.]?\d*%|\d+[,.]?\d*\s*reais?/gi)
+      const textContent = `${ad.transcription || ""} ${ad.image_description || ""}`;
+      const rateMatches = textContent.match(
+        /\d+[,.]?\d*%|\d+[,.]?\d*\s*reais?/gi,
+      );
       if (rateMatches && rateMatches.length > 0) {
-        adsWithRates++
+        adsWithRates++;
         rateMatches.forEach((rate) => {
-          rateCount[rate] = (rateCount[rate] || 0) + 1
-        })
+          rateCount[rate] = (rateCount[rate] || 0) + 1;
+        });
       }
-    })
+    });
 
     const topTags = Object.entries(tagCount)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
-      .map(([tag, count]) => ({ tag, count }))
+      .map(([tag, count]) => ({ tag, count }));
 
     const commonRates = Object.entries(rateCount)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 8)
-      .map(([rate, count]) => ({ rate, count }))
+      .map(([rate, count]) => ({ rate, count }));
 
     return {
       totalAds: ads.length,
@@ -145,10 +171,11 @@ export function AdAnalytics({ ads, competitors, analyticsData, loading, error }:
         adsWithRates,
         commonRates,
       },
-    }
-  }, [ads, competitors])
+    };
+  }, [ads, competitors]);
 
-  const getPercentage = (value: number, total: number) => (total > 0 ? Math.round((value / total) * 100) : 0)
+  const getPercentage = (value: number, total: number) =>
+    total > 0 ? Math.round((value / total) * 100) : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -162,14 +189,26 @@ export function AdAnalytics({ ads, competitors, analyticsData, loading, error }:
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-center">
-            <div className="text-3xl font-bold text-primary">{analytics.totalAds}</div>
+            <div className="text-3xl font-bold text-primary">
+              {analytics.totalAds}
+            </div>
             <p className="text-sm text-muted-foreground">Total de Anúncios</p>
           </div>
 
           <div className="text-center">
-            <div className="text-2xl font-semibold text-secondary">{analytics.rateAnalysis.adsWithRates}</div>
-            <p className="text-sm text-muted-foreground">Com Taxas Detectadas</p>
-            <Progress value={getPercentage(analytics.rateAnalysis.adsWithRates, analytics.totalAds)} className="mt-2" />
+            <div className="text-2xl font-semibold text-secondary">
+              {analytics.rateAnalysis.adsWithRates}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Com Taxas Detectadas
+            </p>
+            <Progress
+              value={getPercentage(
+                analytics.rateAnalysis.adsWithRates,
+                analytics.totalAds,
+              )}
+              className="mt-2"
+            />
           </div>
         </CardContent>
       </Card>
@@ -183,15 +222,19 @@ export function AdAnalytics({ ads, competitors, analyticsData, loading, error }:
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {Object.entries(analytics.platformDistribution).map(([platform, count]) => (
-            <div key={platform} className="flex items-center justify-between">
-              <span className="text-sm capitalize">{platform}</span>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary">{count}</Badge>
-                <span className="text-xs text-muted-foreground">{getPercentage(count, analytics.totalAds)}%</span>
+          {Object.entries(analytics.platformDistribution).map(
+            ([platform, count]) => (
+              <div key={platform} className="flex items-center justify-between">
+                <span className="text-sm capitalize">{platform}</span>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{count}</Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {getPercentage(count, analytics.totalAds)}%
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ),
+          )}
         </CardContent>
       </Card>
 
@@ -204,15 +247,19 @@ export function AdAnalytics({ ads, competitors, analyticsData, loading, error }:
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {Object.entries(analytics.competitorDistribution).map(([id, data]) => (
-            <div key={id} className="flex items-center justify-between">
-              <span className="text-sm">{data.name}</span>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">{data.count}</Badge>
-                <span className="text-xs text-muted-foreground">{getPercentage(data.count, analytics.totalAds)}%</span>
+          {Object.entries(analytics.competitorDistribution).map(
+            ([id, data]) => (
+              <div key={id} className="flex items-center justify-between">
+                <span className="text-sm">{data.name}</span>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">{data.count}</Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {getPercentage(data.count, analytics.totalAds)}%
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ),
+          )}
         </CardContent>
       </Card>
 
@@ -258,5 +305,5 @@ export function AdAnalytics({ ads, competitors, analyticsData, loading, error }:
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

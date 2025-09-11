@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import type { ThemeType, ThemeAnalytics } from "@/lib/types"
+import { useState, useEffect } from "react";
+import type { ThemeType, ThemeAnalytics } from "@/lib/types";
 
 export function useThemeAnalytics() {
   const [analytics, setAnalytics] = useState<ThemeAnalytics>({
@@ -14,19 +14,21 @@ export function useThemeAnalytics() {
     mostPopularTheme: "default",
     themeChangeFrequency: 0,
     lastThemeChange: new Date().toISOString(),
-  })
+  });
 
   useEffect(() => {
     // Load analytics from localStorage
-    const savedAnalytics = localStorage.getItem("edge-intelligence-theme-analytics")
+    const savedAnalytics = localStorage.getItem(
+      "edge-intelligence-theme-analytics",
+    );
     if (savedAnalytics) {
       try {
-        setAnalytics(JSON.parse(savedAnalytics))
+        setAnalytics(JSON.parse(savedAnalytics));
       } catch (error) {
-        console.error("Failed to parse theme analytics:", error)
+        console.error("Failed to parse theme analytics:", error);
       }
     }
-  }, [])
+  }, []);
 
   const trackThemeChange = (theme: ThemeType) => {
     setAnalytics((prev) => {
@@ -42,13 +44,16 @@ export function useThemeAnalytics() {
           ...prev.themeUsage,
           [theme]: prev.themeUsage[theme] + 1,
         }).reduce((a, b) => (a[1] > b[1] ? a : b))[0] as ThemeType,
-      }
+      };
 
       // Save to localStorage
-      localStorage.setItem("edge-intelligence-theme-analytics", JSON.stringify(newAnalytics))
-      return newAnalytics
-    })
-  }
+      localStorage.setItem(
+        "edge-intelligence-theme-analytics",
+        JSON.stringify(newAnalytics),
+      );
+      return newAnalytics;
+    });
+  };
 
   const resetAnalytics = () => {
     const resetData: ThemeAnalytics = {
@@ -61,14 +66,17 @@ export function useThemeAnalytics() {
       mostPopularTheme: "default",
       themeChangeFrequency: 0,
       lastThemeChange: new Date().toISOString(),
-    }
-    setAnalytics(resetData)
-    localStorage.setItem("edge-intelligence-theme-analytics", JSON.stringify(resetData))
-  }
+    };
+    setAnalytics(resetData);
+    localStorage.setItem(
+      "edge-intelligence-theme-analytics",
+      JSON.stringify(resetData),
+    );
+  };
 
   return {
     analytics,
     trackThemeChange,
     resetAnalytics,
-  }
+  };
 }

@@ -1,11 +1,13 @@
 # Prompt: Converter V0 para Executável + Temas Dinâmicos
 
 ## Contexto
+
 Tenho um projeto do V0 (edge-intelligence-hub) que precisa ser convertido para rodar localmente e depois receber temas dinâmicos das marcas CloudWalk, InfinitePay e JIM.
 
 ## PASSO 1: Tornar o V0 Executável
 
 ### Problemas Comuns do V0 para Resolver:
+
 1. **Package.json**: Adicionar dependências que estão faltando
 2. **Imports**: Corrigir imports que não existem
 3. **Componentes**: Criar componentes shadcn/ui que estão sendo importados mas não existem
@@ -13,6 +15,7 @@ Tenho um projeto do V0 (edge-intelligence-hub) que precisa ser convertido para r
 5. **TypeScript**: Resolver erros de tipos
 
 ### Dependências Necessárias:
+
 ```json
 {
   "dependencies": {
@@ -28,21 +31,23 @@ Tenho um projeto do V0 (edge-intelligence-hub) que precisa ser convertido para r
 ```
 
 ### Componentes Shadcn/ui para Criar:
+
 - `components/ui/card.tsx`
-- `components/ui/button.tsx` 
+- `components/ui/button.tsx`
 - `components/ui/badge.tsx`
 - `components/ui/tabs.tsx`
 - `components/ui/input.tsx`
 - `lib/utils.ts` (função cn)
 
 ### Configuração Tailwind:
+
 ```js
 // tailwind.config.js
 module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     container: {
@@ -79,10 +84,11 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
 ```
 
 ### CSS Base (globals.css):
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -111,12 +117,13 @@ module.exports = {
 ### Temas das Marcas:
 
 #### CloudWalk (Azul Metálico)
+
 ```typescript
 cloudwalk: {
   name: "CloudWalk",
   colors: {
     primary: "#4091ff",    // Azul metálico
-    secondary: "#6366f1",  // Roxo complementar  
+    secondary: "#6366f1",  // Roxo complementar
     accent: "#8b5cf6",     // Roxo
     background: "#ffffff", // Branco
     foreground: "#000000", // Preto
@@ -126,9 +133,10 @@ cloudwalk: {
 ```
 
 #### InfinitePay (Verde Neon + Roxo + Fundo Preto)
+
 ```typescript
 infinitepay: {
-  name: "InfinitePay", 
+  name: "InfinitePay",
   colors: {
     primary: "#9AFF00",    // Verde neon
     secondary: "#8b5cf6",  // Roxo
@@ -141,6 +149,7 @@ infinitepay: {
 ```
 
 #### JIM (Roxo + Fundo Branco + Cards Preto/Branco)
+
 ```typescript
 jim: {
   name: "JIM",
@@ -158,6 +167,7 @@ jim: {
 ### Implementação dos Temas:
 
 #### 1. ThemeProvider Context:
+
 ```typescript
 // components/theme-provider.tsx
 "use client"
@@ -172,7 +182,7 @@ const themes = {
 
 export function ThemeProvider({ children }) {
   const [currentTheme, setCurrentTheme] = useState("default")
-  
+
   const setTheme = (theme) => {
     setCurrentTheme(theme)
     // Aplicar CSS custom properties
@@ -182,7 +192,7 @@ export function ThemeProvider({ children }) {
     root.style.setProperty("--background", themeConfig.colors.background)
     // ... outras propriedades
   }
-  
+
   return (
     <ThemeContext.Provider value={{ currentTheme, setTheme, themes }}>
       {children}
@@ -192,16 +202,17 @@ export function ThemeProvider({ children }) {
 ```
 
 #### 2. Header com Seleção de Tema:
+
 ```typescript
 // components/header.tsx
 export function Header() {
   const { currentTheme, setTheme, themes } = useTheme()
-  
+
   return (
     <header className="border-b bg-background">
       <div className="container flex h-16 items-center justify-between">
         <h1 className="text-2xl font-bold">Edge Intelligence Hub</h1>
-        
+
         <div className="flex items-center space-x-2">
           <span className="text-sm text-muted-foreground">Tema:</span>
           {Object.entries(themes).map(([key, theme]) => (
@@ -225,6 +236,7 @@ export function Header() {
 ```
 
 #### 3. CSS Dinâmico para Temas:
+
 ```css
 /* globals.css - adicionar após as variáveis base */
 
@@ -254,29 +266,37 @@ export function Header() {
 ```
 
 #### 4. Aplicar Tema no Body:
+
 ```typescript
 // No ThemeProvider, adicionar:
 useEffect(() => {
-  document.body.className = currentTheme !== "default" ? `theme-${currentTheme}` : ""
-}, [currentTheme])
+  document.body.className =
+    currentTheme !== "default" ? `theme-${currentTheme}` : "";
+}, [currentTheme]);
 ```
 
 ### Filtros por Tema:
+
 ```typescript
 // Adicionar lógica para filtrar anúncios baseado no tema
 const getCompetitorsByTheme = (theme) => {
-  switch(theme) {
-    case 'infinitepay': return ['Mercado Pago', 'Stone', 'PagBank'] // Brasil
-    case 'jim': return ['Square', 'PayPal', 'Stripe'] // EUA  
-    case 'cloudwalk': return [] // Todos
-    default: return [] // Todos
+  switch (theme) {
+    case "infinitepay":
+      return ["Mercado Pago", "Stone", "PagBank"]; // Brasil
+    case "jim":
+      return ["Square", "PayPal", "Stripe"]; // EUA
+    case "cloudwalk":
+      return []; // Todos
+    default:
+      return []; // Todos
   }
-}
+};
 ```
 
 ## Checklist de Implementação:
 
 ### Passo 1 - Executável:
+
 - [ ] `npm install` das dependências necessárias
 - [ ] Criar componentes shadcn/ui faltantes
 - [ ] Configurar tailwind.config.js
@@ -285,6 +305,7 @@ const getCompetitorsByTheme = (theme) => {
 - [ ] Testar se `npm run dev` funciona
 
 ### Passo 2 - Temas:
+
 - [ ] Criar ThemeProvider com as 4 marcas
 - [ ] Atualizar Header com seleção de tema
 - [ ] Adicionar logos reais das marcas (URLs)
@@ -294,6 +315,7 @@ const getCompetitorsByTheme = (theme) => {
 - [ ] Verificar se as cores ficaram "sensacionais" como solicitado
 
 ## Resultado Final:
+
 - ✅ Projeto V0 rodando localmente sem erros
 - ✅ Temas dinâmicos com cores exatas das marcas
 - ✅ Header com logos reais (não base64)

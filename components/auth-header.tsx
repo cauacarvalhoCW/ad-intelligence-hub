@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { ThemeToggle } from "./theme-toggle"
+import { ThemeToggle } from "./theme-toggle";
 
 export function AuthHeader() {
   return (
@@ -10,5 +10,5 @@ export function AuthHeader() {
         <ThemeToggle />
       </div>
     </header>
-  )
+  );
 }

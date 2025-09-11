@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useTheme } from "@/components/theme-provider"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { getCompetitorsByTheme } from "@/lib/themes"
-import { Palette, Building2, Globe, Calendar } from "lucide-react"
+import { useTheme } from "@/components/theme-provider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { getCompetitorsByTheme } from "@/lib/themes";
+import { Palette, Building2, Globe, Calendar } from "lucide-react";
 
 export function ThemeStatus() {
-  const { currentTheme, themes, competitorScope } = useTheme()
-  const theme = themes[currentTheme]
+  const { currentTheme, themes, competitorScope } = useTheme();
+  const theme = themes[currentTheme];
 
   return (
     <Card className="w-full">
@@ -21,10 +21,10 @@ export function ThemeStatus() {
       <CardContent className="space-y-4">
         <div className="flex items-center gap-3">
           {theme.logo && (
-            <img 
-              src={theme.logo} 
-              alt={`${theme.name} logo`} 
-              className="w-12 h-12 object-contain rounded-lg border p-1" 
+            <img
+              src={theme.logo}
+              alt={`${theme.name} logo`}
+              className="w-12 h-12 object-contain rounded-lg border p-1"
             />
           )}
           <div className="flex-1">
@@ -34,32 +34,32 @@ export function ThemeStatus() {
               </p>
             )}
             <div className="flex flex-wrap gap-2">
-              <Badge 
-                variant="secondary" 
-                style={{ 
-                  backgroundColor: theme.colors.primary, 
+              <Badge
+                variant="secondary"
+                style={{
+                  backgroundColor: theme.colors.primary,
                   color: theme.colors.background,
-                  border: `1px solid ${theme.colors.primary}20`
+                  border: `1px solid ${theme.colors.primary}20`,
                 }}
               >
                 Primary
               </Badge>
-              <Badge 
+              <Badge
                 variant="secondary"
-                style={{ 
-                  backgroundColor: theme.colors.secondary, 
+                style={{
+                  backgroundColor: theme.colors.secondary,
                   color: theme.colors.background,
-                  border: `1px solid ${theme.colors.secondary}20`
+                  border: `1px solid ${theme.colors.secondary}20`,
                 }}
               >
                 Secondary
               </Badge>
-              <Badge 
+              <Badge
                 variant="secondary"
-                style={{ 
-                  backgroundColor: theme.colors.accent, 
+                style={{
+                  backgroundColor: theme.colors.accent,
                   color: theme.colors.background,
-                  border: `1px solid ${theme.colors.accent}20`
+                  border: `1px solid ${theme.colors.accent}20`,
                 }}
               >
                 Accent
@@ -78,9 +78,9 @@ export function ThemeStatus() {
         {theme.metadata?.websiteUrl && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Globe className="w-4 h-4" />
-            <a 
-              href={theme.metadata.websiteUrl} 
-              target="_blank" 
+            <a
+              href={theme.metadata.websiteUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors"
             >
@@ -111,10 +111,10 @@ export function ThemeStatus() {
         <div className="pt-3 border-t">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Calendar className="w-3 h-3" />
-            <span>Tema aplicado em {new Date().toLocaleString('pt-BR')}</span>
+            <span>Tema aplicado em {new Date().toLocaleString("pt-BR")}</span>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

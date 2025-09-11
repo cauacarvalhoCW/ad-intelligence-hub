@@ -1,77 +1,87 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Calendar, ExternalLink, Play, Image as ImageIcon } from 'lucide-react'
-import { Ad } from '@/lib/types'
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar, ExternalLink, Play, Image as ImageIcon } from "lucide-react";
+import { Ad } from "@/lib/types";
 
 interface AdCardProps {
-  ad: Ad
-  recencyActiveDays?: number
-  onClick?: (ad: Ad) => void
+  ad: Ad;
+  recencyActiveDays?: number;
+  onClick?: (ad: Ad) => void;
 }
 
 export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
-  const [imageError, setImageError] = useState(false)
-  const [videoError, setVideoError] = useState(false)
+  const [imageError, setImageError] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   // Calcular se o anúncio é recente/ativo
-  const isRecent = ad.start_date 
-    ? new Date(ad.start_date) >= new Date(Date.now() - recencyActiveDays * 24 * 60 * 60 * 1000)
-    : false
+  const isRecent = ad.start_date
+    ? new Date(ad.start_date) >=
+      new Date(Date.now() - recencyActiveDays * 24 * 60 * 60 * 1000)
+    : false;
 
   // Gerar slug do competidor para logo
   const competitorSlug = ad.competitor?.name
     ?.toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 
   // Processar tags
-  const tags = ad.tags
-    ?.split(/[,;]/)
-    .map((tag: string) => tag.trim())
-    .filter(Boolean)
-    .slice(0, 3) || []
+  const tags =
+    ad.tags
+      ?.split(/[,;]/)
+      .map((tag: string) => tag.trim())
+      .filter(Boolean)
+      .slice(0, 3) || [];
 
   // Gerar título com fallbacks
   const getTitle = () => {
-    if (ad.product) return ad.product
-    
+    if (ad.product) return ad.product;
+
     if (ad.transcription) {
-      return ad.transcription.split(' ').slice(0, 10).join(' ') + '...'
+      return ad.transcription.split(" ").slice(0, 10).join(" ") + "...";
     }
-    
+
     if (ad.image_description) {
-      return ad.image_description.split(' ').slice(0, 10).join(' ') + '...'
+      return ad.image_description.split(" ").slice(0, 10).join(" ") + "...";
     }
-    
-    return 'Anúncio sem título'
-  }
+
+    return "Anúncio sem título";
+  };
 
   // Verificar se source é mídia direta
   const isDirectMedia = (url: string) => {
-    return url.includes('.mp4') || url.includes('.mov') || url.includes('.webm') ||
-           url.includes('.jpg') || url.includes('.jpeg') || url.includes('.png') || url.includes('.webp')
-  }
+    return (
+      url.includes(".mp4") ||
+      url.includes(".mov") ||
+      url.includes(".webm") ||
+      url.includes(".jpg") ||
+      url.includes(".jpeg") ||
+      url.includes(".png") ||
+      url.includes(".webp")
+    );
+  };
 
   // Verificar se é plataforma Meta
-  const isMetaPlatform = ad.source?.includes('facebook') || ad.source?.includes('meta')
+  const isMetaPlatform =
+    ad.source?.includes("facebook") || ad.source?.includes("meta");
 
   // Formatar data
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return '–'
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      timeZone: 'America/Sao_Paulo'
-    })
-  }
+    if (!dateString) return "–";
+    return new Date(dateString).toLocaleDateString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+    });
+  };
 
   // URL para Meta Ads Library
-  const metaAdsUrl = `https://www.facebook.com/ads/library/?id=${ad.ad_id}`
+  const metaAdsUrl = `https://www.facebook.com/ads/library/?id=${ad.ad_id}`;
 
   return (
-    <Card 
+    <Card
       className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
       onClick={() => onClick?.(ad)}
     >
@@ -81,10 +91,10 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
           <div className="flex items-center gap-3">
             <img
               src={`/logos/competitors/${competitorSlug}.jpg`}
-              alt={ad.competitor?.name || 'Competidor'}
-            className="w-8 h-8 rounded"
+              alt={ad.competitor?.name || "Competidor"}
+              className="w-8 h-8 rounded"
               onError={(e) => {
-                e.currentTarget.src = '/placeholder-logo.svg'
+                e.currentTarget.src = "/placeholder-logo.svg";
               }}
             />
             <div>
@@ -95,21 +105,29 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
               </div>
             </div>
           </div>
-          
+
           {/* Badges */}
           <div className="flex flex-col gap-1">
             <Badge variant="outline" className="text-xs">
-              {ad.asset_type === 'video' ? (
-                <><Play className="w-3 h-3 mr-1" /> Vídeo</>
+              {ad.asset_type === "video" ? (
+                <>
+                  <Play className="w-3 h-3 mr-1" /> Vídeo
+                </>
               ) : (
-                <><ImageIcon className="w-3 h-3 mr-1" /> Imagem</>
+                <>
+                  <ImageIcon className="w-3 h-3 mr-1" /> Imagem
+                </>
               )}
             </Badge>
             {isMetaPlatform && (
-              <Badge variant="secondary" className="text-xs">Meta</Badge>
+              <Badge variant="secondary" className="text-xs">
+                Meta
+              </Badge>
             )}
             {isRecent && (
-              <Badge variant="default" className="text-xs bg-green-500">Ativo</Badge>
+              <Badge variant="default" className="text-xs bg-green-500">
+                Ativo
+              </Badge>
             )}
           </div>
         </div>
@@ -117,7 +135,11 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
 
       {/* Mídia - Tamanho padronizado */}
       <div className="relative bg-gray-100 aspect-video h-48">
-        {ad.asset_type === 'video' && isRecent && ad.source && isDirectMedia(ad.source) && !videoError ? (
+        {ad.asset_type === "video" &&
+        isRecent &&
+        ad.source &&
+        isDirectMedia(ad.source) &&
+        !videoError ? (
           <video
             controls
             className="w-full h-full object-cover"
@@ -127,7 +149,10 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
             <source src={ad.source} type="video/mp4" />
             Seu navegador não suporta vídeo.
           </video>
-        ) : ad.asset_type === 'image' && ad.source && isDirectMedia(ad.source) && !imageError ? (
+        ) : ad.asset_type === "image" &&
+          ad.source &&
+          isDirectMedia(ad.source) &&
+          !imageError ? (
           <img
             src={ad.source}
             alt={getTitle()}
@@ -137,13 +162,13 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
             <div className="text-center">
-              {ad.asset_type === 'video' ? (
+              {ad.asset_type === "video" ? (
                 <Play className="w-12 h-12 mx-auto mb-2 text-gray-400" />
               ) : (
                 <ImageIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
               )}
               <p className="text-sm text-gray-500">
-                {ad.asset_type === 'video' ? 'Vídeo' : 'Imagem'} não disponível
+                {ad.asset_type === "video" ? "Vídeo" : "Imagem"} não disponível
               </p>
             </div>
           </div>
@@ -153,9 +178,7 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
       {/* Conteúdo */}
       <div className="p-4">
         {/* Título */}
-        <h4 className="font-medium text-sm mb-2 line-clamp-2">
-          {getTitle()}
-        </h4>
+        <h4 className="font-medium text-sm mb-2 line-clamp-2">{getTitle()}</h4>
 
         {/* Tags */}
         {tags.length > 0 && (
@@ -179,8 +202,8 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
           size="sm"
           className="w-full"
           onClick={(e) => {
-            e.stopPropagation()
-            window.open(metaAdsUrl, '_blank')
+            e.stopPropagation();
+            window.open(metaAdsUrl, "_blank");
           }}
         >
           <ExternalLink className="w-4 h-4 mr-2" />
@@ -188,5 +211,5 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
         </Button>
       </div>
     </Card>
-  )
+  );
 }
