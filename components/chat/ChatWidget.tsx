@@ -505,8 +505,7 @@ export function ChatWidget({
                     <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h4 className="font-medium mb-2">Olá! 👋</h4>
                     <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                      Sou seu assistente especializado em inteligência de anúncios. Como posso
-                      ajudar você hoje?
+                      Sou o EspiADinha, seu assistente de inteligência de anúncios. Vou facilitar seu trabalho: diga o concorrente, o período e se quer lista, contagem ou ranking. 😉
                     </p>
                   </div>
                 )}
