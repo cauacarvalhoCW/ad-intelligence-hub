@@ -167,11 +167,7 @@
 }
 
 .chat-loading-container {
-  background: linear-gradient(
-    135deg,
-    hsl(var(--muted)) 0%,
-    hsl(var(--muted) / 0.5) 100%
-  );
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.5) 100%);
   border-radius: 16px;
   padding: 16px;
   backdrop-filter: blur(4px);
@@ -238,11 +234,7 @@
   }
 
   .chat-loading-container {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--muted) / 0.3) 100%
-    );
+    background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.3) 100%);
   }
 }
 

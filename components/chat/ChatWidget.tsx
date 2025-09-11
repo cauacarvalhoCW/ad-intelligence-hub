@@ -11,13 +11,7 @@
 
 "use client";
 
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   MessageCircle,
   X,
@@ -99,9 +93,7 @@ export function ChatWidget({
   const [isMaximized, setIsMaximized] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [message, setMessage] = useState("");
-  const [chatSize, setChatSize] = useState<ChatSize>(
-    WIDGET_CONFIG.DEFAULT_SIZE,
-  );
+  const [chatSize, setChatSize] = useState<ChatSize>(WIDGET_CONFIG.DEFAULT_SIZE);
   const [maxSize, setMaxSize] = useState<ChatSize>({ width: 800, height: 700 });
   const [resizeState, setResizeState] = useState<ResizeState>({
     isResizing: false,
@@ -251,14 +243,7 @@ export function ChatWidget({
       document.addEventListener("mouseup", handleMouseUp);
       document.body.style.cursor = getResizeCursor(direction);
     },
-    [
-      chatSize,
-      isMobile,
-      isMaximized,
-      maxSize,
-      resizeState.startPos,
-      resizeState.startSize,
-    ],
+    [chatSize, isMobile, isMaximized, maxSize, resizeState.startPos, resizeState.startSize],
   );
 
   const getResizeCursor = (direction: string): string => {
@@ -402,11 +387,7 @@ export function ChatWidget({
         style={{ zIndex: WIDGET_CONFIG.Z_INDEX.BUTTON }}
         aria-label={isOpen ? "Fechar chat" : "Abrir chat"}
       >
-        {isOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <MessageCircle className="h-6 w-6" />
-        )}
+        {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
 
         {/* Notification badge */}
         {!isOpen && hasMessages && (
@@ -524,19 +505,15 @@ export function ChatWidget({
                     <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h4 className="font-medium mb-2">Olá! 👋</h4>
                     <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                      Sou seu assistente especializado em inteligência de
-                      anúncios. Como posso ajudar você hoje?
+                      Sou seu assistente especializado em inteligência de anúncios. Como posso
+                      ajudar você hoje?
                     </p>
                   </div>
                 )}
 
                 {/* Conversation messages */}
                 {messages.map((msg, index) => (
-                  <ChatMessage
-                    key={msg.id}
-                    message={msg}
-                    isLast={index === messages.length - 1}
-                  />
+                  <ChatMessage key={msg.id} message={msg} isLast={index === messages.length - 1} />
                 ))}
 
                 {/* Typing indicator */}
@@ -552,9 +529,7 @@ export function ChatWidget({
                           <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:150ms]" />
                           <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:300ms]" />
                         </div>
-                        <span className="text-sm text-muted-foreground ml-2">
-                          Pensando...
-                        </span>
+                        <span className="text-sm text-muted-foreground ml-2">Pensando...</span>
                       </div>
                     </div>
                   </div>
