@@ -1,12 +1,12 @@
 # Projeto - Ad Hub
 
-## Versões 
+## Versões
 
-### v1 
- 
+### v1
+
 - Escolha de perspectiva de vizualição de dados e tema (Cloudwalk, InfinitePay, JIM. Padrão)
-- Analytics e Métricas sobre os ads dos concorrentes 
-- Filtro para buscaa de ads especificos 
+- Analytics e Métricas sobre os ads dos concorrentes
+- Filtro para buscaa de ads especificos
 
 ### v2
 
@@ -15,7 +15,6 @@
 - Corrigir algumas issues na aplicação
 - Scrape de um concorrente especifico
 - Print Imagens
-
 
 # 🎯 Edge Intelligence Hub - Ad Hub
 
@@ -30,6 +29,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
 ## 🚀 Versão 0 (v0) - Features Implementadas
 
 ### 🎨 **Sistema de Temas e Perspectivas**
+
 - **4 Perspectivas Disponíveis:**
   - **🌍 CloudWalk**: Visão global (competidores BR + US)
   - **💚 InfinitePay**: Foco no mercado brasileiro (PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto)
@@ -44,6 +44,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Persistência da escolha do usuário
 
 ### 📊 **Dashboard Principal**
+
 - **Visão Geral Dinâmica:**
   - Contador de anúncios filtrados por tema
   - Estatísticas de competidores ativos
@@ -51,6 +52,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Navegação por abas organizadas
 
 ### 🔍 **Sistema de Filtros Avançados**
+
 - **Filtros Disponíveis:**
   - Busca textual (título, descrição, texto extraído)
   - Filtro por competidor específico
@@ -60,6 +62,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Filtro por tags
 
 ### 📈 **Analytics e Métricas**
+
 - **Análise Estatística:**
   - Distribuição por plataformas
   - Análise de concorrentes
@@ -75,6 +78,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Estatísticas de competitividade de taxas
 
 ### 🎯 **Análise Competitiva Avançada**
+
 - **Insights de Concorrentes:**
   - Score de sentiment automático
   - Classificação de posicionamento (Agressivo, Equilibrado, Conservador)
@@ -89,6 +93,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Comparação entre concorrentes
 
 ### 📊 **Análise de Tendências**
+
 - **Tendências Temporais:**
   - Gráficos de linha para evolução semanal
   - Análise de 8 semanas de dados
@@ -102,6 +107,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Resumo semanal automatizado
 
 ### 🔧 **Extrator Inteligente de Taxas**
+
 - **Funcionalidades de Extração:**
   - Regex avançado para percentuais
   - Detecção de valores monetários (R$, $)
@@ -110,6 +116,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Categorização automática de benefícios
 
 ### 🎴 **Visualização de Anúncios**
+
 - **Cards Interativos:**
   - Preview completo do anúncio
   - Informações do competidor
@@ -125,6 +132,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Acesso direto à landing page
 
 ### 🌓 **Sistema de Temas Dark/Light**
+
 - **Funcionalidades:**
   - Toggle dark/light mode
   - Persistência da preferência
@@ -133,6 +141,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
   - Acessibilidade otimizada
 
 ### 🎨 **Interface e UX**
+
 - **Design System:**
   - Componentes baseados em Radix UI
   - Estilização com Tailwind CSS
@@ -145,6 +154,7 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
 ## 🛠️ **Stack Tecnológica**
 
 ### **Frontend**
+
 - **Next.js 15.2.4** - Framework React com App Router
 - **React 19** - Biblioteca de interface
 - **TypeScript** - Tipagem estática
@@ -153,16 +163,19 @@ O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva 
 - **Lucide React** - Ícones modernos
 
 ### **Visualização de Dados**
+
 - **Recharts** - Gráficos e charts interativos
 - **React Hook Form** - Gerenciamento de formulários
 - **Zod** - Validação de schemas
 
 ### **Estado e Temas**
+
 - **Next Themes** - Gerenciamento de temas
 - **Context API** - Estado global
 - **Local Storage** - Persistência de preferências
 
 ### **Ferramentas de Desenvolvimento**
+
 - **ESLint** - Linting de código
 - **PostCSS** - Processamento CSS
 - **Vercel Analytics** - Métricas de uso
@@ -196,21 +209,25 @@ edge-intelligence-hub/
 ## 🎯 **Principais Diferenciais da v0**
 
 ### ✅ **Análise Multi-Perspectiva**
+
 - Visualização contextualizada por empresa/mercado
 - Filtragem automática baseada em escopo de negócio
 - Branding personalizado por perspectiva
 
 ### ✅ **Inteligência de Taxas**
+
 - Extração automática de ofertas e taxas
 - Análise competitiva de pricing
 - Tendências de mercado em tempo real
 
 ### ✅ **Analytics Avançados**
+
 - Métricas de sentiment automático
 - Classificação de estratégias competitivas
 - Insights acionáveis para tomada de decisão
 
 ### ✅ **UX/UI Premium**
+
 - Interface moderna e responsiva
 - Sistema de temas consistente
 - Navegação intuitiva e acessível

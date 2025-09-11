@@ -1,12 +1,12 @@
-import { SignIn } from '@clerk/nextjs'
-import { AuthHeader } from '@/components/auth-header'
+import { SignIn } from "@clerk/nextjs";
+import { AuthHeader } from "@/components/auth-header";
 
 export default function Page() {
   return (
     <div className="min-h-screen bg-background relative">
       {/* Simplified header with only theme toggle */}
       <AuthHeader />
-      
+
       {/* Centered layout inspired by Clerk's best practices */}
       <div className="grid w-full min-h-screen items-center px-4 sm:justify-center">
         <div className="w-full max-w-md mx-auto space-y-6">
@@ -19,10 +19,10 @@ export default function Page() {
               Faça login para acessar a plataforma
             </p>
           </div>
-          
+
           {/* Clerk Sign In component */}
           <div className="flex justify-center">
-            <SignIn 
+            <SignIn
               appearance={{
                 elements: {
                   rootBox: "mx-auto",
@@ -31,12 +31,12 @@ export default function Page() {
                 layout: {
                   socialButtonsPlacement: "bottom",
                   socialButtonsVariant: "iconButton",
-                }
+                },
               }}
             />
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

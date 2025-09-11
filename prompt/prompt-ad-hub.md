@@ -9,6 +9,7 @@
 ## 🏗️ Stack Tecnológica
 
 ### Core Technologies
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript 5+
 - **Styling**: Tailwind CSS + CSS Custom Properties
@@ -18,6 +19,7 @@
 - **Data Fetching**: Server Components + React Query (client-side)
 
 ### Dependencies
+
 ```json
 {
   "dependencies": {
@@ -49,6 +51,7 @@
 ## 🗄️ Schema do Banco de Dados (Supabase) - Schema Real
 
 ### Tabela `competitors`
+
 ```sql
 CREATE TABLE public.competitors (
   id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
@@ -66,6 +69,7 @@ EXECUTE FUNCTION extensions.moddatetime();
 ```
 
 ### Tabela `ads`
+
 ```sql
 CREATE TABLE public.ads (
   ad_id TEXT NOT NULL,
@@ -99,6 +103,7 @@ EXECUTE FUNCTION extensions.moddatetime('updated_at');
 ```
 
 ### Tabela `variations`
+
 ```sql
 CREATE TABLE public.variations (
   variation_id UUID NOT NULL DEFAULT extensions.uuid_generate_v4(),
@@ -296,24 +301,28 @@ edge-intelligence-hub/
 ### Referências Visuais e Paletas
 
 #### **CloudWalk Theme** (https://www.cloudwalk.io)
+
 - **Escopo**: Competidores BR + US (visão global)
 - **Paleta**: Gradiente quente (laranja → rosa → roxo) + Branco + Cinza claro
 - **Cores Principais**: `#ffffff` (texto), `#f5f5f5` (nav), gradiente `#f59e0b → #ec4899`
 - **Competidores**: Todos os mercados (Stone, PagBank, Square, PayPal, etc.)
 
 #### **InfinitePay Theme** (https://www.infinitepay.io)
+
 - **Escopo**: Competidores BR (foco nacional)
 - **Paleta**: Verde limão neon + Roxo + Preto + Branco
 - **Cores Principais**: `#9AFF00` (neon), `#8b5cf6` (roxo), `#000000` (texto)
 - **Competidores**: PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto
 
 #### **JIM Theme** (https://www.jim.com)
+
 - **Escopo**: Competidores US (foco internacional)
 - **Paleta**: Roxo vibrante + Cinza claro + Branco
 - **Cores Principais**: `#8b5cf6` (roxo), `#f9fafb` (background), `#1f2937` (dark)
 - **Competidores**: Square, PayPal, Stripe, Venmo, SumUp
 
 ### CSS Custom Properties
+
 ```css
 /* globals.css */
 :root {
@@ -331,13 +340,13 @@ edge-intelligence-hub/
   --color-border: #e2e8f0;
   --color-input: #ffffff;
   --color-ring: #2563eb;
-  
+
   /* Semantic Colors */
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-info: #3b82f6;
-  
+
   /* Layout */
   --radius: 16px;
   --spacing-xs: 0.25rem;
@@ -345,11 +354,11 @@ edge-intelligence-hub/
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
-  
+
   /* Typography */
   --font-sans: ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
-  
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", monospace;
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
@@ -373,14 +382,20 @@ edge-intelligence-hub/
 
 [data-theme="cloudwalk"] {
   /* Cores extraídas de https://www.cloudwalk.io */
-  --color-primary: #ffffff;        /* Branco (texto principal) */
+  --color-primary: #ffffff; /* Branco (texto principal) */
   --color-primary-foreground: #000000;
-  --color-secondary: #f5f5f5;      /* Cinza claro (navegação) */
+  --color-secondary: #f5f5f5; /* Cinza claro (navegação) */
   --color-secondary-foreground: #000000;
-  --color-accent: #fbbf24;         /* Dourado/amarelo (do gradiente) */
+  --color-accent: #fbbf24; /* Dourado/amarelo (do gradiente) */
   --color-accent-foreground: #000000;
-  --brand-gradient: linear-gradient(135deg, #f59e0b 0%, #f97316 30%, #ec4899 70%, #8b5cf6 100%);
-  
+  --brand-gradient: linear-gradient(
+    135deg,
+    #f59e0b 0%,
+    #f97316 30%,
+    #ec4899 70%,
+    #8b5cf6 100%
+  );
+
   /* Cores específicas CloudWalk */
   --cloudwalk-white: #ffffff;
   --cloudwalk-warm-gradient: linear-gradient(135deg, #f59e0b, #f97316, #ec4899);
@@ -390,16 +405,16 @@ edge-intelligence-hub/
 
 [data-theme="infinitepay"] {
   /* Cores extraídas de https://www.infinitepay.io */
-  --color-primary: #9AFF00;        /* Verde limão neon (botão principal) */
+  --color-primary: #9aff00; /* Verde limão neon (botão principal) */
   --color-primary-foreground: #000000;
-  --color-secondary: #f8fafc;      /* Branco/cinza muito claro */
+  --color-secondary: #f8fafc; /* Branco/cinza muito claro */
   --color-secondary-foreground: #000000;
-  --color-accent: #8b5cf6;         /* Roxo (texto de destaque) */
+  --color-accent: #8b5cf6; /* Roxo (texto de destaque) */
   --color-accent-foreground: #ffffff;
-  --brand-gradient: linear-gradient(135deg, #9AFF00 0%, #00b894 100%);
-  
+  --brand-gradient: linear-gradient(135deg, #9aff00 0%, #00b894 100%);
+
   /* Cores específicas InfinitePay */
-  --infinitepay-neon-green: #9AFF00;
+  --infinitepay-neon-green: #9aff00;
   --infinitepay-purple: #8b5cf6;
   --infinitepay-dark-green: #00b894;
   --infinitepay-black: #000000;
@@ -408,14 +423,14 @@ edge-intelligence-hub/
 
 [data-theme="jim"] {
   /* Cores extraídas de https://www.jim.com */
-  --color-primary: #8b5cf6;        /* Roxo vibrante (botões) */
+  --color-primary: #8b5cf6; /* Roxo vibrante (botões) */
   --color-primary-foreground: #ffffff;
-  --color-secondary: #f9fafb;      /* Cinza muito claro (background) */
+  --color-secondary: #f9fafb; /* Cinza muito claro (background) */
   --color-secondary-foreground: #111827;
-  --color-accent: #7c3aed;         /* Roxo mais escuro */
+  --color-accent: #7c3aed; /* Roxo mais escuro */
   --color-accent-foreground: #ffffff;
   --brand-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  
+
   /* Cores específicas JIM */
   --jim-purple: #8b5cf6;
   --jim-purple-dark: #7c3aed;
@@ -434,7 +449,7 @@ edge-intelligence-hub/
 
 ```sql
 -- 1. Buscar anúncios com informações do competidor (consulta principal)
-SELECT 
+SELECT
   a.ad_id,
   a.competitor_id,
   a.source,                    -- URL externa (pode ficar indisponível)
@@ -463,8 +478,8 @@ WHERE 1=1
   -- AND a.product ILIKE '%' || $3 || '%'   -- Filtro por produto
   -- AND a.year = $4 AND a.week = $5        -- Filtro por ano/semana
   -- AND a.start_date >= $6 AND a.start_date <= $7  -- Filtro por data
-  -- AND (a.tags ILIKE '%' || $8 || '%' OR 
-  --      a.image_description ILIKE '%' || $8 || '%' OR 
+  -- AND (a.tags ILIKE '%' || $8 || '%' OR
+  --      a.image_description ILIKE '%' || $8 || '%' OR
   --      a.transcription ILIKE '%' || $8 || '%' OR
   --      a.product ILIKE '%' || $8 || '%')  -- Busca simples por texto
 GROUP BY a.ad_id, c.name, c.home_url
@@ -472,7 +487,7 @@ ORDER BY a.start_date DESC NULLS LAST, a.created_at DESC
 LIMIT $9 OFFSET $10;  -- Paginação
 
 -- 2. Buscar competidores
-SELECT 
+SELECT
   id,
   name,
   home_url,
@@ -481,7 +496,7 @@ FROM competitors
 ORDER BY name;
 
 -- 3. Buscar variações de um anúncio específico
-SELECT 
+SELECT
   variation_id,
   parent_ad_id,
   title,
@@ -495,7 +510,7 @@ WHERE parent_ad_id = $1
 ORDER BY created_at DESC;
 
 -- 4. Buscar detalhes de um anúncio específico
-SELECT 
+SELECT
   ad_id,
   asset_type,
   product,
@@ -510,7 +525,7 @@ FROM ads
 WHERE ad_id = $1;
 
 -- 5. Buscar detalhes de uma variação específica
-SELECT 
+SELECT
   variation_id,
   title,
   description,
@@ -520,7 +535,7 @@ FROM variations
 WHERE variation_id = $1;
 
 -- 6. Estatísticas para dashboard
-SELECT 
+SELECT
   COUNT(*) as total_ads,
   COUNT(DISTINCT competitor_id) as total_competitors,
   COUNT(DISTINCT asset_type) as total_asset_types,
@@ -538,7 +553,7 @@ SELECT DISTINCT product FROM ads WHERE product IS NOT NULL ORDER BY product;
 SELECT DISTINCT display_format FROM ads WHERE display_format IS NOT NULL ORDER BY display_format;
 
 -- 8. Busca simples por texto (sem banco vetorial)
-SELECT 
+SELECT
   a.ad_id,
   a.competitor_id,
   a.tags,
@@ -549,8 +564,8 @@ SELECT
 FROM ads a
 LEFT JOIN competitors c ON a.competitor_id = c.id
 WHERE (
-  a.tags ILIKE '%' || $1 || '%' OR 
-  a.image_description ILIKE '%' || $1 || '%' OR 
+  a.tags ILIKE '%' || $1 || '%' OR
+  a.image_description ILIKE '%' || $1 || '%' OR
   a.transcription ILIKE '%' || $1 || '%' OR
   a.product ILIKE '%' || $1 || '%'
 )
@@ -561,15 +576,19 @@ LIMIT $2 OFFSET $3;
 ### ⚠️ Importantes Considerações Técnicas
 
 #### **🚨 IMPORTANTE: APENAS LEITURA**
+
 **NUNCA INSERIR, ATUALIZAR OU DELETAR DADOS** - O sistema é **100% READ-ONLY**. Apenas consultas SELECT são permitidas. Não modificar a estrutura do banco de dados de forma alguma.
 
 #### **🚫 NÃO USAR BANCO VETORIAL**
+
 **IMPORTANTE**: Não usar banco de dados vetorial, TS Factory, ou qualquer sistema de busca vetorial. Usar apenas:
+
 - Consultas simples com `ILIKE` para busca de texto
 - Campos de texto normais (tags, transcription, image_description)
 - Sem `tsvector`, `ts_rank`, `plainto_tsquery` ou similares
 
 #### **Gestão de Índices**
+
 **NÃO CRIAR ÍNDICES ADICIONAIS** - O banco já possui os índices necessários. Usar apenas consultas diretas sem modificar a estrutura do banco de dados.
 
 #### **Estrutura Real dos Dados**
@@ -577,13 +596,15 @@ LIMIT $2 OFFSET $3;
 **IMPORTANTE**: Entendimento correto dos campos e seu uso real:
 
 **Tabela `competitors`:**
+
 - `id` e `name`: Principais campos utilizados
 - `home_url`: URL da página do Facebook do competidor
 - Demais campos são auxiliares
 
 **Tabela `ads`:**
+
 - `source`: URL externa que pode ficar indisponível após 1-3 dias
-- `asset_type`: "video" ou "image" 
+- `asset_type`: "video" ou "image"
 - `product`: Qual produto está sendo anunciado
 - `tags`: Tags relacionadas ao vídeo/anúncio
 - `image_description`: Descrição da imagem ou de todo o vídeo
@@ -594,6 +615,7 @@ LIMIT $2 OFFSET $3;
 - **`asset`: Campo vazio - IGNORAR completamente**
 
 **Tabela `variations`:**
+
 - Variações do anúncio principal com título, descrição e botão
 - `button_label` e `button_url`: Call-to-action da variação
 - Foco em textos e elementos visuais
@@ -610,56 +632,60 @@ LIMIT $2 OFFSET $3;
 // Exemplo de como os dados aparecem quando consultados
 const exemploMercadoPago = {
   competitor: {
-    id: '550e8400-e29b-41d4-a716-446655440001',
-    name: 'Mercado Pago',
-    home_url: 'https://facebook.com/mercadopago'
+    id: "550e8400-e29b-41d4-a716-446655440001",
+    name: "Mercado Pago",
+    home_url: "https://facebook.com/mercadopago",
   },
-  
+
   ad: {
-    ad_id: 'mp_point_2024_001',
-    competitor_id: '550e8400-e29b-41d4-a716-446655440001',
-    source: 'https://facebook.com/ads/library/12345', // Pode ficar indisponível
-    asset_type: 'video',
-    product: 'Mercado Pago Point',
-    tags: 'maquininha, point, vendas, pix, cartão',
-    image_description: 'Vídeo mostra empresário usando a maquininha Point em sua loja, processando pagamentos via cartão e PIX',
-    transcription: 'Aceite cartão e PIX na sua loja com a Point do Mercado Pago. Taxa zero no débito e PIX. Peça já a sua!',
+    ad_id: "mp_point_2024_001",
+    competitor_id: "550e8400-e29b-41d4-a716-446655440001",
+    source: "https://facebook.com/ads/library/12345", // Pode ficar indisponível
+    asset_type: "video",
+    product: "Mercado Pago Point",
+    tags: "maquininha, point, vendas, pix, cartão",
+    image_description:
+      "Vídeo mostra empresário usando a maquininha Point em sua loja, processando pagamentos via cartão e PIX",
+    transcription:
+      "Aceite cartão e PIX na sua loja com a Point do Mercado Pago. Taxa zero no débito e PIX. Peça já a sua!",
     ad_analysis: {
-      sentiment: 'positive',
+      sentiment: "positive",
       cta_count: 2,
       mentions_competitors: false,
-      key_benefits: ['taxa zero', 'pix', 'cartão'],
+      key_benefits: ["taxa zero", "pix", "cartão"],
       // Informações de taxas extraídas da análise
       rates: {
-        debit: '0%',
-        pix: '0%',
-        credit: '2.99%'
-      }
+        debit: "0%",
+        pix: "0%",
+        credit: "2.99%",
+      },
     },
     year: 2024,
     week: 12,
-    start_date: '2024-03-20T10:30:00Z',
-    display_format: 'video'
+    start_date: "2024-03-20T10:30:00Z",
+    display_format: "video",
   },
-  
+
   variations: [
     {
-      variation_id: '550e8400-e29b-41d4-a716-446655440002',
-      parent_ad_id: 'mp_point_2024_001',
-      title: 'Point Pro - Taxa Zero',
-      description: 'Maquininha com taxa zero no débito e PIX. Ideal para pequenos negócios.',
-      button_label: 'Peça sua Point',
-      button_url: 'https://mercadopago.com.br/point'
+      variation_id: "550e8400-e29b-41d4-a716-446655440002",
+      parent_ad_id: "mp_point_2024_001",
+      title: "Point Pro - Taxa Zero",
+      description:
+        "Maquininha com taxa zero no débito e PIX. Ideal para pequenos negócios.",
+      button_label: "Peça sua Point",
+      button_url: "https://mercadopago.com.br/point",
     },
     {
-      variation_id: '550e8400-e29b-41d4-a716-446655440003',
-      parent_ad_id: 'mp_point_2024_001',
-      title: 'Point Smart - Completa',
-      description: 'Maquininha completa com Wi-Fi, 4G e bateria que dura o dia todo.',
-      button_label: 'Saiba mais',
-      button_url: 'https://mercadopago.com.br/point-smart'
-    }
-  ]
+      variation_id: "550e8400-e29b-41d4-a716-446655440003",
+      parent_ad_id: "mp_point_2024_001",
+      title: "Point Smart - Completa",
+      description:
+        "Maquininha completa com Wi-Fi, 4G e bateria que dura o dia todo.",
+      button_label: "Saiba mais",
+      button_url: "https://mercadopago.com.br/point-smart",
+    },
+  ],
 };
 ```
 
@@ -668,59 +694,77 @@ const exemploMercadoPago = {
 ```typescript
 // Exemplo Stone Ton
 const exemploStoneTon = {
-  competitor: { id: 'stone-uuid', name: 'Stone', home_url: 'https://facebook.com/stone' },
+  competitor: {
+    id: "stone-uuid",
+    name: "Stone",
+    home_url: "https://facebook.com/stone",
+  },
   ad: {
-    ad_id: 'stone_ton_2024_001',
-    product: 'Stone Ton',
-    asset_type: 'image',
-    tags: 'maquininha, ton, sem mensalidade, taxa baixa',
-    image_description: 'Imagem da maquininha Ton sendo usada em uma padaria, com destaque para "sem mensalidade"',
-    transcription: 'Maquininha Ton da Stone. Sem mensalidade, taxa a partir de 1,99%. Peça já!',
+    ad_id: "stone_ton_2024_001",
+    product: "Stone Ton",
+    asset_type: "image",
+    tags: "maquininha, ton, sem mensalidade, taxa baixa",
+    image_description:
+      'Imagem da maquininha Ton sendo usada em uma padaria, com destaque para "sem mensalidade"',
+    transcription:
+      "Maquininha Ton da Stone. Sem mensalidade, taxa a partir de 1,99%. Peça já!",
     ad_analysis: {
-      sentiment: 'positive',
-      key_benefits: ['sem mensalidade', 'taxa baixa'],
-      rates: { credit: '1,99%', debit: '0%', monthly_fee: 'Grátis' }
+      sentiment: "positive",
+      key_benefits: ["sem mensalidade", "taxa baixa"],
+      rates: { credit: "1,99%", debit: "0%", monthly_fee: "Grátis" },
     },
-    start_date: '2024-03-15T14:20:00Z'
-  }
+    start_date: "2024-03-15T14:20:00Z",
+  },
 };
 
 // Exemplo PagBank
 const exemploPagBank = {
-  competitor: { id: 'pagbank-uuid', name: 'PagBank', home_url: 'https://facebook.com/pagbank' },
+  competitor: {
+    id: "pagbank-uuid",
+    name: "PagBank",
+    home_url: "https://facebook.com/pagbank",
+  },
   ad: {
-    ad_id: 'pagbank_pos_2024_001',
-    product: 'PagBank POS',
-    asset_type: 'video',
-    tags: 'pos, pagbank, conta digital, pix',
-    image_description: 'Vídeo mostra empresário recebendo pagamentos via POS e gerenciando pelo app',
-    transcription: 'PagBank POS: receba com cartão, PIX e conta digital tudo em um só lugar. Taxa competitiva!',
+    ad_id: "pagbank_pos_2024_001",
+    product: "PagBank POS",
+    asset_type: "video",
+    tags: "pos, pagbank, conta digital, pix",
+    image_description:
+      "Vídeo mostra empresário recebendo pagamentos via POS e gerenciando pelo app",
+    transcription:
+      "PagBank POS: receba com cartão, PIX e conta digital tudo em um só lugar. Taxa competitiva!",
     ad_analysis: {
-      sentiment: 'positive',
-      key_benefits: ['conta digital', 'tudo em um'],
-      rates: { credit: '2,49%', pix: '0%', debit: '0%' }
+      sentiment: "positive",
+      key_benefits: ["conta digital", "tudo em um"],
+      rates: { credit: "2,49%", pix: "0%", debit: "0%" },
     },
-    start_date: '2024-03-18T09:15:00Z'
-  }
+    start_date: "2024-03-18T09:15:00Z",
+  },
 };
 
 // Exemplo Square (US)
 const exemploSquare = {
-  competitor: { id: 'square-uuid', name: 'Square', home_url: 'https://facebook.com/square' },
+  competitor: {
+    id: "square-uuid",
+    name: "Square",
+    home_url: "https://facebook.com/square",
+  },
   ad: {
-    ad_id: 'square_reader_2024_001',
-    product: 'Square Reader',
-    asset_type: 'video',
-    tags: 'card reader, square, small business, contactless',
-    image_description: 'Video shows coffee shop owner using Square Reader for contactless payments',
-    transcription: 'Accept payments anywhere with Square Reader. 2.6% + 10¢ per transaction. Get started today!',
+    ad_id: "square_reader_2024_001",
+    product: "Square Reader",
+    asset_type: "video",
+    tags: "card reader, square, small business, contactless",
+    image_description:
+      "Video shows coffee shop owner using Square Reader for contactless payments",
+    transcription:
+      "Accept payments anywhere with Square Reader. 2.6% + 10¢ per transaction. Get started today!",
     ad_analysis: {
-      sentiment: 'positive',
-      key_benefits: ['anywhere', 'contactless'],
-      rates: { credit: '2.6% + $0.10', contactless: '2.6% + $0.10' }
+      sentiment: "positive",
+      key_benefits: ["anywhere", "contactless"],
+      rates: { credit: "2.6% + $0.10", contactless: "2.6% + $0.10" },
     },
-    start_date: '2024-03-20T16:30:00Z'
-  }
+    start_date: "2024-03-20T16:30:00Z",
+  },
 };
 
 // Array com todos os exemplos para uso fácil
@@ -728,7 +772,7 @@ export const MOCK_ADS = [
   exemploMercadoPago,
   exemploStoneTon,
   exemploPagBank,
-  exemploSquare
+  exemploSquare,
 ];
 ```
 
@@ -749,12 +793,14 @@ export const MOCK_ADS = [
 Cada anúncio deve ser exibido em **cards informativos** que destacam:
 
 #### **📊 Informações de Taxas**
+
 - **Taxa POS Crédito**: Extraída da análise ou transcrição
 - **Taxa POS Débito**: Informação de cobrança no débito
 - **Taxa PIX**: Cobrança para PIX (geralmente 0%)
 - **Outras taxas**: Antecipação, mensalidade, etc.
 
 #### **🎯 Informações do Produto**
+
 - **Nome do Produto**: Ex: "Mercado Pago Point", "Stone Ton", "PagBank POS"
 - **Tipo de Solução**: Maquininha, app, link de pagamento
 - **Comunicação Principal**: Mensagem chave do anúncio
@@ -768,7 +814,7 @@ interface AdCard {
   competitor: string;           // "Mercado Pago"
   product: string;              // "Point Pro"
   asset_type: 'video' | 'image';
-  
+
   // Taxas (destaque principal)
   rates: {
     credit_pos?: string;        // "2,99%"
@@ -777,16 +823,16 @@ interface AdCard {
     monthly_fee?: string;       // "R$ 15,90"
     anticipation?: string;      // "3,99%"
   };
-  
+
   // Comunicação
   main_message: string;         // "Taxa zero no débito e PIX"
   transcription: string;        // Transcrição completa
   tags: string[];               // ["maquininha", "pix", "taxa zero"]
-  
+
   // Metadados
   start_date: string;           // Data do Facebook
   variations_count: number;     // Quantas variações tem
-  
+
   // Futuro: Comparação
   competitive_analysis?: {
     better_than_market: boolean;
@@ -813,7 +859,7 @@ export function AdCard({ ad, onClick }: AdCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Card 
+    <Card
       className={`
         cursor-pointer transition-all duration-300 hover:shadow-lg
         ${isHovered ? 'scale-105 shadow-xl' : 'hover:scale-102'}
@@ -921,7 +967,7 @@ interface ProductBadgeProps {
 
 export function ProductBadge({ product, type }: ProductBadgeProps) {
   const icon = type === 'video' ? '🎥' : '📸';
-  
+
   return (
     <div className="flex items-center gap-2">
       <Badge variant="outline" className="text-xs">
@@ -946,48 +992,56 @@ export interface ExtractedRates {
 
 export function extractRatesFromAd(ad: Ad): ExtractedRates {
   const rates: ExtractedRates = {};
-  
+
   // 1. Primeiro, tentar extrair do ad_analysis (JSONB)
   if (ad.ad_analysis?.rates) {
     return ad.ad_analysis.rates;
   }
-  
+
   // 2. Extrair da transcrição
-  const text = `${ad.transcription || ''} ${ad.image_description || ''} ${ad.tags || ''}`.toLowerCase();
-  
+  const text =
+    `${ad.transcription || ""} ${ad.image_description || ""} ${ad.tags || ""}`.toLowerCase();
+
   // Padrões de taxa
   const patterns = {
     credit: /(?:crédito|credit).*?(\d+[,.]?\d*%)/gi,
     debit: /(?:débito|debit).*?(\d+[,.]?\d*%|zero|grátis)/gi,
     pix: /pix.*?(\d+[,.]?\d*%|zero|grátis)/gi,
-    monthly: /(?:mensalidade|mensal).*?(r\$\s*\d+[,.]?\d*|\d+[,.]?\d*|zero|grátis)/gi,
-    anticipation: /(?:antecipação|antecip).*?(\d+[,.]?\d*%)/gi
+    monthly:
+      /(?:mensalidade|mensal).*?(r\$\s*\d+[,.]?\d*|\d+[,.]?\d*|zero|grátis)/gi,
+    anticipation: /(?:antecipação|antecip).*?(\d+[,.]?\d*%)/gi,
   };
-  
+
   // Taxa zero patterns
-  if (text.includes('taxa zero') || text.includes('sem taxa')) {
-    if (text.includes('débito') || text.includes('pix')) {
-      rates.debit_pos = '0%';
-      rates.pix = '0%';
+  if (text.includes("taxa zero") || text.includes("sem taxa")) {
+    if (text.includes("débito") || text.includes("pix")) {
+      rates.debit_pos = "0%";
+      rates.pix = "0%";
     }
   }
-  
+
   // Extrair taxas específicas
   Object.entries(patterns).forEach(([key, pattern]) => {
     const match = text.match(pattern);
     if (match) {
-      const rateKey = key === 'credit' ? 'credit_pos' : 
-                     key === 'debit' ? 'debit_pos' : 
-                     key === 'monthly' ? 'monthly_fee' : key;
+      const rateKey =
+        key === "credit"
+          ? "credit_pos"
+          : key === "debit"
+            ? "debit_pos"
+            : key === "monthly"
+              ? "monthly_fee"
+              : key;
       rates[rateKey as keyof ExtractedRates] = match[1];
     }
   });
-  
+
   return rates;
 }
 ```
 
 As taxas são extraídas de:
+
 1. **`ad_analysis`** (JSONB) - se contiver informações estruturadas
 2. **`transcription`** - buscar padrões como "2,99%", "taxa zero"
 3. **`image_description`** - descrições que mencionem preços
@@ -996,6 +1050,7 @@ As taxas são extraídas de:
 ### Futuro: Knowledge Base (KB)
 
 **Conceito para próximas versões:**
+
 - Criar KB com produtos próprios da empresa
 - Comparar taxas dos concorrentes vs. produtos próprios
 - Destacar vantagens competitivas
@@ -1008,6 +1063,7 @@ As taxas são extraídas de:
 ### Layout do Header - Especificação Exata
 
 O **header** deve ter:
+
 - **Logo clicável** no canto esquerdo que muda conforme o tema
 - **Quando clicar no logo**: abre dropdown com opções de tema
 - **Cada tema** muda: cores, logo, e **filtra automaticamente** os competidores
@@ -1018,30 +1074,31 @@ O **header** deve ter:
 // Estado do logo baseado no tema atual
 const LOGO_CONFIG = {
   light: {
-    logo: '/logos/edge-hub-default.svg', // Logo padrão
-    name: 'Edge Intelligence Hub',
-    description: 'Todos os competidores'
+    logo: "/logos/edge-hub-default.svg", // Logo padrão
+    name: "Edge Intelligence Hub",
+    description: "Todos os competidores",
   },
   dark: {
-    logo: '/logos/edge-hub-default.svg', // Logo padrão (dark)
-    name: 'Edge Intelligence Hub',
-    description: 'Todos os competidores'
+    logo: "/logos/edge-hub-default.svg", // Logo padrão (dark)
+    name: "Edge Intelligence Hub",
+    description: "Todos os competidores",
   },
   cloudwalk: {
-    logo: '/logos/cloudwalk.svg',
-    name: 'CloudWalk Intelligence',
-    description: 'Competidores BR + US'
+    logo: "/logos/cloudwalk.svg",
+    name: "CloudWalk Intelligence",
+    description: "Competidores BR + US",
   },
   infinitepay: {
-    logo: '/logos/infinitepay.svg', 
-    name: 'InfinitePay Intelligence',
-    description: 'Competidores BR: PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto'
+    logo: "/logos/infinitepay.svg",
+    name: "InfinitePay Intelligence",
+    description:
+      "Competidores BR: PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto",
   },
   jim: {
-    logo: '/logos/jim.svg',
-    name: 'JIM Intelligence', 
-    description: 'Competidores US: Square, PayPal, Stripe, Venmo, SumUp'
-  }
+    logo: "/logos/jim.svg",
+    name: "JIM Intelligence",
+    description: "Competidores US: Square, PayPal, Stripe, Venmo, SumUp",
+  },
 };
 ```
 
@@ -1058,9 +1115,9 @@ import { ChevronDown } from 'lucide-react';
 export function Header() {
   const { theme, setTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   const currentLogo = LOGO_CONFIG[theme];
-  
+
   const themeOptions = [
     { id: 'light', name: 'Padrão Light', icon: '☀️', logo: LOGO_CONFIG.light },
     { id: 'dark', name: 'Padrão Dark', icon: '🌙', logo: LOGO_CONFIG.dark },
@@ -1072,15 +1129,15 @@ export function Header() {
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        
+
         {/* Logo Clicável - PRINCIPAL */}
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <img 
-              src={currentLogo.logo} 
+            <img
+              src={currentLogo.logo}
               alt={currentLogo.name}
               className="h-8 w-8"
             />
@@ -1110,8 +1167,8 @@ export function Header() {
                       ${theme === option.id ? 'bg-primary/10 border border-primary/20' : ''}
                     `}
                   >
-                    <img 
-                      src={option.logo.logo} 
+                    <img
+                      src={option.logo.logo}
                       alt={option.name}
                       className="h-6 w-6"
                     />
@@ -1148,24 +1205,24 @@ Quando o tema muda, **automaticamente** filtrar os anúncios:
 function useFilteredAds() {
   const { theme, competitorScope } = useTheme();
   const { ads } = useAds(); // Busca todos os anúncios
-  
+
   const filteredAds = useMemo(() => {
     if (competitorScope.length === 0) {
       return ads; // Tema padrão - mostra todos
     }
-    
-    return ads.filter(ad => 
+
+    return ads.filter(ad =>
       competitorScope.includes(ad.competitor?.name || '')
     );
   }, [ads, competitorScope]);
-  
+
   return filteredAds;
 }
 
 // Usar no componente principal
 function AdsGrid() {
   const filteredAds = useFilteredAds(); // Já filtrado automaticamente
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredAds.map(ad => (
@@ -1192,18 +1249,21 @@ function AdsGrid() {
 **A ideia principal é a questão das cores!** Quando muda o tema:
 
 #### **CloudWalk** 🌍
+
 - **Cores**: Gradiente quente (laranja → rosa → roxo)
 - **Primary**: `#ffffff` (branco)
 - **Accent**: `#fbbf24` (dourado)
 - **Cards**: Bordas e acentos com gradiente CloudWalk
 
-#### **InfinitePay** 💜  
+#### **InfinitePay** 💜
+
 - **Cores**: Verde limão neon + Roxo
 - **Primary**: `#9AFF00` (verde neon)
 - **Accent**: `#8b5cf6` (roxo)
 - **Cards**: Destaque nas taxas com verde neon
 
 #### **JIM** 🔵
+
 - **Cores**: Roxo vibrante + Cinza
 - **Primary**: `#8b5cf6` (roxo)
 - **Accent**: `#7c3aed` (roxo escuro)
@@ -1218,7 +1278,7 @@ function AdsGrid() {
 }
 
 [data-theme="infinitepay"] .rate-highlight {
-  background: linear-gradient(135deg, #9AFF00 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #9aff00 0%, #8b5cf6 100%);
   color: white;
 }
 
@@ -1281,7 +1341,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Aplicar tema no documento
     document.documentElement.setAttribute('data-theme', theme);
-    
+
     // Salvar no localStorage
     localStorage.setItem('edge-hub-theme', theme);
   }, [theme]);
@@ -1356,29 +1416,30 @@ export function ThemeSwitcher() {
 ## 🔧 Funcionalidades Detalhadas
 
 ### 1. **Sistema de Filtros Avançado (Baseado no Schema Real)**
+
 ```typescript
 interface FilterState {
-  competitors: string[];           // UUIDs dos competidores selecionados
+  competitors: string[]; // UUIDs dos competidores selecionados
   dateRange: {
     start: Date | null;
     end: Date | null;
   };
-  assetTypes: string[];           // Tipos de asset (baseado em ads.asset_type)
-  sources: string[];              // Fontes dos anúncios (ads.source)
-  products: string[];             // Produtos (ads.product)
-  displayFormats: string[];       // Formatos de display (ads.display_format)
+  assetTypes: string[]; // Tipos de asset (baseado em ads.asset_type)
+  sources: string[]; // Fontes dos anúncios (ads.source)
+  products: string[]; // Produtos (ads.product)
+  displayFormats: string[]; // Formatos de display (ads.display_format)
   yearWeek: {
     year: number | null;
     week: number | null;
   };
-  search: string;                 // Busca full-text (tags, image_description, transcription)
-  hasVariations: boolean;         // Apenas anúncios com variações
-  hasAnalysis: boolean;           // Apenas anúncios com ad_analysis
+  search: string; // Busca full-text (tags, image_description, transcription)
+  hasVariations: boolean; // Apenas anúncios com variações
+  hasAnalysis: boolean; // Apenas anúncios com ad_analysis
 }
 
 // Tipos baseados no schema real
 interface Competitor {
-  id: string;                     // UUID
+  id: string; // UUID
   name: string;
   home_url: string;
   created_at: string;
@@ -1386,84 +1447,86 @@ interface Competitor {
 }
 
 interface Ad {
-  ad_id: string;                  // TEXT (PK)
-  competitor_id: string;          // UUID (FK)
-  source: string | null;          // URL externa (pode ficar indisponível após 1-3 dias)
-  asset_type: string;             // "video" ou "image"
-  product: string | null;         // Produto sendo anunciado
-  ad_analysis: any | null;        // JSONB - Análise completa do anúncio
+  ad_id: string; // TEXT (PK)
+  competitor_id: string; // UUID (FK)
+  source: string | null; // URL externa (pode ficar indisponível após 1-3 dias)
+  asset_type: string; // "video" ou "image"
+  product: string | null; // Produto sendo anunciado
+  ad_analysis: any | null; // JSONB - Análise completa do anúncio
   created_at: string;
   updated_at: string;
   year: number | null;
   week: number | null;
-  start_date: string | null;      // TIMESTAMP - Data real do Facebook
-  display_format: string | null;  // "video", "DCO", etc.
-  tags: string | null;            // Tags relacionadas ao anúncio
+  start_date: string | null; // TIMESTAMP - Data real do Facebook
+  display_format: string | null; // "video", "DCO", etc.
+  tags: string | null; // Tags relacionadas ao anúncio
   image_description: string | null; // Descrição da imagem ou vídeo completo
-  transcription: string | null;   // Transcrição do áudio do vídeo
-  
+  transcription: string | null; // Transcrição do áudio do vídeo
+
   // Dados relacionados (joins)
   competitor?: Competitor;
   variations?: Variation[];
 }
 
 interface Variation {
-  variation_id: string;           // UUID (PK)
-  parent_ad_id: string;           // TEXT (FK para ads.ad_id)
-  title: string;                  // Título da variação
-  description: string;            // Descrição da variação
-  button_label: string;           // Texto do botão CTA
-  button_url: string;             // URL de destino do botão
+  variation_id: string; // UUID (PK)
+  parent_ad_id: string; // TEXT (FK para ads.ad_id)
+  title: string; // Título da variação
+  description: string; // Descrição da variação
+  button_label: string; // Texto do botão CTA
+  button_url: string; // URL de destino do botão
   created_at: string;
   updated_at: string;
-  competitor_id: string | null;   // UUID
+  competitor_id: string | null; // UUID
 }
 ```
 
 ### 2. **Sistema de Tags Inteligente**
+
 ```typescript
 // lib/tags/dictionary.ts
 export const TAG_DICTIONARY = {
   // Fintech/Payments (PT)
-  'maquininha': ['maquininha', 'máquina de cartão', 'point', 'terminal'],
-  'pix': ['pix', 'transferência instantânea', 'qr code'],
-  'tap_to_pay': ['tap to pay', 'aproximação', 'contactless', 'nfc'],
-  'cnpj': ['cnpj', 'pessoa jurídica', 'empresa'],
-  'mdr': ['mdr', 'taxa', 'tarifa', 'custo'],
-  'antecipacao': ['antecipação', 'adiantamento', 'recebimento'],
-  
+  maquininha: ["maquininha", "máquina de cartão", "point", "terminal"],
+  pix: ["pix", "transferência instantânea", "qr code"],
+  tap_to_pay: ["tap to pay", "aproximação", "contactless", "nfc"],
+  cnpj: ["cnpj", "pessoa jurídica", "empresa"],
+  mdr: ["mdr", "taxa", "tarifa", "custo"],
+  antecipacao: ["antecipação", "adiantamento", "recebimento"],
+
   // Fintech/Payments (EN)
-  'card_reader': ['card reader', 'terminal', 'pos system'],
-  'instant_payment': ['instant payment', 'real time', 'immediate'],
-  'fees': ['fees', 'rate', 'pricing', 'cost'],
-  'business': ['business', 'merchant', 'company'],
-  'advance': ['advance', 'early payment', 'cash advance'],
-  
+  card_reader: ["card reader", "terminal", "pos system"],
+  instant_payment: ["instant payment", "real time", "immediate"],
+  fees: ["fees", "rate", "pricing", "cost"],
+  business: ["business", "merchant", "company"],
+  advance: ["advance", "early payment", "cash advance"],
+
   // Marketing/Creative
-  'promocao': ['promoção', 'desconto', 'oferta', 'cashback'],
-  'onboarding': ['cadastro', 'abertura', 'conta digital'],
-  'app': ['aplicativo', 'app', 'mobile', 'celular'],
+  promocao: ["promoção", "desconto", "oferta", "cashback"],
+  onboarding: ["cadastro", "abertura", "conta digital"],
+  app: ["aplicativo", "app", "mobile", "celular"],
 } as const;
 
 // lib/tags/extractor.ts
 export function extractTags(text: string): string[] {
   const tags: string[] = [];
   const normalizedText = text.toLowerCase();
-  
+
   Object.entries(TAG_DICTIONARY).forEach(([tag, keywords]) => {
-    const hasKeyword = keywords.some(keyword => 
-      normalizedText.includes(keyword.toLowerCase())
+    const hasKeyword = keywords.some((keyword) =>
+      normalizedText.includes(keyword.toLowerCase()),
     );
     if (hasKeyword) {
       tags.push(tag);
     }
   });
-  
+
   return [...new Set(tags)]; // Remove duplicatas
 }
 ```
 
 ### 3. **Paginação e Performance**
+
 ```typescript
 // Configuração de paginação
 const PAGINATION_CONFIG = {
@@ -1475,35 +1538,36 @@ const PAGINATION_CONFIG = {
 // Configuração de conteúdo dos anúncios
 const AD_CONTENT_CONFIG = {
   placeholder: {
-    image_description: 'Descrição não disponível',
-    transcription: 'Transcrição não disponível',
-    tags: 'Tags não disponíveis'
+    image_description: "Descrição não disponível",
+    transcription: "Transcrição não disponível",
+    tags: "Tags não disponíveis",
   },
   maxTextLength: {
     description: 200,
     transcription: 500,
-    tags: 100
+    tags: 100,
   },
   // Tratamento para source URLs indisponíveis
-  sourceUnavailableMessage: 'URL original não está mais disponível'
+  sourceUnavailableMessage: "URL original não está mais disponível",
 };
 ```
 
 ### 4. **Export CSV Customizável**
+
 ```typescript
 interface ExportConfig {
   includeFields: {
-    basic: boolean;          // title, competitor, date
-    content: boolean;        // description, transcription
-    metrics: boolean;        // engagement, spend estimate
-    tags: boolean;           // tags, keywords
-    technical: boolean;      // asset_type, platform, mime_type
+    basic: boolean; // title, competitor, date
+    content: boolean; // description, transcription
+    metrics: boolean; // engagement, spend estimate
+    tags: boolean; // tags, keywords
+    technical: boolean; // asset_type, platform, mime_type
   };
   dateRange: {
     start: Date;
     end: Date;
   };
-  format: 'csv' | 'xlsx';
+  format: "csv" | "xlsx";
   filename?: string;
 }
 ```
@@ -1513,6 +1577,7 @@ interface ExportConfig {
 ## 🚀 Configuração de Deploy (Vercel)
 
 ### Variáveis de Ambiente
+
 ```bash
 # .env.local.example
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -1526,6 +1591,7 @@ VERCEL_ENV=production
 ```
 
 ### Configuração do Next.js
+
 ```javascript
 // next.config.js
 /** @type {import('next').NextConfig} */
@@ -1537,9 +1603,9 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/api/:path*',
+        source: "/api/:path*",
         headers: [
-          { key: 'Cache-Control', value: 'public, max-age=300, s-maxage=600' },
+          { key: "Cache-Control", value: "public, max-age=300, s-maxage=600" },
         ],
       },
     ];
@@ -1550,58 +1616,56 @@ module.exports = nextConfig;
 ```
 
 ### Configuração do Tailwind
+
 ```javascript
 // tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        background: 'var(--color-background)',
-        foreground: 'var(--color-foreground)',
+        background: "var(--color-background)",
+        foreground: "var(--color-foreground)",
         primary: {
-          DEFAULT: 'var(--color-primary)',
-          foreground: 'var(--color-primary-foreground)',
+          DEFAULT: "var(--color-primary)",
+          foreground: "var(--color-primary-foreground)",
         },
         secondary: {
-          DEFAULT: 'var(--color-secondary)',
-          foreground: 'var(--color-secondary-foreground)',
+          DEFAULT: "var(--color-secondary)",
+          foreground: "var(--color-secondary-foreground)",
         },
         muted: {
-          DEFAULT: 'var(--color-muted)',
-          foreground: 'var(--color-muted-foreground)',
+          DEFAULT: "var(--color-muted)",
+          foreground: "var(--color-muted-foreground)",
         },
         accent: {
-          DEFAULT: 'var(--color-accent)',
-          foreground: 'var(--color-accent-foreground)',
+          DEFAULT: "var(--color-accent)",
+          foreground: "var(--color-accent-foreground)",
         },
-        border: 'var(--color-border)',
-        input: 'var(--color-input)',
-        ring: 'var(--color-ring)',
+        border: "var(--color-border)",
+        input: "var(--color-input)",
+        ring: "var(--color-ring)",
       },
       borderRadius: {
-        DEFAULT: 'var(--radius)',
+        DEFAULT: "var(--radius)",
       },
       fontFamily: {
-        sans: ['var(--font-sans)'],
-        mono: ['var(--font-mono)'],
+        sans: ["var(--font-sans)"],
+        mono: ["var(--font-mono)"],
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        "fade-in": "fadeIn 0.5s ease-in-out",
+        "slide-up": "slideUp 0.3s ease-out",
+        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
 };
 ```
 
@@ -1610,24 +1674,28 @@ module.exports = {
 ## 📱 Requisitos de UI/UX
 
 ### Responsividade
+
 - **Mobile First**: Design otimizado para mobile (320px+)
 - **Breakpoints**: sm (640px), md (768px), lg (1024px), xl (1280px)
 - **Touch Friendly**: Botões com min-height de 44px
 - **Swipe Gestures**: Navegação por swipe em carrosséis
 
 ### Acessibilidade (WCAG 2.1 AA)
+
 - **Contraste**: Mínimo 4.5:1 para texto normal
 - **Keyboard Navigation**: Todos os elementos navegáveis via teclado
 - **Screen Readers**: Aria-labels e landmarks apropriados
 - **Focus Management**: Indicadores visuais claros
 
 ### Performance
+
 - **Core Web Vitals**: LCP < 2.5s, FID < 100ms, CLS < 0.1
 - **Image Optimization**: WebP/AVIF com fallback JPEG
 - **Lazy Loading**: Imagens e componentes fora da viewport
 - **Code Splitting**: Chunks otimizados por rota
 
 ### Micro-interações
+
 - **Loading States**: Skeletons para carregamento
 - **Hover Effects**: Feedback visual em elementos interativos
 - **Transitions**: Animações suaves (200-300ms)
@@ -1638,21 +1706,25 @@ module.exports = {
 ## 🔄 Fluxos de Usuário Principais
 
 ### 1. **Exploração de Anúncios**
+
 ```
 Landing → Selecionar Tema → Aplicar Filtros → Navegar Grid → Ver Detalhes → Explorar Variações
 ```
 
 ### 2. **Busca e Filtragem**
+
 ```
 Busca Textual → Filtros Combinados → Resultados Filtrados → Salvar na URL → Compartilhar Link
 ```
 
 ### 3. **Export de Dados**
+
 ```
 Aplicar Filtros → Botão Export → Configurar Campos → Download CSV → Análise Externa
 ```
 
 ### 4. **Troca de Contexto**
+
 ```
 Theme Switcher → Selecionar Marca → Atualizar Competidores → Recarregar Dados → Nova Visualização
 ```
@@ -1662,20 +1734,22 @@ Theme Switcher → Selecionar Marca → Atualizar Competidores → Recarregar Da
 ## 📊 Métricas e Analytics
 
 ### KPIs do Produto
+
 - **Engagement**: Tempo na página, cliques em anúncios
 - **Filtros**: Filtros mais utilizados, combinações populares
 - **Export**: Frequência de downloads, campos mais exportados
 - **Temas**: Distribuição de uso por tema/marca
 
 ### Tracking de Eventos
+
 ```typescript
 // Eventos para analytics
 interface AnalyticsEvents {
-  'ad_viewed': { adId: string; competitor: string; theme: string };
-  'filter_applied': { filterType: string; value: string };
-  'export_downloaded': { recordCount: number; format: string };
-  'theme_switched': { from: string; to: string };
-  'search_performed': { query: string; resultsCount: number };
+  ad_viewed: { adId: string; competitor: string; theme: string };
+  filter_applied: { filterType: string; value: string };
+  export_downloaded: { recordCount: number; format: string };
+  theme_switched: { from: string; to: string };
+  search_performed: { query: string; resultsCount: number };
 }
 ```
 
@@ -1684,12 +1758,14 @@ interface AnalyticsEvents {
 ## 🧪 Testes e Qualidade
 
 ### Estratégia de Testes
+
 - **Unit Tests**: Utilities, hooks, componentes isolados
 - **Integration Tests**: Fluxos de filtros, APIs
 - **E2E Tests**: Jornadas críticas do usuário
 - **Visual Regression**: Screenshots automatizados
 
 ### Ferramentas
+
 ```json
 {
   "devDependencies": {
@@ -1708,6 +1784,7 @@ interface AnalyticsEvents {
 ## 🚀 Roadmap de Implementação
 
 ### Fase 1: Core (Semana 1-2)
+
 - [ ] Setup do projeto Next.js + TypeScript
 - [ ] Configuração Supabase + Schema
 - [ ] Componentes UI base
@@ -1715,6 +1792,7 @@ interface AnalyticsEvents {
 - [ ] Layout responsivo
 
 ### Fase 2: Funcionalidades (Semana 3-4)
+
 - [ ] Sistema de filtros completo
 - [ ] Grid de anúncios com paginação
 - [ ] Modal de detalhes
@@ -1722,6 +1800,7 @@ interface AnalyticsEvents {
 - [ ] API routes
 
 ### Fase 3: Otimização (Semana 5)
+
 - [ ] Performance optimization
 - [ ] Export CSV
 - [ ] Testes automatizados
@@ -1729,6 +1808,7 @@ interface AnalyticsEvents {
 - [ ] Analytics
 
 ### Fase 4: Refinamento (Semana 6)
+
 - [ ] Polimento UI/UX
 - [ ] Acessibilidade
 - [ ] Documentação
@@ -1740,17 +1820,20 @@ interface AnalyticsEvents {
 ## 📚 Documentação Adicional
 
 ### README.md Sugerido
+
 ```markdown
 # Edge Intelligence Hub
 
 Plataforma de análise de anúncios de concorrentes com múltiplos temas corporativos.
 
 ## Quick Start
+
 1. `npm install`
 2. Configure `.env.local` com credenciais Supabase
 3. `npm run dev`
 
 ## Scripts
+
 - `npm run dev` - Desenvolvimento
 - `npm run build` - Build produção
 - `npm run test` - Testes
@@ -1758,6 +1841,7 @@ Plataforma de análise de anúncios de concorrentes com múltiplos temas corpora
 ```
 
 ### Contribuição
+
 - **Code Style**: Prettier + ESLint
 - **Commits**: Conventional Commits
 - **PRs**: Template com checklist
@@ -1786,12 +1870,13 @@ Plataforma de análise de anúncios de concorrentes com múltiplos temas corpora
 ### Sites para Análise
 
 - **CloudWalk**: https://www.cloudwalk.io
-- **InfinitePay**: https://www.infinitepay.io  
+- **InfinitePay**: https://www.infinitepay.io
 - **JIM**: https://www.jim.com
 
 ### Elementos a Extrair
 
 Para cada site, extrair cores dos seguintes elementos:
+
 - **Header/Navigation**: Cor de fundo, texto, botões
 - **Botões Primários**: Background, hover, texto
 - **Botões Secundários**: Background, hover, texto
@@ -1819,6 +1904,7 @@ Após extrair as cores, substituir os `#XXXXXX` no CSS pelos códigos reais:
 ## 📋 Checklist de Implementação
 
 ### ✅ Concluído
+
 - [x] Schema do banco atualizado com tabelas reais
 - [x] Interfaces TypeScript alinhadas com schema
 - [x] Consultas SQL otimizadas para o schema real
@@ -1846,6 +1932,7 @@ Após extrair as cores, substituir os `#XXXXXX` no CSS pelos códigos reais:
 - [x] **📋 Instruções específicas para V0**
 
 ### 🔄 Pendente
+
 - [ ] Testar consultas SQL no Supabase
 - [ ] Implementar troca de temas no layout principal
 - [ ] Conectar filtros com escopo de competidores por tema

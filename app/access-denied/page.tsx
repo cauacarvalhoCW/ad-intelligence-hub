@@ -1,16 +1,22 @@
-'use client'
-import { SignOutButton } from '@clerk/nextjs'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertTriangle, Mail, LogOut } from 'lucide-react'
-import { AuthHeader } from '@/components/auth-header'
+"use client";
+import { SignOutButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertTriangle, Mail, LogOut } from "lucide-react";
+import { AuthHeader } from "@/components/auth-header";
 
 export default function AccessDeniedPage() {
   return (
     <div className="min-h-screen bg-background relative">
       {/* Header simplified with only theme toggle */}
       <AuthHeader />
-      
+
       <div className="grid w-full min-h-screen items-center px-4 sm:justify-center">
         <div className="w-full max-w-md mx-auto space-y-6">
           {/* title and subtitle */}
@@ -19,7 +25,7 @@ export default function AccessDeniedPage() {
               Edge Intelligence Hub
             </h1>
           </div>
-          
+
           {/* Card access denied */}
           <Card className="shadow-lg border border-destructive/20">
             <CardHeader className="text-center space-y-4">
@@ -27,13 +33,15 @@ export default function AccessDeniedPage() {
                 <AlertTriangle className="w-6 h-6 text-destructive" />
               </div>
               <div>
-                <CardTitle className="text-destructive">Acesso Negado</CardTitle>
+                <CardTitle className="text-destructive">
+                  Acesso Negado
+                </CardTitle>
                 <CardDescription className="mt-2">
                   Este aplicativo é restrito
                 </CardDescription>
               </div>
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
               {/* Information about domain */}
               <div className="bg-muted/50 p-4 rounded-lg space-y-3">
@@ -42,10 +50,11 @@ export default function AccessDeniedPage() {
                   Domínio Requerido
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Para acessar esta aplicação, você precisa fazer login com um e-mail corporativo
+                  Para acessar esta aplicação, você precisa fazer login com um
+                  e-mail corporativo
                 </p>
               </div>
-              
+
               {/* Logout button */}
               <div className="pt-2">
                 <SignOutButton>
@@ -57,9 +66,8 @@ export default function AccessDeniedPage() {
               </div>
             </CardContent>
           </Card>
-          
         </div>
       </div>
     </div>
-  )
+  );
 }

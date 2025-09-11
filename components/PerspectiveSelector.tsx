@@ -1,47 +1,57 @@
-'use client'
+"use client";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Perspective } from '@/hooks/useAds'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Perspective } from "@/hooks/useAds";
 
 interface PerspectiveSelectorProps {
-  value: Perspective
-  onChange: (perspective: Perspective) => void
+  value: Perspective;
+  onChange: (perspective: Perspective) => void;
 }
 
 const PERSPECTIVES = [
   {
-    id: 'default' as const,
-    name: 'Todos os Competidores',
-    description: 'Visualização completa',
-    competitors: 'Todos',
-    icon: '🌍'
+    id: "default" as const,
+    name: "Todos os Competidores",
+    description: "Visualização completa",
+    competitors: "Todos",
+    icon: "🌍",
   },
   {
-    id: 'infinitepay' as const,
-    name: 'InfinitePay',
-    description: 'Perspectiva Brasil',
-    competitors: 'PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto',
-    icon: '💜'
+    id: "infinitepay" as const,
+    name: "InfinitePay",
+    description: "Perspectiva Brasil",
+    competitors: "PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto",
+    icon: "💜",
   },
   {
-    id: 'jim' as const,
-    name: 'JIM',
-    description: 'Perspectiva Internacional',
-    competitors: 'Square, PayPal, Stripe, Venmo, SumUp',
-    icon: '🔵'
+    id: "jim" as const,
+    name: "JIM",
+    description: "Perspectiva Internacional",
+    competitors: "Square, PayPal, Stripe, Venmo, SumUp",
+    icon: "🔵",
   },
   {
-    id: 'cloudwalk' as const,
-    name: 'CloudWalk',
-    description: 'Perspectiva Global',
-    competitors: 'Todos os mercados',
-    icon: '☁️'
-  }
-]
+    id: "cloudwalk" as const,
+    name: "CloudWalk",
+    description: "Perspectiva Global",
+    competitors: "Todos os mercados",
+    icon: "☁️",
+  },
+];
 
-export function PerspectiveSelector({ value, onChange }: PerspectiveSelectorProps) {
-  const currentPerspective = PERSPECTIVES.find(p => p.id === value) || PERSPECTIVES[0]
+export function PerspectiveSelector({
+  value,
+  onChange,
+}: PerspectiveSelectorProps) {
+  const currentPerspective =
+    PERSPECTIVES.find((p) => p.id === value) || PERSPECTIVES[0];
 
   return (
     <div className="space-y-2">
@@ -78,5 +88,5 @@ export function PerspectiveSelector({ value, onChange }: PerspectiveSelectorProp
         </SelectContent>
       </Select>
     </div>
-  )
+  );
 }

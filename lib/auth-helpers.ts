@@ -1,8 +1,8 @@
-import { auth, currentUser } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 // Domain guard configuration
-const ALLOWED_DOMAIN = '@cloudwalk.io';
+const ALLOWED_DOMAIN = "@cloudwalk.io";
 
 /**
  * Helper to verify if the user is authenticated
@@ -10,7 +10,7 @@ const ALLOWED_DOMAIN = '@cloudwalk.io';
 export async function requireAuth() {
   const { userId } = await auth();
   if (!userId) {
-    redirect('/sign-in');
+    redirect("/sign-in");
   }
   return { userId };
 }
@@ -21,27 +21,33 @@ export async function requireAuth() {
 export async function requireAuthWithDomainCheck() {
   const { userId } = await auth();
   if (!userId) {
-    console.log('🔒 requireAuthWithDomainCheck: No userId, redirecting to sign-in');
-    redirect('/sign-in');
+    console.log(
+      "🔒 requireAuthWithDomainCheck: No userId, redirecting to sign-in",
+    );
+    redirect("/sign-in");
   }
 
   // Domain verification
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress || '';
-  
-  console.log('🔍 requireAuthWithDomainCheck Debug:');
-  console.log('  👤 User ID:', userId);
-  console.log('  📧 Email found:', email);
-  console.log('  🎯 Required domain:', ALLOWED_DOMAIN);
-  console.log('  ✅ Email ends with domain?', email.endsWith(ALLOWED_DOMAIN));
-  
+  const email = user?.primaryEmailAddress?.emailAddress || "";
+
+  console.log("🔍 requireAuthWithDomainCheck Debug:");
+  console.log("  👤 User ID:", userId);
+  console.log("  📧 Email found:", email);
+  console.log("  🎯 Required domain:", ALLOWED_DOMAIN);
+  console.log("  ✅ Email ends with domain?", email.endsWith(ALLOWED_DOMAIN));
+
   if (!email.endsWith(ALLOWED_DOMAIN)) {
-    console.log(`🚫 requireAuthWithDomainCheck: Domain check FAILED for email: "${email}"`);
+    console.log(
+      `🚫 requireAuthWithDomainCheck: Domain check FAILED for email: "${email}"`,
+    );
     console.log(`   Expected to end with: "${ALLOWED_DOMAIN}"`);
-    redirect('/access-denied');
+    redirect("/access-denied");
   }
 
-  console.log(`✅ requireAuthWithDomainCheck: Domain check PASSED for email: "${email}"`);
+  console.log(
+    `✅ requireAuthWithDomainCheck: Domain check PASSED for email: "${email}"`,
+  );
   return { userId, user };
 }
 
@@ -67,11 +73,14 @@ export async function getUserData() {
 /**
  * Helper to check user domain without redirect
  */
-export async function checkUserDomain(): Promise<{ isValid: boolean; email: string }> {
+export async function checkUserDomain(): Promise<{
+  isValid: boolean;
+  email: string;
+}> {
   const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress || '';
+  const email = user?.primaryEmailAddress?.emailAddress || "";
   const isValid = email.endsWith(ALLOWED_DOMAIN);
-  
+
   return { isValid, email };
 }
 
@@ -81,11 +90,11 @@ export async function checkUserDomain(): Promise<{ isValid: boolean; email: stri
 export async function requireRole(requiredRole: string) {
   const { sessionClaims } = await auth();
   const userRole = (sessionClaims as any)?.metadata?.role;
-  
+
   if (userRole !== requiredRole) {
-    redirect('/unauthorized');
+    redirect("/unauthorized");
   }
-  
+
   return { userRole };
 }
 
