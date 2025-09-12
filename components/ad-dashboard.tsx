@@ -18,6 +18,8 @@ import { useAds } from "@/hooks/useAds";
 import { useCompetitors } from "@/hooks/useCompetitors";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useTheme } from "@/components/theme-provider";
+import { LogoLoading } from "@/components/ui/logo-loading";
+import { X } from "lucide-react";
 import type { Ad } from "@/lib/types";
 
 // Função para formatar e limpar o ad_analysis
@@ -174,9 +176,12 @@ export function AdDashboard() {
   if (adsLoading || competitorsLoading) {
     return (
       <div className="space-y-6">
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-muted-foreground">Carregando anúncios...</p>
+        <div className="py-12">
+          <LogoLoading 
+            size="lg" 
+            text="Carregando anúncios..." 
+            className="py-8"
+          />
         </div>
       </div>
     );
@@ -226,6 +231,140 @@ export function AdDashboard() {
         </div>
       </div>
 
+      {/* Seção de Filtros Ativos */}
+      {(filters.searchTerm || 
+        filters.selectedCompetitors.length > 0 || 
+        filters.selectedAdType !== "all" || 
+        filters.dateFrom || 
+        filters.dateTo) ? (
+        <div className="bg-muted/50 p-4 rounded-lg border">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Filtros Ativos
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setFilters({
+                  searchTerm: "",
+                  selectedCompetitors: [],
+                  selectedPlatform: "all",
+                  selectedAdType: "all",
+                  dateRange: "all",
+                  dateFrom: "",
+                  dateTo: "",
+                  tags: [],
+                });
+                setCurrentPage(1);
+              }}
+              className="text-xs h-7"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Limpar Todos
+            </Button>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {/* Filtro de Busca */}
+            {filters.searchTerm && (
+              <Badge variant="default" className="gap-1">
+                🔍 Busca: "{filters.searchTerm}"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFilters(prev => ({ ...prev, searchTerm: "" }))}
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+
+            {/* Filtro de Competidores */}
+            {filters.selectedCompetitors.length > 0 && (
+              filters.selectedCompetitors.length <= 3 ? (
+                // Mostrar nomes individuais quando há poucos selecionados
+                filters.selectedCompetitors.map((competitorId) => {
+                  const competitor = competitors.find(c => c.id === competitorId);
+                  return (
+                    <Badge key={competitorId} variant="default" className="gap-1">
+                      👥 {competitor?.name || competitorId}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setFilters(prev => ({ 
+                          ...prev, 
+                          selectedCompetitors: prev.selectedCompetitors.filter(id => id !== competitorId)
+                        }))}
+                        className="h-4 w-4 p-0 hover:bg-transparent"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </Badge>
+                  );
+                })
+              ) : (
+                // Mostrar resumo quando há muitos selecionados
+                <Badge variant="default" className="gap-1">
+                  👥 {filters.selectedCompetitors.length} competidores selecionados
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFilters(prev => ({ ...prev, selectedCompetitors: [] }))}
+                    className="h-4 w-4 p-0 hover:bg-transparent"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              )
+            )}
+
+            {/* Filtro de Tipo de Anúncio */}
+            {filters.selectedAdType !== "all" && (
+              <Badge variant="default" className="gap-1">
+                🎬 Tipo: {filters.selectedAdType === "video" ? "Vídeo" : 
+                         filters.selectedAdType === "image" ? "Imagem" : filters.selectedAdType}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFilters(prev => ({ ...prev, selectedAdType: "all" }))}
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+
+            {/* Filtro de Data */}
+            {(filters.dateFrom || filters.dateTo) && (
+              <Badge variant="default" className="gap-1">
+                📅 Período: {filters.dateFrom && new Date(filters.dateFrom).toLocaleDateString('pt-BR')}
+                {filters.dateFrom && filters.dateTo && " até "}
+                {filters.dateTo && new Date(filters.dateTo).toLocaleDateString('pt-BR')}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFilters(prev => ({ ...prev, dateFrom: "", dateTo: "" }))}
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+          </div>
+        </div>
+      ) : (
+        // Mostrar quando nenhum filtro está ativo
+        <div className="bg-muted/30 p-3 rounded-lg border border-dashed">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="text-sm">
+              ℹ️ Nenhum filtro ativo - mostrando todos os anúncios da perspectiva <strong>{currentTheme}</strong>
+            </span>
+          </div>
+        </div>
+      )}
+
       <AdFilters
         competitors={competitors}
         currentPerspective={currentTheme}
@@ -252,94 +391,93 @@ export function AdDashboard() {
           </TabsTrigger>
         </TabsList>
 
+        {/* Paginação movida para cima - logo após as abas */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-4 mb-6">
+            {/* Primeira página */}
+            {currentPage > 3 && (
+              <>
+                <Button
+                  variant={1 === currentPage ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(1)}
+                >
+                  1
+                </Button>
+                {currentPage > 4 && (
+                  <span className="text-muted-foreground">...</span>
+                )}
+              </>
+            )}
+
+            {/* Páginas ao redor da atual */}
+            {Array.from(
+              { length: Math.min(5, pagination.totalPages) },
+              (_, i) => {
+                let pageNum;
+                if (pagination.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= pagination.totalPages - 2) {
+                  pageNum = pagination.totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                if (pageNum < 1 || pageNum > pagination.totalPages)
+                  return null;
+                if (currentPage > 3 && pageNum === 1) return null;
+                if (
+                  currentPage < pagination.totalPages - 2 &&
+                  pageNum === pagination.totalPages
+                )
+                  return null;
+
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={pageNum === currentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              },
+            )}
+
+            {/* Última página */}
+            {currentPage < pagination.totalPages - 2 && (
+              <>
+                {currentPage < pagination.totalPages - 3 && (
+                  <span className="text-muted-foreground">...</span>
+                )}
+                <Button
+                  variant={
+                    pagination.totalPages === currentPage ? "default" : "outline"
+                  }
+                  size="sm"
+                  onClick={() => setCurrentPage(pagination.totalPages)}
+                >
+                  {pagination.totalPages}
+                </Button>
+              </>
+            )}
+          </div>
+        )}
+
         <TabsContent value="ads" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAds.map((ad) => (
-              <AdCard
+              <AdCard 
                 key={ad.ad_id}
-                ad={ad}
-                onClick={() => setSelectedAd(ad)}
+                ad={ad} 
+                onClick={() => setSelectedAd(ad)} 
               />
             ))}
           </div>
 
-          {/* Paginação */}
-          {pagination && pagination.totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-8">
-              {/* Primeira página */}
-              {currentPage > 3 && (
-                <>
-                  <Button
-                    variant={1 === currentPage ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(1)}
-                  >
-                    1
-                  </Button>
-                  {currentPage > 4 && (
-                    <span className="text-muted-foreground">...</span>
-                  )}
-                </>
-              )}
-
-              {/* Páginas ao redor da atual */}
-              {Array.from(
-                { length: Math.min(5, pagination.totalPages) },
-                (_, i) => {
-                  let pageNum;
-                  if (pagination.totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1;
-                  } else if (currentPage >= pagination.totalPages - 2) {
-                    pageNum = pagination.totalPages - 4 + i;
-                  } else {
-                    pageNum = currentPage - 2 + i;
-                  }
-
-                  if (pageNum < 1 || pageNum > pagination.totalPages)
-                    return null;
-                  if (currentPage > 3 && pageNum === 1) return null;
-                  if (
-                    currentPage < pagination.totalPages - 2 &&
-                    pageNum === pagination.totalPages
-                  )
-                    return null;
-
-                  return (
-                    <Button
-                      key={pageNum}
-                      variant={pageNum === currentPage ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(pageNum)}
-                    >
-                      {pageNum}
-                    </Button>
-                  );
-                },
-              )}
-
-              {/* Última página */}
-              {currentPage < pagination.totalPages - 2 && (
-                <>
-                  {currentPage < pagination.totalPages - 3 && (
-                    <span className="text-muted-foreground">...</span>
-                  )}
-                  <Button
-                    variant={
-                      pagination.totalPages === currentPage
-                        ? "default"
-                        : "outline"
-                    }
-                    size="sm"
-                    onClick={() => setCurrentPage(pagination.totalPages)}
-                  >
-                    {pagination.totalPages}
-                  </Button>
-                </>
-              )}
-            </div>
-          )}
 
           {filteredAds.length === 0 && (
             <Card>
@@ -369,7 +507,7 @@ export function AdDashboard() {
         </TabsContent>
 
         <TabsContent value="trends">
-          <TrendAnalysis ads={filteredAds} />
+          <TrendAnalysis ads={filteredAds} currentTheme={currentTheme} />
         </TabsContent>
       </Tabs>
 
@@ -452,23 +590,23 @@ export function AdDashboard() {
 
               {/* Ad Analysis - Análise Completa */}
               {selectedAd.ad_analysis && (
-                <div>
+              <div>
                   <h4 className="font-semibold mb-2">📊 Análise do Anúncio</h4>
                   <div className="bg-primary/5 dark:bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
                     <div className="prose prose-sm max-w-none">
                       {formatAdAnalysis(selectedAd.ad_analysis)}
                     </div>
                   </div>
-                </div>
+              </div>
               )}
 
               {selectedAd.transcription && (
-                <div>
+              <div>
                   <h4 className="font-semibold mb-2">Transcrição</h4>
                   <p className="text-sm bg-muted p-3 rounded">
                     {selectedAd.transcription}
                   </p>
-                </div>
+              </div>
               )}
 
               {selectedAd.image_description && (
@@ -487,28 +625,28 @@ export function AdDashboard() {
               </div>
 
               {selectedAd.tags && (
-                <div>
-                  <h4 className="font-semibold mb-2">Tags</h4>
-                  <div className="flex flex-wrap gap-2">
+              <div>
+                <h4 className="font-semibold mb-2">Tags</h4>
+                <div className="flex flex-wrap gap-2">
                     {selectedAd.tags.split(/[,;]/).map((tag, index) => (
                       <Badge key={index} variant="secondary">
                         {tag.trim()}
-                      </Badge>
-                    ))}
-                  </div>
+                    </Badge>
+                  ))}
                 </div>
+              </div>
               )}
 
-              <Button className="w-full" asChild>
+                <Button className="w-full" asChild>
                 <a
                   href={`https://www.facebook.com/ads/library/?id=${selectedAd.ad_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                    <ExternalLink className="h-4 w-4 mr-2" />
                   Ver na Meta Ads Library
-                </a>
-              </Button>
+                  </a>
+                </Button>
             </CardContent>
           </Card>
         </div>

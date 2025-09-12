@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
           : selectedCompetitors;
     }
 
-    // Construir query base (SEM LIMIT/OFFSET)
+    // Construir query base com select primeiro
     let query = supabase.from("ads").select(`
         ad_id,
         competitor_id,
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
           id,
           name
         )
-      `);
+      `, { count: "exact" });
 
     // Aplicar filtros de qualidade mínima
     query = query
@@ -141,64 +141,34 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // SOLUÇÃO TEMPORÁRIA: Usar total fixo baseado no que sabemos ser real
-    const totalAds = 1909; // Total real do banco
+    // EXECUTAR QUERY REAL PARA CONTAR ANÚNCIOS FILTRADOS
+    console.log("📊 Executando query para contar anúncios filtrados...");
+    
+    const { data: filteredAds, error: queryError, count: totalCount } = await query
+      .limit(2000); // Limite alto para pegar mais dados para análise
 
-    console.log(`📊 Usando total fixo: ${totalAds} anúncios`);
+    if (queryError) {
+      console.error("❌ Erro na query de analytics:", queryError);
+      throw queryError;
+    }
 
-    // Distribuição baseada nos dados reais que vimos
-    const metrics = {
-      total_ads: totalAds,
-      by_competitor: [
-        { competitor_name: "PagBank", count: 480 },
-        { competitor_name: "Mercado Pago", count: 440 },
-        { competitor_name: "InfinitePay", count: 290 },
-        { competitor_name: "Ton", count: 230 },
-        { competitor_name: "Cora", count: 180 },
-        { competitor_name: "Stone", count: 150 },
-        { competitor_name: "Jeitto", count: 139 },
-      ],
-      by_asset_type: [
-        { asset_type: "video", count: 1145 },
-        { asset_type: "image", count: 764 },
-      ],
-      weekly: [],
-      top_tags: [
-        { tag: "maquininha", count: 286 },
-        { tag: "pagamento", count: 229 },
-        { tag: "pix", count: 191 },
-        { tag: "empreendedorismo", count: 153 },
-        { tag: "urgência", count: 134 },
-      ],
-      fees: [
-        {
-          label: "credito",
-          ads_com_taxa: 180,
-          matches: 180,
-          min: 0,
-          median: 2.49,
-          max: 15.89,
-        },
-        {
-          label: "debito",
-          ads_com_taxa: 25,
-          matches: 25,
-          min: 0,
-          median: 0,
-          max: 1.99,
-        },
-        {
-          label: "pix",
-          ads_com_taxa: 35,
-          matches: 35,
-          min: 0,
-          median: 0,
-          max: 0.99,
-        },
-      ],
-      offers: [],
-      platform: [{ label: "Meta", value: totalAds }],
-    };
+    const totalAds = totalCount || 0;
+    console.log(`📊 Total de anúncios filtrados: ${totalAds}`);
+    console.log(`📊 Dados retornados para análise: ${filteredAds?.length || 0}`);
+
+    // Calcular métricas reais baseadas nos dados filtrados
+    const metrics = calculateMetrics(filteredAds || [], {
+      perspective,
+      competitors: competitorsParam?.split(",") || [],
+      platform,
+      ad_types: adTypesParam?.split(",") || [],
+      date_from: dateFrom,
+      date_to: dateTo,
+      q: search,
+    });
+
+    // Usar o count real da query
+    metrics.total_ads = totalAds;
 
     return NextResponse.json({
       applied: {
@@ -302,7 +272,7 @@ async function calculateMetricsWithCount(
 
     const competitorCounts: Record<string, { name: string; count: number }> =
       {};
-    competitorData?.forEach((ad) => {
+    competitorData?.forEach((ad: any) => {
       const name = ad.competitors?.name || "Desconhecido";
       competitorCounts[name] = competitorCounts[name] || { name, count: 0 };
       competitorCounts[name].count++;
@@ -323,7 +293,7 @@ async function calculateMetricsWithCount(
     }
 
     const assetCounts: Record<string, number> = {};
-    assetData?.forEach((ad) => {
+    assetData?.forEach((ad: any) => {
       const type = ad.asset_type?.toLowerCase() || "unknown";
       assetCounts[type] = (assetCounts[type] || 0) + 1;
     });

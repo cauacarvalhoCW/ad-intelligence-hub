@@ -495,19 +495,56 @@
   font-weight: 600 !important;
 }
 
-/* Adding hover and transition effects for cards */
-.ad-card {
+/* 🎨 HOVER EFFECTS NOS CARDS POR TEMA - SEM MEXER NO HEADER */
+
+/* DEFAULT THEME - Marrom-caramelo da logo */
+.theme-default .group:hover,
+.group:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 15px 35px -5px rgba(139, 69, 19, 0.2),  /* Sombra marrom-caramelo */
+    0 5px 15px -5px rgba(210, 105, 30, 0.15); /* Sombra chocolate */
+  border-color: rgba(139, 69, 19, 0.3);
+}
+
+/* INFINITEPAY THEME - Verde neon + Roxo */
+.theme-infinitepay .group:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 15px 35px -5px rgba(139, 92, 246, 0.25),  /* Sombra roxa forte */
+    0 5px 15px -5px rgba(154, 255, 0, 0.2);     /* Sombra verde neon */
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+/* JIM THEME - Roxo vibrante */
+.theme-jim .group:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 15px 35px -5px rgba(139, 92, 246, 0.4),   /* Sombra roxa forte */
+    0 5px 15px -5px rgba(168, 85, 247, 0.3);    /* Sombra roxa secundária */
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+/* CLOUDWALK THEME - Dourado + Rosa */
+.theme-cloudwalk .group:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 15px 35px -5px rgba(245, 158, 11, 0.3),   /* Sombra dourada */
+    0 5px 15px -5px rgba(236, 72, 153, 0.2);    /* Sombra rosa */
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* DARK THEME - Indigo elegante */
+.theme-dark .group:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 15px 35px -5px rgba(99, 102, 241, 0.25),  /* Sombra indigo forte */
+    0 5px 15px -5px rgba(79, 70, 229, 0.2);     /* Sombra indigo secundária */
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* Transição suave para todos os cards */
+.group {
   transition: all 0.3s ease;
   cursor: pointer;
-}
-
-.ad-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.ad-card:active {
-  transform: translateY(-2px);
 }

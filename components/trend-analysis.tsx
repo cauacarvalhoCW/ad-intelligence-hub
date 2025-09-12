@@ -13,12 +13,15 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  Legend,
 } from "recharts";
 import { TrendingUp, Calendar, Activity, Percent } from "lucide-react";
 import type { Ad } from "@/lib/types";
+import { themes } from "@/lib/themes";
 
 interface TrendAnalysisProps {
   ads: Ad[];
+  currentTheme?: string;
 }
 
 interface TrendData {
@@ -26,6 +29,7 @@ interface TrendData {
   count: number;
   rateAds: number;
   platforms: Record<string, number>;
+  competitors: Record<string, number>; // Adicionar dados por competidor
 }
 
 interface RateTrend {
@@ -35,17 +39,18 @@ interface RateTrend {
   change: number;
 }
 
-export function TrendAnalysis({ ads }: TrendAnalysisProps) {
-  const { timelineTrends, rateTrends, platformTrends } = useMemo(() => {
+export function TrendAnalysis({ ads, currentTheme = "default" }: TrendAnalysisProps) {
+  const { timelineTrends, chartData, allCompetitors, rateTrends, platformTrends, weeklyMetrics } = useMemo(() => {
     // Group ads by week for timeline analysis
     const weeklyData: Record<string, TrendData> = {};
     const rateFrequency: Record<string, number[]> = {};
     const platformData: Record<string, number[]> = {};
 
     ads.forEach((ad) => {
-      const date = ad.start_date
-        ? new Date(ad.start_date)
-        : new Date(ad.created_at);
+      // Usar APENAS start_date (anúncios válidos já têm start_date obrigatório)
+      if (!ad.start_date) return; // Skip se não tiver start_date
+      
+      const date = new Date(ad.start_date);
       const weekStart = new Date(
         date.getFullYear(),
         date.getMonth(),
@@ -59,10 +64,16 @@ export function TrendAnalysis({ ads }: TrendAnalysisProps) {
           count: 0,
           rateAds: 0,
           platforms: {},
+          competitors: {}, // Inicializar dados por competidor
         };
       }
 
       weeklyData[weekKey].count += 1;
+
+      // Contar por competidor
+      const competitorName = ad.competitors?.name || "Outros";
+      weeklyData[weekKey].competitors[competitorName] = 
+        (weeklyData[weekKey].competitors[competitorName] || 0) + 1;
 
       // Platform baseado no source
       const platform =
@@ -91,9 +102,75 @@ export function TrendAnalysis({ ads }: TrendAnalysisProps) {
       platformData[platform].push(date.getTime());
     });
 
-    const timelineTrends = Object.values(weeklyData)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(-8); // Last 8 weeks
+    // Garantir que temos dados suficientes para mostrar uma linha
+    const allWeeks = Object.values(weeklyData)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    // Debug detalhado para verificar dados reais
+    console.log("📊 DADOS REAIS DOS ANÚNCIOS:", {
+      totalAds: ads.length,
+      totalWeeks: allWeeks.length,
+      dadosPorSemana: allWeeks.map(w => ({
+        semana: w.date,
+        total: w.count,
+        competidores: Object.keys(w.competitors).length,
+        detalhes: w.competitors
+      })),
+      competidoresUnicos: Array.from(new Set(ads.map(ad => ad.competitors?.name).filter(Boolean))),
+      datasUnicas: Array.from(new Set(ads.map(ad => ad.start_date).filter(Boolean))).sort()
+    });
+    
+    // Se temos poucas semanas, criar semanas vazias para completar 12
+    const now = new Date();
+    const last12Weeks = [];
+    
+    for (let i = 11; i >= 0; i--) {
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - (i * 7) - now.getDay());
+      const weekKey = weekStart.toISOString().split("T")[0];
+      
+      const existingWeek = weeklyData[weekKey];
+      if (existingWeek) {
+        last12Weeks.push(existingWeek);
+      } else {
+        // Criar semana vazia
+        last12Weeks.push({
+          date: weekKey,
+          count: 0,
+          rateAds: 0,
+          platforms: {},
+          competitors: {}
+        });
+      }
+    }
+    
+    const timelineTrends = last12Weeks;
+
+    // Obter TODOS os competidores da perspectiva atual (não apenas os que têm anúncios)
+    const themeConfig = themes[currentTheme as keyof typeof themes];
+    const allCompetitors = themeConfig?.metadata?.competitorScope || 
+      Array.from(new Set(ads.map(ad => ad.competitors?.name).filter(Boolean)));
+    
+    console.log("🎯 COMPETIDORES DA PERSPECTIVA:", {
+      tema: currentTheme,
+      competidoresEsperados: allCompetitors,
+      competidoresComAnuncios: Array.from(new Set(ads.map(ad => ad.competitors?.name).filter(Boolean)))
+    });
+
+    // Processar dados para o gráfico com uma linha por competidor
+    const chartData = timelineTrends.map(week => {
+      const weekData: any = {
+        date: week.date,
+        total: week.count
+      };
+      
+      // Adicionar dados de cada competidor para esta semana
+      allCompetitors.forEach(competitor => {
+        weekData[competitor] = week.competitors[competitor] || 0;
+      });
+      
+      return weekData;
+    });
 
     // Calculate rate trends
     const rateTrends: RateTrend[] = Object.entries(rateFrequency)
@@ -129,11 +206,31 @@ export function TrendAnalysis({ ads }: TrendAnalysisProps) {
       .map(([platform, timestamps]) => ({
         platform,
         count: timestamps.length,
-        avgPerWeek: Math.round(timestamps.length / 8),
+        avgPerWeek: Math.round(timestamps.length / Math.max(timelineTrends.length, 1)),
       }))
       .sort((a, b) => b.count - a.count);
 
-    return { timelineTrends, rateTrends, platformTrends };
+    // Calcular métricas reais para o resumo semanal
+    const totalAdsInPeriod = timelineTrends.reduce((acc, week) => acc + week.count, 0);
+    const totalRateAdsInPeriod = timelineTrends.reduce((acc, week) => acc + week.rateAds, 0);
+    const avgAdsPerWeek = Math.round(totalAdsInPeriod / Math.max(timelineTrends.length, 1));
+    const avgRateAdsPerWeek = Math.round(totalRateAdsInPeriod / Math.max(timelineTrends.length, 1));
+    const ratesInUpTrend = rateTrends.filter((r) => r.trend === "up").length;
+    const leadingPlatform = platformTrends[0]?.platform || "Meta";
+
+    return { 
+      timelineTrends, 
+      chartData,
+      allCompetitors,
+      rateTrends, 
+      platformTrends,
+      weeklyMetrics: {
+        avgAdsPerWeek,
+        avgRateAdsPerWeek,
+        ratesInUpTrend,
+        leadingPlatform
+      }
+    };
   }, [ads]);
 
   return (
@@ -144,12 +241,12 @@ export function TrendAnalysis({ ads }: TrendAnalysisProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Tendência Temporal (8 semanas)
+              Tendência Temporal (12 semanas)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={timelineTrends}>
+              <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
@@ -166,22 +263,34 @@ export function TrendAnalysis({ ads }: TrendAnalysisProps) {
                     new Date(value).toLocaleDateString("pt-BR")
                   }
                   formatter={(value, name) => [
-                    value,
-                    name === "count" ? "Total Anúncios" : "Com Taxas",
+                    `${value} anúncios`,
+                    name === "total" ? "Total Anúncios" : name,
                   ]}
                 />
-                <Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#8884d8"
-                  strokeWidth={2}
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  formatter={(value) => `${value}`}
                 />
-                <Line
-                  type="monotone"
-                  dataKey="rateAds"
-                  stroke="#82ca9d"
-                  strokeWidth={2}
-                />
+                {/* Linha para cada competidor */}
+                {allCompetitors.map((competitor, index) => {
+                  const colors = [
+                    "#8884d8", "#82ca9d", "#ffc658", "#ff7c7c", 
+                    "#8dd1e1", "#d084d0", "#ffb347", "#87ceeb"
+                  ];
+                  return (
+                    <Line
+                      key={competitor}
+                      name={competitor} // Nome para a legenda
+                      type="monotone"
+                      dataKey={competitor}
+                      stroke={colors[index % colors.length]}
+                      strokeWidth={2}
+                      dot={{ fill: colors[index % colors.length], strokeWidth: 1, r: 3 }}
+                      activeDot={{ r: 5, stroke: colors[index % colors.length], strokeWidth: 2 }}
+                      connectNulls={true}
+                    />
+                  );
+                })}
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -268,31 +377,25 @@ export function TrendAnalysis({ ads }: TrendAnalysisProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-primary">
-                {Math.round(
-                  timelineTrends.reduce((acc, week) => acc + week.count, 0) /
-                    timelineTrends.length,
-                )}
+                {weeklyMetrics.avgAdsPerWeek}
               </div>
               <p className="text-sm text-muted-foreground">Anúncios/semana</p>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-secondary">
-                {Math.round(
-                  timelineTrends.reduce((acc, week) => acc + week.rateAds, 0) /
-                    timelineTrends.length,
-                )}
+                {weeklyMetrics.avgRateAdsPerWeek}
               </div>
               <p className="text-sm text-muted-foreground">Com taxas/semana</p>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-accent">
-                {rateTrends.filter((r) => r.trend === "up").length}
+                {weeklyMetrics.ratesInUpTrend}
               </div>
               <p className="text-sm text-muted-foreground">Taxas em alta</p>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-muted-foreground">
-                {platformTrends[0]?.platform || "N/A"}
+                {weeklyMetrics.leadingPlatform}
               </div>
               <p className="text-sm text-muted-foreground">Plataforma líder</p>
             </div>
