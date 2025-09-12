@@ -495,11 +495,16 @@
   font-weight: 600 !important;
 }
 
-/* 🎨 HOVER EFFECTS NOS CARDS POR TEMA - SEM MEXER NO HEADER */
+/* 🎨 HOVER EFFECTS NOS CARDS POR TEMA - ESCOPADOS SOMENTE PARA CARDS */
+
+/* IMPORTANTE: não use seletor `.group` globalmente,
+   pois ele também é usado dentro do chat. Escopamos
+   os efeitos somente para elementos que são Cards
+   (identificados por `[data-slot="card"]`). */
 
 /* DEFAULT THEME - Marrom-caramelo da logo */
-.theme-default .group:hover,
-.group:hover {
+.theme-default [data-slot="card"].group:hover,
+[data-slot="card"].group:hover {
   transform: translateY(-6px);
   box-shadow: 
     0 15px 35px -5px rgba(139, 69, 19, 0.2),  /* Sombra marrom-caramelo */
@@ -508,7 +513,7 @@
 }
 
 /* INFINITEPAY THEME - Verde neon + Roxo */
-.theme-infinitepay .group:hover {
+.theme-infinitepay [data-slot="card"].group:hover {
   transform: translateY(-6px);
   box-shadow: 
     0 15px 35px -5px rgba(139, 92, 246, 0.25),  /* Sombra roxa forte */
@@ -517,7 +522,7 @@
 }
 
 /* JIM THEME - Roxo vibrante */
-.theme-jim .group:hover {
+.theme-jim [data-slot="card"].group:hover {
   transform: translateY(-6px);
   box-shadow: 
     0 15px 35px -5px rgba(139, 92, 246, 0.4),   /* Sombra roxa forte */
@@ -526,7 +531,7 @@
 }
 
 /* CLOUDWALK THEME - Dourado + Rosa */
-.theme-cloudwalk .group:hover {
+.theme-cloudwalk [data-slot="card"].group:hover {
   transform: translateY(-6px);
   box-shadow: 
     0 15px 35px -5px rgba(245, 158, 11, 0.3),   /* Sombra dourada */
@@ -535,7 +540,7 @@
 }
 
 /* DARK THEME - Indigo elegante */
-.theme-dark .group:hover {
+.theme-dark [data-slot="card"].group:hover {
   transform: translateY(-6px);
   box-shadow: 
     0 15px 35px -5px rgba(99, 102, 241, 0.25),  /* Sombra indigo forte */
@@ -543,8 +548,8 @@
   border-color: rgba(99, 102, 241, 0.3);
 }
 
-/* Transição suave para todos os cards */
-.group {
+/* Transição suave apenas para grupos de Card */
+[data-slot="card"].group {
   transition: all 0.3s ease;
   cursor: pointer;
 }

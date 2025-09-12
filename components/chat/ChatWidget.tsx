@@ -78,6 +78,40 @@ const getMaxSize = () => {
   };
 };
 
+// Frases sarcásticas para o estado "pensando"
+const THINKING_MESSAGES: string[] = [
+  "Sério mesmo? Vou ter que mastigar a informação pra você...",
+  "Deixa eu adivinhar, quer que eu faça tudo sozinho de novo...",
+  "Nossa, que pergunta complexa! Deixa eu pensar por você...",
+  "Hmm, parece que alguém não quer se esforçar hoje...",
+  "Tudo bem, já que você insiste em não pensar...",
+  "Que bom, mais um que quer tudo na mão... Vamos lá então.",
+  "Ah tá, mais um que quer ser carregado no colo... Vamos nessa.",
+  "Deixa eu ver se entendi: você quer que EU faça o trabalho de novo?",
+  "Nossa, que situação única! Alguém que não quer pensar...",
+  "Perfeito, outro que acha que eu sou Google com personalidade.",
+  "Sério? Preciso explicar como se você tivesse 5 anos?",
+  "Que bom, adoro quando me tratam como assistente pessoal...",
+  "Ah claro, porque pesquisar é coisa do passado mesmo, né?",
+  "Deixa eu adivinhar: quer a resposta mastigada e na boca?",
+  "Tudo bem, mais um dia sendo babá intelectual...",
+  "Nossa, que pergunta elaborada! Quase me fez suar aqui.",
+  "Hmm, parece que hoje é dia de preguiça mental total...",
+  "Beleza, já que autonomia não é seu forte mesmo...",
+  "Que surpresa! Mais alguém que quer milagre sem esforço.",
+  "Sério mesmo? Vou ter que conectar os pontos pra você?",
+  "Claro, porque usar o cérebro é overrated, né?",
+  "Ah, entendi... hoje é dia de terceirizar o raciocínio.",
+  "Perfeito, adoro ser tratado como oráculo particular.",
+  "Deixa eu facilitar então, já que você claramente desistiu...",
+  "Que bom, mais um que confunde AI com empregada doméstica.",
+  "Tá, já que você insiste em não mover um neurônio...",
+  "Claro, porque pensar é muito difícil mesmo, né?",
+  "Já que você claramente não vai se esforçar, deixa comigo...",
+  "Ah, que surpresa... mais alguém que quer tudo pronto...",
+  "Beleza, já que esforço não é seu forte, vou facilitar mesmo...",
+];
+
 // Main widget component
 
 export function ChatWidget({
@@ -317,6 +351,14 @@ export function ChatWidget({
 
   // Render helper functions and computed values
 
+  // Mensagem aleatória de "pensando". Gera uma frase somente quando o
+  // estado de loading entra em true, evitando trocar a cada re-render.
+  const thinkingMessage = useMemo(() => {
+    if (!isLoading) return "Pensando...";
+    const i = Math.floor(Math.random() * THINKING_MESSAGES.length);
+    return THINKING_MESSAGES[i];
+  }, [isLoading]);
+
   const renderResizeBorders = useMemo(() => {
     if (isMobile || isMaximized) return null;
 
@@ -430,9 +472,11 @@ export function ChatWidget({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b bg-primary/5 shrink-0">
             <div className="flex items-center gap-3">
-              <MessageCircle className="h-5 w-5 text-primary" />
+              {/* Usa o logo do site no header do chat */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logos/logo.png" alt="EspiADinha" className="h-5 w-5" />
               <div>
-                <h3 className="font-semibold text-sm">Assistente IA</h3>
+                <h3 className="font-semibold text-sm">EspiADinha</h3>
                 <p className="text-xs text-muted-foreground">
                   {isSystemReady ? "Online" : "Conectando..."}
                 </p>
@@ -502,7 +546,8 @@ export function ChatWidget({
                 {/* Welcome message */}
                 {messages.length === 0 && (
                   <div className="text-center py-8">
-                    <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/logos/logo.png" alt="EspiADinha" className="h-12 w-12 mx-auto mb-4" />
                     <h4 className="font-medium mb-2">Olá! 👋</h4>
                     <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                       Sou o EspiADinha, seu assistente de inteligência de anúncios. Vou facilitar seu trabalho: diga o concorrente, o período e se quer lista, contagem ou ranking. 😉
@@ -518,9 +563,13 @@ export function ChatWidget({
                 {/* Typing indicator */}
                 {isLoading && (
                   <div className="flex items-start gap-3 animate-in fade-in-0 duration-300">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      🤖
-                    </div>
+                    {/* Ícone de pensamento com o logo do site */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/logos/logo.png"
+                      alt="Assistente"
+                      className="w-8 h-8 rounded-full bg-primary/10 p-1 shrink-0"
+                    />
                     <div className="bg-muted/50 rounded-2xl p-4 max-w-[80%]">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-1">
@@ -528,7 +577,8 @@ export function ChatWidget({
                           <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:150ms]" />
                           <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:300ms]" />
                         </div>
-                        <span className="text-sm text-muted-foreground ml-2">Pensando...</span>
+                        {/* Mensagem de digitação sarcástica (aleatória) */}
+                        <span className="text-sm text-muted-foreground ml-2">{thinkingMessage}</span>
                       </div>
                     </div>
                   </div>

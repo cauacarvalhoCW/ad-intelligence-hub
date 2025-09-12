@@ -6,7 +6,8 @@
 "use client";
 
 import React, { memo } from "react";
-import { User, Bot, AlertTriangle } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { User, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { parseAdsFromText } from "@/lib/chat/adsParser";
@@ -781,6 +782,7 @@ function tryRenderTotalsAndRanking(content: string): React.ReactNode | null {
 // Main component with memoization for performance
 
 export const ChatMessage = memo<ChatMessageProps>(({ message, isLast = false, className }) => {
+  const { user } = useUser();
   const isUser = message.role === "user";
   const isAssistant = message.role === "assistant";
   const isSystem = message.role === "system";
@@ -810,14 +812,28 @@ export const ChatMessage = memo<ChatMessageProps>(({ message, isLast = false, cl
       {/* Avatar */}
       <div
         className={cn(
-          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden",
           "ring-2 ring-background transition-all duration-200",
           isUser
             ? "bg-primary text-primary-foreground order-2 group-hover:ring-primary/20"
-            : "bg-muted text-muted-foreground group-hover:ring-muted-foreground/20",
+            : "bg-muted group-hover:ring-muted-foreground/20",
         )}
       >
-        {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+        {isUser ? (
+          user?.imageUrl ? (
+            // Foto do perfil do usuário autenticado (Clerk)
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.imageUrl} alt={user.fullName || "Você"} className="h-full w-full object-cover" />
+          ) : (
+            <User className="h-4 w-4 text-primary-foreground" />
+          )
+        ) : (
+          // Usa o mesmo ícone do loading (logo do site)
+          // OBS: se quiser trocar depois, ajuste o caminho abaixo
+          // para outro asset.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src="/logos/logo.png" alt="Assistente" className="h-4 w-4 object-contain" />
+        )}
       </div>
 
       {/* Message content */}
