@@ -1,5 +1,6 @@
 import { requireAuthWithDomainCheck } from "@/lib/auth-helpers";
 import { Header } from "@/components/header";
+import { LogoLoading } from "@/components/ui/logo-loading";
 import { Suspense } from "react";
 
 export default async function ProtectedLayout({
@@ -17,7 +18,13 @@ export default async function ProtectedLayout({
   return (
     <>
       <Header />
-      <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+      <Suspense fallback={
+        <div className="container mx-auto px-4 py-8">
+          <LogoLoading size="lg" text="Carregando página..." />
+        </div>
+      }>
+        {children}
+      </Suspense>
     </>
   );
 }

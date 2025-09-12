@@ -14,9 +14,11 @@ import { Suspense } from "react";
 
 // App metadata for SEO and social sharing
 export const metadata: Metadata = {
-  title: "Edge Intelligence Hub",
+  title: "EspiADinha",
   description: "Análise de Anúncios Concorrentes",
-  generator: "v0.app",
+  icons: {
+    icon: "/logos/logo.png",
+  },
 };
 
 export default function RootLayout({

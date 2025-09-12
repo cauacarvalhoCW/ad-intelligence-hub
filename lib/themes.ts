@@ -61,7 +61,8 @@ export const themes: Record<ThemeType, ThemeConfig> = {
     },
   },
   default: {
-    name: "Edge Intelligence Hub",
+    name: "EspiADinha",
+    logo: "/logos/logo.png",
     colors: {
       primary: "#111111",
       secondary: "#f1f5f9",
