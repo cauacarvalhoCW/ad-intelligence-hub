@@ -20,7 +20,7 @@ function AdCard({ item }: { item: AdItem }) {
   const fallbackAdId = adIdFromHref ? adIdFromHref[1] : undefined;
   const finalAdId = item.adId || fallbackAdId;
   return (
-    <div className="rounded-xl border bg-muted/30 p-4 space-y-3">
+    <div className="rounded-xl border bg-muted/30 p-4 space-y-3 border-border dark:border-white/20">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -55,7 +55,7 @@ function AdCard({ item }: { item: AdItem }) {
             </Badge>
           )}
           {item.date && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs dark:border-white/20">
               {item.date}
             </Badge>
           )}

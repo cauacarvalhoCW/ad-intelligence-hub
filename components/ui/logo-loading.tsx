@@ -21,21 +21,24 @@ export function LogoLoading({
 
   return (
     <div className={cn("flex flex-col items-center justify-center space-y-3", className)}>
-      {/* Logo animado pulando */}
-      <div className="relative">
+      {/* Logo animado. Removemos o círculo/halo atrás para reduzir distração
+          visual no loading e evitar desalinhamentos entre elementos. */}
+      <div className="relative animate-bounce">
         <img
           src="/logos/logo.png"
           alt="EspiADinha"
           className={cn(
             sizeClasses[size],
-            "animate-bounce drop-shadow-lg"
+            "drop-shadow-lg"
           )}
         />
-        {/* Efeito de brilho */}
-        <div className={cn(
-          sizeClasses[size],
-          "absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full animate-pulse"
-        )} />
+        {/** Halo removido intencionalmente
+         *  Caso queira restaurar, use o bloco abaixo:
+         *  <div className={cn(
+         *    sizeClasses[size],
+         *    "absolute inset-0 scale-110 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full animate-pulse"
+         *  )} />
+         */}
       </div>
       
       {/* Texto de loading */}
