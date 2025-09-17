@@ -13,7 +13,8 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-import type { Ad, Competitor } from "@/lib/types";
+import type { Ad } from "@/features/ads/types";
+import type { Competitor } from "@/lib/types";
 
 interface CompetitiveAnalysisProps {
   ads: Ad[];

@@ -16,7 +16,7 @@ import {
   Legend,
 } from "recharts";
 import { TrendingUp, Calendar, Activity, Percent } from "lucide-react";
-import type { Ad } from "@/lib/types";
+import type { Ad } from "@/features/ads/types";
 import { themes } from "@/lib/themes";
 
 interface TrendAnalysisProps {

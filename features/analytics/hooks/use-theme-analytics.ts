@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { ThemeType, ThemeAnalytics } from "@/lib/types";
+import type { ThemeAnalytics, ThemeType } from "@/features/analytics/types";
 
 export function useThemeAnalytics() {
   const [analytics, setAnalytics] = useState<ThemeAnalytics>({

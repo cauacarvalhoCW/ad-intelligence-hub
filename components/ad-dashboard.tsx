@@ -7,16 +7,18 @@ import { Button } from "@/shared/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { ExternalLink, BarChart3, TrendingUp, Target } from "lucide-react";
 import { AdFilters, type FilterState } from "@/components/ad-filters";
-import { AdAnalytics } from "@/components/ad-analytics";
-import { AnalyticsDashboard } from "@/components/analytics-dashboard";
-import { CompetitiveAnalysis } from "@/components/competitive-analysis";
-import { CompetitiveDashboard } from "@/components/competitive-dashboard";
-import { TrendAnalysis } from "@/components/trend-analysis";
+import {
+  AdAnalytics,
+  AnalyticsDashboard,
+  CompetitiveAnalysis,
+  CompetitiveDashboard,
+  TrendAnalysis,
+} from "@/features/analytics/components";
 import { RateExtractor } from "@/components/rate-extractor";
 import { AdCard } from "@/features/ads/components/AdCard";
 import { useAds } from "@/features/ads/hooks";
 import { useCompetitors } from "@/hooks/useCompetitors";
-import { useAnalytics } from "@/hooks/useAnalytics";
+import { useAnalytics } from "@/features/analytics/hooks";
 import { useTheme } from "@/components/theme-provider";
 import { LogoLoading } from "@/shared/ui/logo-loading";
 import { X } from "lucide-react";
