@@ -18,14 +18,10 @@ export function parseAnalyticsRequestParams(
   request: NextRequest,
 ): AnalyticsRequestParams {
   const { searchParams } = new URL(request.url);
-
-  const perspectiveValue = searchParams.get("perspective");
-  const perspective = isPerspective(perspectiveValue)
-    ? perspectiveValue
-    : DEFAULT_PERSPECTIVE;
+  const perspectiveRaw = searchParams.get("perspective");
 
   return {
-    perspective,
+    perspective: isPerspective(perspectiveRaw) ? perspectiveRaw : DEFAULT_PERSPECTIVE,
     search: searchParams.get("search") || undefined,
     competitors: parseList(searchParams.get("competitors")),
     assetTypes: parseList(searchParams.get("adTypes")),
