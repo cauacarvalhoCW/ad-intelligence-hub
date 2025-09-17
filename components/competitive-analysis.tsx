@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import {
   TrendingUp,
   Target,

@@ -6,9 +6,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+} from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { ArrowLeft, Shield, User, Mail, Calendar } from "lucide-react";
 import { Header } from "@/components/header";
 import Link from "next/link";

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { ExternalLink, BarChart3, TrendingUp, Target } from "lucide-react";
 import { AdFilters, type FilterState } from "@/components/ad-filters";
 import { AdAnalytics } from "@/components/ad-analytics";
@@ -18,7 +18,7 @@ import { useAds } from "@/hooks/useAds";
 import { useCompetitors } from "@/hooks/useCompetitors";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useTheme } from "@/components/theme-provider";
-import { LogoLoading } from "@/components/ui/logo-loading";
+import { LogoLoading } from "@/shared/ui/logo-loading";
 import { X } from "lucide-react";
 import type { Ad } from "@/lib/types";
 

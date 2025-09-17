@@ -9,7 +9,7 @@ import React, { memo } from "react";
 import { useUser } from "@clerk/nextjs";
 import { User, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import { parseAdsFromText } from "@/lib/chat/adsParser";
 import AdList from "./AdList";
 import { ChatMessage as ChatMessageType } from "@/lib/types/chat";

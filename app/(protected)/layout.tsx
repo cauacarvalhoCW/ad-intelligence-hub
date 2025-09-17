@@ -1,6 +1,6 @@
 import { requireAuthWithDomainCheck } from "@/lib/auth-helpers";
 import { Header } from "@/components/header";
-import { LogoLoading } from "@/components/ui/logo-loading";
+import { LogoLoading } from "@/shared/ui/logo-loading";
 import { Suspense } from "react";
 
 export default async function ProtectedLayout({

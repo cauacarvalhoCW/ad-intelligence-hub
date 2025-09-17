@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
 import { BarChart3, TrendingUp, Target, Eye, Users, Tag } from "lucide-react";
 
 interface AnalyticsResponse {

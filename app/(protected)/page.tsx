@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { AdDashboard } from "@/components/ad-dashboard";
-import { LogoLoading } from "@/components/ui/logo-loading";
+import { LogoLoading } from "@/shared/ui/logo-loading";
 
 export default function HomePage() {
   return (

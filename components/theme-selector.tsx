@@ -1,9 +1,9 @@
 "use client";
 
 import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Card, CardContent } from "@/shared/ui/card";
 import { Palette, Check } from "lucide-react";
 
 export function ThemeSelector() {

@@ -1,8 +1,8 @@
 "use client";
 
 import { useTheme } from "@/components/theme-provider";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
 import { getCompetitorsByTheme } from "@/lib/themes";
 import { Palette, Building2, Globe, Calendar } from "lucide-react";
 

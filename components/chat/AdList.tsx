@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import type { ParsedAds, AdItem } from "@/lib/chat/adsParser";
 
 function AdCard({ item }: { item: AdItem }) {

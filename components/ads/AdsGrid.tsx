@@ -2,7 +2,7 @@
 
 import { AdCard } from "./AdCard";
 import { Ad } from "@/lib/types";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 interface AdsGridProps {
   ads: Ad[];

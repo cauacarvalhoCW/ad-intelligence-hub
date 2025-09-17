@@ -6,8 +6,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+} from "@/shared/ui/select";
+import { Badge } from "@/shared/ui/badge";
 import { Perspective } from "@/hooks/useAds";
 
 interface PerspectiveSelectorProps {
