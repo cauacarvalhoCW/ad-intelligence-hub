@@ -841,13 +841,13 @@ interface AdCard {
 }
 
 // Componente AdCard com interações
-// components/ads/AdCard.tsx
+// features/ads/components/AdCard.tsx
 'use client';
 
 import { useState } from 'react';
 import { Card } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
-import { RatesDisplay } from './RatesDisplay';
+import { RatesDisplay } from '@/features/ads/components/RatesDisplay';
 import { ProductBadge } from './ProductBadge';
 
 interface AdCardProps {
@@ -927,7 +927,7 @@ export function AdCard({ ad, onClick }: AdCardProps) {
 }
 
 // Componente RatesDisplay
-// components/ads/RatesDisplay.tsx
+// features/ads/components/RatesDisplay.tsx
 interface RatesDisplayProps {
   rates: {
     credit_pos?: string;
@@ -959,7 +959,7 @@ export function RatesDisplay({ rates }: RatesDisplayProps) {
 }
 
 // Componente ProductBadge
-// components/ads/ProductBadge.tsx
+// features/ads/components/ProductBadge.tsx
 interface ProductBadgeProps {
   product: string;
   type: 'video' | 'image';

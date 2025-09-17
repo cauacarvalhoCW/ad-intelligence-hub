@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useAds, Perspective } from "@/hooks/useAds";
-import { AdsGrid } from "./ads/AdsGrid";
+import { useAds } from "@/features/ads/hooks";
+import { DEFAULT_PERSPECTIVE, type Perspective } from "@/features/ads/types";
+import { AdsGrid } from "@/features/ads/components/AdsGrid";
 import { PerspectiveSelector } from "./PerspectiveSelector";
 import { Card } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
@@ -12,7 +13,7 @@ import { RefreshCw } from "lucide-react";
 const RECENCY_ACTIVE_DAYS = 2;
 
 export function AdsExplorer() {
-  const [perspective, setPerspective] = useState<Perspective>("default");
+  const [perspective, setPerspective] = useState<Perspective>(DEFAULT_PERSPECTIVE);
   const [page, setPage] = useState(1);
 
   const { ads, loading, error, pagination, refetch } = useAds({

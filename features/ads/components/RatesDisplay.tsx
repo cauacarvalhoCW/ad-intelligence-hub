@@ -5,7 +5,7 @@ import {
   extractRatesFromAd,
   formatRateForDisplay,
 } from "@/lib/utils/ratesExtractor";
-import type { Ad } from "@/lib/types";
+import type { Ad } from "@/features/ads/types";
 
 interface RatesDisplayProps {
   ad: Ad;
