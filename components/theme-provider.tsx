@@ -3,8 +3,8 @@
 import type * as React from "react";
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ThemeType } from "@/lib/types";
-import { applyTheme, getSavedTheme, themes } from "@/lib/themes"; // Added themes import
-import { useThemeAnalytics } from "@/hooks/use-theme-analytics";
+import { applyTheme, getSavedTheme, themes } from "@/lib/themes";
+import { useThemeAnalytics } from "@/features/analytics/hooks";
 
 interface CorporateThemeContextType {
   corporateTheme: ThemeType;

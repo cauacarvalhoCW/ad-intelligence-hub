@@ -848,7 +848,7 @@ import { useState } from 'react';
 import { Card } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { RatesDisplay } from '@/features/ads/components/RatesDisplay';
-import { ProductBadge } from './ProductBadge';
+import { ProductBadge } from '@/features/ads/components/ProductBadge';
 
 interface AdCardProps {
   ad: AdCard;

@@ -191,7 +191,7 @@ edge-intelligence-hub/
 │   ├── ui/               # Componentes base (Radix UI)
 │   ├── ads/              # Componentes específicos de anúncios
 │   ├── ad-dashboard.tsx  # Dashboard principal
-│   ├── ad-analytics.tsx  # Componente de analytics
+│   ├── features/analytics/components/ad-analytics.tsx  # Componente de analytics
 │   ├── competitive-analysis.tsx # Análise competitiva
 │   ├── trend-analysis.tsx # Análise de tendências
 │   └── rate-extractor.tsx # Extrator de taxas
