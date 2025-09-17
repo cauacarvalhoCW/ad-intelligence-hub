@@ -2,7 +2,7 @@
 
 import { Badge } from "@/shared/ui/badge";
 import { extractProductFromAd } from "@/lib/utils/ratesExtractor";
-import type { Ad } from "@/lib/types";
+import type { Ad } from "@/features/ads/types";
 
 interface ProductBadgeProps {
   ad: Ad;

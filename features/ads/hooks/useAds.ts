@@ -1,20 +1,19 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Ad, FilterState } from "@/lib/types";
-
-export type Perspective = "infinitepay" | "jim" | "cloudwalk" | "default";
+import { DEFAULT_PERSPECTIVE } from "@/features/ads/types";
+import type {
+  Ad,
+  AdsPagination,
+  FilterState,
+  Perspective,
+} from "@/features/ads/types";
 
 interface UseAdsResult {
   ads: Ad[];
   loading: boolean;
   error: string | null;
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+  pagination: AdsPagination;
   perspective: Perspective;
   refetch: () => void;
 }
@@ -30,7 +29,7 @@ export function useAds(options: UseAdsOptions = {}): UseAdsResult {
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState<AdsPagination>({
     page: options.page || 1,
     limit: options.limit || 24,
     total: 0,
@@ -133,7 +132,7 @@ export function useAds(options: UseAdsOptions = {}): UseAdsResult {
     loading,
     error,
     pagination,
-    perspective: options.perspective || "default",
+    perspective: options.perspective || DEFAULT_PERSPECTIVE,
     refetch: fetchAds,
   };
 }

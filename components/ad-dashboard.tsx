@@ -13,14 +13,14 @@ import { CompetitiveAnalysis } from "@/components/competitive-analysis";
 import { CompetitiveDashboard } from "@/components/competitive-dashboard";
 import { TrendAnalysis } from "@/components/trend-analysis";
 import { RateExtractor } from "@/components/rate-extractor";
-import { AdCard } from "@/components/ads/AdCard";
-import { useAds } from "@/hooks/useAds";
+import { AdCard } from "@/features/ads/components/AdCard";
+import { useAds } from "@/features/ads/hooks";
 import { useCompetitors } from "@/hooks/useCompetitors";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useTheme } from "@/components/theme-provider";
 import { LogoLoading } from "@/shared/ui/logo-loading";
 import { X } from "lucide-react";
-import type { Ad } from "@/lib/types";
+import type { Ad } from "@/features/ads/types";
 
 // Função para formatar e limpar o ad_analysis
 function formatAdAnalysis(analysis: string | any): React.ReactElement {

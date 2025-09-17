@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 import { Badge } from "@/shared/ui/badge";
-import { Perspective } from "@/hooks/useAds";
+import type { Perspective } from "@/features/ads/types";
 
 interface PerspectiveSelectorProps {
   value: Perspective;

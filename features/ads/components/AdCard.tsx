@@ -5,7 +5,7 @@ import { Card } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Calendar, ExternalLink, Play, Image as ImageIcon } from "lucide-react";
-import { Ad } from "@/lib/types";
+import type { Ad } from "@/features/ads/types";
 
 interface AdCardProps {
   ad: Ad;

@@ -1,7 +1,7 @@
 "use client";
 
 import { AdCard } from "./AdCard";
-import { Ad } from "@/lib/types";
+import type { Ad } from "@/features/ads/types";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 interface AdsGridProps {

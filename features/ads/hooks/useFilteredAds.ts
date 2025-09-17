@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { mockAds } from "@/lib/mock-data";
-import type { Ad } from "@/lib/types";
+import type { Ad } from "@/features/ads/types";
 
 // Hook que filtra anúncios baseado no tema atual
 export function useFilteredAds() {
