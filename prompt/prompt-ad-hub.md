@@ -845,8 +845,8 @@ interface AdCard {
 'use client';
 
 import { useState } from 'react';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/shared/ui/card';
+import { Badge } from '@/shared/ui/badge';
 import { RatesDisplay } from './RatesDisplay';
 import { ProductBadge } from './ProductBadge';
 
@@ -1379,7 +1379,7 @@ export function useTheme() {
 'use client';
 
 import { useTheme } from '@/lib/contexts/ThemeContext';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/shared/ui/button';
 
 const THEMES = [
   { id: 'light', name: 'Light', icon: '☀️' },

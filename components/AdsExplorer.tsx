@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useAds, Perspective } from "@/hooks/useAds";
 import { AdsGrid } from "./ads/AdsGrid";
 import { PerspectiveSelector } from "./PerspectiveSelector";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { RefreshCw } from "lucide-react";
 
 const RECENCY_ACTIVE_DAYS = 2;

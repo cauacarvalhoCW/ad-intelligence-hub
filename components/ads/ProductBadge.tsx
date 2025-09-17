@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import { extractProductFromAd } from "@/lib/utils/ratesExtractor";
 import type { Ad } from "@/lib/types";
 

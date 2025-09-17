@@ -1,13 +1,13 @@
 "use client";
 import { SignOutButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/shared/ui/card";
 import { AlertTriangle, Mail, LogOut } from "lucide-react";
 import { AuthHeader } from "@/components/auth-header";
 
