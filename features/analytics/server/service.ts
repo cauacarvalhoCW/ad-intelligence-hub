@@ -11,10 +11,6 @@ import {
   ANALYTICS_TAG_STOPWORDS,
 } from "./constants";
 
-interface FetchAnalyticsDependencies {
-  supabase: SupabaseClient;
-}
-
 interface AnalyticsSupabaseRow {
   ad_id: string;
   competitor_id: string;
@@ -23,7 +19,7 @@ interface AnalyticsSupabaseRow {
   tags?: string | null;
   image_description?: string | null;
   transcription?: string | null;
-  ad_analysis?: Record<string, any> | null;
+  ad_analysis?: Record<string, unknown> | null;
   source?: string | null;
   start_date?: string | null;
   competitors?: {
@@ -32,7 +28,11 @@ interface AnalyticsSupabaseRow {
   } | null;
 }
 
-function normalizeDateBoundary(value?: string | null, end = false): string | undefined {
+interface FetchAnalyticsDependencies {
+  supabase: SupabaseClient;
+}
+
+function normalizeBoundary(value?: string | null, end = false): string | undefined {
   if (!value) return undefined;
   const suffix = end ? "T23:59:59.999-03:00" : "T00:00:00.000-03:00";
   return new Date(`${value}${suffix}`).toISOString();
@@ -42,13 +42,13 @@ async function resolvePerspectiveCompetitors(
   supabase: SupabaseClient,
   perspective: Perspective,
 ): Promise<string[]> {
-  const competitorNames = ANALYTICS_PERSPECTIVE_COMPETITORS[perspective] ?? [];
-  if (competitorNames.length === 0) return [];
+  const names = ANALYTICS_PERSPECTIVE_COMPETITORS[perspective] ?? [];
+  if (names.length === 0) return [];
 
   const { data, error } = await supabase
     .from("competitors")
     .select("id, name")
-    .in("name", competitorNames);
+    .in("name", names);
 
   if (error) {
     throw new Error(`Failed to resolve perspective competitors: ${error.message}`);
@@ -106,14 +106,14 @@ function buildBaseQuery(
     query = query.in("asset_type", params.assetTypes);
   }
 
-  const fromDate = normalizeDateBoundary(params.dateFrom, false);
-  if (fromDate) {
-    query = query.gte("start_date", fromDate);
+  const from = normalizeBoundary(params.dateFrom, false);
+  if (from) {
+    query = query.gte("start_date", from);
   }
 
-  const toDate = normalizeDateBoundary(params.dateTo, true);
-  if (toDate) {
-    query = query.lte("start_date", toDate);
+  const to = normalizeBoundary(params.dateTo, true);
+  if (to) {
+    query = query.lte("start_date", to);
   }
 
   if (params.search) {
@@ -134,7 +134,7 @@ function getWeekStart(date: Date): string {
   return copy.toISOString().split("T")[0];
 }
 
-function extractAndCleanTags(rows: AnalyticsSupabaseRow[]) {
+function extractTags(rows: AnalyticsSupabaseRow[]) {
   const counters: Record<string, number> = {};
 
   rows.forEach((row) => {
@@ -169,14 +169,17 @@ function extractFeesAndOffers(rows: AnalyticsSupabaseRow[]) {
 
   rows.forEach((row) => {
     if (row.ad_analysis?.rates) {
-      const { credit, debit, pix } = row.ad_analysis.rates;
-      const parsedRates: Array<[string, string | undefined]> = [
+      const { credit, debit, pix } = row.ad_analysis.rates as Record<
+        string,
+        string | undefined
+      >;
+      const pairs: Array<[string, string | undefined]> = [
         ["credito", credit],
         ["debito", debit],
         ["pix", pix],
       ];
 
-      parsedRates.forEach(([bucket, value]) => {
+      pairs.forEach(([bucket, value]) => {
         if (!value || value === "0%") return;
         const parsed = parseFloat(value.replace(/[%,]/g, "."));
         if (!Number.isFinite(parsed) || parsed > 30) return;
@@ -191,10 +194,10 @@ function extractFeesAndOffers(rows: AnalyticsSupabaseRow[]) {
     const matches = text.match(/(\d{1,2}(?:[.,]\d{1,2})?)\s*%/g) || [];
 
     matches.forEach((match) => {
-      const matchIndex = text.indexOf(match);
+      const idx = text.indexOf(match);
       const context = text.substring(
-        Math.max(0, matchIndex - 40),
-        Math.min(text.length, matchIndex + match.length + 40),
+        Math.max(0, idx - 40),
+        Math.min(text.length, idx + match.length + 40),
       );
       const percent = parseFloat(match.replace("%", "").replace(",", "."));
       if (!Number.isFinite(percent)) return;
@@ -261,19 +264,16 @@ function calculateMetrics(
   params: AnalyticsRequestParams,
   total: number,
 ): AnalyticsMetrics {
-  const byCompetitorMap = new Map<string, number>();
-  const byAssetTypeMap = new Map<string, number>();
+  const competitorMap = new Map<string, number>();
+  const assetMap = new Map<string, number>();
   const weeklyMap = new Map<string, number>();
 
   rows.forEach((row) => {
-    const competitorName = row.competitors?.name || "Desconhecido";
-    byCompetitorMap.set(
-      competitorName,
-      (byCompetitorMap.get(competitorName) ?? 0) + 1,
-    );
+    const competitor = row.competitors?.name || "Desconhecido";
+    competitorMap.set(competitor, (competitorMap.get(competitor) ?? 0) + 1);
 
     const assetType = row.asset_type?.toLowerCase() || "unknown";
-    byAssetTypeMap.set(assetType, (byAssetTypeMap.get(assetType) ?? 0) + 1);
+    assetMap.set(assetType, (assetMap.get(assetType) ?? 0) + 1);
 
     if (row.start_date) {
       const weekStart = getWeekStart(new Date(row.start_date));
@@ -281,11 +281,11 @@ function calculateMetrics(
     }
   });
 
-  const by_competitor = Array.from(byCompetitorMap.entries())
+  const by_competitor = Array.from(competitorMap.entries())
     .map(([competitor_name, count]) => ({ competitor_name, count }))
     .sort((a, b) => b.count - a.count);
 
-  const by_asset_type = Array.from(byAssetTypeMap.entries()).map(
+  const by_asset_type = Array.from(assetMap.entries()).map(
     ([asset_type, count]) => ({ asset_type, count }),
   );
 
@@ -293,9 +293,8 @@ function calculateMetrics(
     .map(([week_start, total]) => ({ week_start, total }))
     .sort((a, b) => a.week_start.localeCompare(b.week_start));
 
-  const top_tags = extractAndCleanTags(rows).slice(0, 20);
+  const top_tags = extractTags(rows).slice(0, 20);
   const { fees, offers } = extractFeesAndOffers(rows);
-
   const platform = [{ label: params.platform ?? "Meta", value: total }];
 
   return {
@@ -320,7 +319,6 @@ export async function fetchAnalytics(
   );
 
   const query = buildBaseQuery(supabase, perspectiveIds, params).limit(2000);
-
   const { data, error, count } = await query.returns<AnalyticsSupabaseRow[]>();
 
   if (error) {
