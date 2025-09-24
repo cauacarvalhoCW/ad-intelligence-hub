@@ -150,147 +150,72 @@ export const mockCompetitors: Competitor[] = [
 
 // Exemplos de dados baseados no prompt - Mercado Pago, Stone, PagBank, Square
 export const mockAds: Ad[] = [
-  // Exemplo Mercado Pago (BR)
+  // Exemplo Mercado Pago (BR) - Vídeo com preview
   {
-    id: "mp_point_2024_001",
+    ad_id: "mp_point_2024_001",
     competitor_id: "550e8400-e29b-41d4-a716-446655440001",
-    title: "Point Pro - Taxa Zero",
-    description:
+    product: "Point Pro - Taxa Zero",
+    image_description:
       "Aceite cartão e PIX na sua loja com a Point do Mercado Pago. Taxa zero no débito e PIX. Peça já a sua!",
-    platform: "facebook",
-    ad_type: "video",
-    detected_rates: ["0%", "taxa zero", "2.99%"],
-    extracted_text:
+    source: "https://example.com/video.mp4",
+    asset_type: "video",
+    video_image_preview: "https://picsum.photos/400/600", // Imagem vertical (9:16)
+    transcription:
       "Aceite cartão e PIX na sua loja com a Point do Mercado Pago. Taxa zero no débito e PIX. Peça já a sua!",
-    tags: ["maquininha", "point", "vendas", "pix", "cartão"],
+    tags: "maquininha,point,vendas,pix,cartão",
+    start_date: "2024-03-20T10:30:00Z",
     created_at: "2024-03-20T10:30:00Z",
     updated_at: "2024-03-20T10:30:00Z",
     competitor: mockCompetitors.find((c) => c.name === "Mercado Pago"),
   },
 
-  // Exemplo Stone Ton (BR)
+  // Exemplo Stone Ton (BR) - Imagem quadrada
   {
-    id: "stone_ton_2024_001",
+    ad_id: "stone_ton_2024_001",
     competitor_id: "550e8400-e29b-41d4-a716-446655440002",
-    title: "Maquininha Ton - Sem Mensalidade",
-    description:
+    product: "Maquininha Ton - Sem Mensalidade",
+    image_description:
       "Maquininha Ton da Stone. Sem mensalidade, taxa a partir de 1,99%. Peça já!",
-    platform: "instagram",
-    ad_type: "image",
-    detected_rates: ["1,99%", "0%", "Grátis"],
-    extracted_text:
-      "Maquininha Ton da Stone. Sem mensalidade, taxa a partir de 1,99%. Peça já!",
-    tags: ["maquininha", "ton", "sem mensalidade", "taxa baixa"],
+    source: "https://picsum.photos/500/500", // Imagem quadrada (1:1)
+    asset_type: "image",
+    tags: "maquininha,ton,sem mensalidade,taxa baixa",
+    start_date: "2024-03-15T14:20:00Z",
     created_at: "2024-03-15T14:20:00Z",
     updated_at: "2024-03-15T14:20:00Z",
     competitor: mockCompetitors.find((c) => c.name === "Stone"),
   },
 
-  // Exemplo PagBank (BR)
+  // Exemplo PagBank (BR) - Imagem horizontal
   {
-    id: "pagbank_pos_2024_001",
+    ad_id: "pagbank_pos_2024_001",
     competitor_id: "550e8400-e29b-41d4-a716-446655440003",
-    title: "PagBank POS - Tudo em Um",
-    description:
+    product: "PagBank POS - Tudo em Um",
+    image_description:
       "PagBank POS: receba com cartão, PIX e conta digital tudo em um só lugar. Taxa competitiva!",
-    platform: "facebook",
-    ad_type: "video",
-    detected_rates: ["2,49%", "0%", "0%"],
-    extracted_text:
-      "PagBank POS: receba com cartão, PIX e conta digital tudo em um só lugar. Taxa competitiva!",
-    tags: ["pos", "pagbank", "conta digital", "pix"],
+    source: "https://picsum.photos/800/450", // Imagem horizontal (16:9)
+    asset_type: "image",
+    tags: "pos,pagbank,conta digital,pix",
+    start_date: "2024-03-18T09:15:00Z",
     created_at: "2024-03-18T09:15:00Z",
     updated_at: "2024-03-18T09:15:00Z",
     competitor: mockCompetitors.find((c) => c.name === "PagBank"),
   },
 
-  // Exemplo Square (US)
+  // Exemplo Cora - Vídeo sem preview (para testar fallback)
   {
-    id: "square_reader_2024_001",
-    competitor_id: "550e8400-e29b-41d4-a716-446655440007",
-    title: "Square Reader - Accept Anywhere",
-    description:
-      "Accept payments anywhere with Square Reader. 2.6% + 10¢ per transaction. Get started today!",
-    platform: "google",
-    ad_type: "video",
-    detected_rates: ["2.6% + $0.10", "2.6% + $0.10"],
-    extracted_text:
-      "Accept payments anywhere with Square Reader. 2.6% + 10¢ per transaction. Get started today!",
-    tags: ["card reader", "square", "small business", "contactless"],
-    created_at: "2024-03-20T16:30:00Z",
-    updated_at: "2024-03-20T16:30:00Z",
-    competitor: mockCompetitors.find((c) => c.name === "Square"),
-  },
-
-  // Exemplo PayPal (US)
-  {
-    id: "paypal_business_2024_001",
-    competitor_id: "550e8400-e29b-41d4-a716-446655440008",
-    title: "PayPal Business - Online Payments",
-    description:
-      "Accept online payments with PayPal Business. 2.9% + $0.30 per transaction. No monthly fees!",
-    platform: "linkedin",
-    ad_type: "image",
-    detected_rates: ["2.9% + $0.30", "$0"],
-    extracted_text:
-      "Accept online payments with PayPal Business. 2.9% + $0.30 per transaction. No monthly fees!",
-    tags: ["online payments", "paypal", "business", "no monthly fees"],
-    created_at: "2024-03-22T11:45:00Z",
-    updated_at: "2024-03-22T11:45:00Z",
-    competitor: mockCompetitors.find((c) => c.name === "PayPal"),
-  },
-
-  // Exemplo Stripe (US)
-  {
-    id: "stripe_connect_2024_001",
-    competitor_id: "550e8400-e29b-41d4-a716-446655440009",
-    title: "Stripe Connect - Developer-First",
-    description:
-      "Build powerful payment experiences with Stripe Connect. 2.9% + 30¢ per successful charge.",
-    platform: "facebook",
-    ad_type: "text",
-    detected_rates: ["2.9% + $0.30"],
-    extracted_text:
-      "Build powerful payment experiences with Stripe Connect. 2.9% + 30¢ per successful charge.",
-    tags: ["api", "stripe", "developers", "connect"],
-    created_at: "2024-03-25T08:20:00Z",
-    updated_at: "2024-03-25T08:20:00Z",
-    competitor: mockCompetitors.find((c) => c.name === "Stripe"),
-  },
-
-  // Mais exemplos BR
-  {
-    id: "cora_conta_2024_001",
+    ad_id: "cora_conta_2024_001",
     competitor_id: "550e8400-e29b-41d4-a716-446655440004",
-    title: "Cora - Conta Digital Empresarial",
-    description:
+    product: "Cora - Conta Digital Empresarial",
+    transcription:
       "Conta digital para sua empresa com PIX grátis e cartão sem anuidade. Abra já!",
-    platform: "facebook",
-    ad_type: "video",
-    detected_rates: ["0%", "Grátis"],
-    extracted_text:
-      "Conta digital para sua empresa com PIX grátis e cartão sem anuidade. Abra já!",
-    tags: ["conta digital", "empresarial", "pix grátis", "sem anuidade"],
+    source: "https://example.com/cora-video.mp4",
+    asset_type: "video",
+    // Sem video_image_preview para testar fallback
+    tags: "conta digital,empresarial,pix grátis,sem anuidade",
+    start_date: "2024-03-12T15:30:00Z",
     created_at: "2024-03-12T15:30:00Z",
     updated_at: "2024-03-12T15:30:00Z",
     competitor: mockCompetitors.find((c) => c.name === "Cora"),
   },
 
-  // Mais exemplos US
-  {
-    id: "venmo_business_2024_001",
-    competitor_id: "550e8400-e29b-41d4-a716-446655440010",
-    title: "Venmo Business - Social Payments",
-    description:
-      "Accept Venmo payments for your business. 1.9% + $0.10 per transaction. Social commerce made easy!",
-    platform: "instagram",
-    ad_type: "video",
-    detected_rates: ["1.9% + $0.10"],
-    extracted_text:
-      "Accept Venmo payments for your business. 1.9% + $0.10 per transaction. Social commerce made easy!",
-    tags: ["venmo", "social payments", "business", "mobile"],
-    created_at: "2024-03-28T12:15:00Z",
-    updated_at: "2024-03-28T12:15:00Z",
-    competitor: mockCompetitors.find((c) => c.name === "Venmo"),
-  },
 ];

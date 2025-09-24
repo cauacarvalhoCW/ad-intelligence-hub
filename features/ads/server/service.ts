@@ -19,6 +19,7 @@ interface AdsSupabaseRow {
   tags?: string | null;
   image_description?: string | null;
   transcription?: string | null;
+  video_image_preview?: string | null;
   ad_analysis?: unknown;
   created_at: string;
   updated_at?: string | null;
@@ -110,6 +111,7 @@ export async function fetchAds(
         tags,
         image_description,
         transcription,
+        video_image_preview,
         ad_analysis,
         created_at,
         updated_at,

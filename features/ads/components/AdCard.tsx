@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -17,6 +17,51 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
   const [imageError, setImageError] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [imageAspectRatio, setImageAspectRatio] = useState<string>("9/16"); // Default aspect ratio
+
+  // Função para detectar aspect ratio da imagem
+  const detectImageAspectRatio = (imageUrl: string) => {
+    const img = new Image();
+    img.onload = () => {
+      const ratio = img.width / img.height;
+      
+      // Definir aspect ratios baseados nas dimensões
+      if (ratio >= 0.9 && ratio <= 1.1) {
+        // Quadrado (1:1)
+        setImageAspectRatio("1/1");
+      } else if (ratio >= 1.7 && ratio <= 1.9) {
+        // Landscape/horizontal (16:9)
+        setImageAspectRatio("16/9");
+      } else if (ratio >= 0.55 && ratio <= 0.65) {
+        // Portrait/vertical (9:16)
+        setImageAspectRatio("9/16");
+      } else if (ratio >= 1.2 && ratio <= 1.4) {
+        // Ligeiramente horizontal (4:3)
+        setImageAspectRatio("4/3");
+      } else if (ratio >= 0.7 && ratio <= 0.8) {
+        // Ligeiramente vertical (3:4)
+        setImageAspectRatio("3/4");
+      } else {
+        // Manter padrão para casos extremos
+        setImageAspectRatio("9/16");
+      }
+    };
+    img.onerror = () => {
+      // Em caso de erro, manter o padrão
+      setImageAspectRatio("9/16");
+    };
+    img.src = imageUrl;
+  };
+
+  // Detectar aspect ratio quando a mídia mudar
+  useEffect(() => {
+    if (ad.asset_type === "image" && ad.source && isDirectMedia(ad.source)) {
+      detectImageAspectRatio(ad.source);
+    } else if (ad.asset_type === "video" && ad.video_image_preview) {
+      // Para vídeos, usar a imagem de preview para detectar o aspect ratio
+      detectImageAspectRatio(ad.video_image_preview);
+    }
+  }, [ad.source, ad.asset_type, ad.video_image_preview]);
 
   // Calcular se o anúncio é recente/ativo
   const isRecent = ad.start_date
@@ -112,7 +157,8 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
             <Badge variant="outline" className="text-xs">
               {ad.asset_type === "video" ? (
                 <>
-                  <Play className="w-3 h-3 mr-1" /> Vídeo
+                  <Play className="w-3 h-3 mr-1" /> 
+                  {ad.video_image_preview ? "Vídeo (Preview)" : "Vídeo"}
                 </>
               ) : (
                 <>
@@ -134,8 +180,12 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
         </div>
       </div>
 
-      {/* Mídia - Tamanho padronizado */}
-      <div className="relative bg-gray-100 aspect-video h-48">
+      {/* Mídia - Tamanho dinâmico baseado no aspect ratio */}
+      <div 
+        className="relative bg-gray-100"
+        style={{ aspectRatio: imageAspectRatio }}
+      >
+        {/* Aspect ratio dinâmico baseado na detecção da imagem */}
         {ad.asset_type === "video" &&
         isRecent &&
         ad.source &&
@@ -164,7 +214,7 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/placeholder.jpg"
+                src={ad.video_image_preview || "/placeholder.jpg"}
                 alt="Prévia do vídeo"
                 className="absolute inset-0 w-full h-full object-cover"
                 onError={(e) => {
@@ -173,7 +223,7 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="rounded-full bg-black/60 p-3 shadow-md">
+                <div className="rounded-full bg-black/60 p-3 shadow-md group-hover:bg-black/70 transition-colors">
                   <Play className="w-7 h-7 text-white" />
                 </div>
               </div>
