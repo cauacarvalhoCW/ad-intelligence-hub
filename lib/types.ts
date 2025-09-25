@@ -13,6 +13,7 @@ export interface Ad {
   image_description?: string | null; // Descrição da imagem/vídeo
   transcription?: string | null; // Transcrição do áudio
   video_image_preview?: string | null; // URL da imagem de preview para vídeos
+  platform?: string | null; // "Google" ou "Meta"
   created_at: string;
   updated_at?: string;
 

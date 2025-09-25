@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+ import { useState, useEffect } from "react";
 import { Card } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -18,6 +18,23 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
   const [videoError, setVideoError] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [imageAspectRatio, setImageAspectRatio] = useState<string>("9/16"); // Default aspect ratio
+  
+  // Estados para Google Ads
+  const [iframeError, setIframeError] = useState(false);
+  const [googleAdHtml, setGoogleAdHtml] = useState<string | null>(null);
+
+  // Função para fetch HTML do Google Ad
+  const fetchGoogleAdHtml = async (url: string) => {
+    try {
+      const response = await fetch(`/api/google-ad-proxy?url=${encodeURIComponent(url)}`);
+      if (response.ok) {
+        const html = await response.text();
+        setGoogleAdHtml(html);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar Google Ad:", error);
+    }
+  };
 
   // Função para detectar aspect ratio da imagem
   const detectImageAspectRatio = (imageUrl: string) => {
@@ -111,9 +128,39 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
     );
   };
 
-  // Verificar se é plataforma Meta
-  const isMetaPlatform =
+  // Detectar plataforma
+  const isGooglePlatform = ad.platform === "GOOGLE";
+  const isMetaPlatform = ad.platform === "META" || 
     ad.source?.includes("facebook") || ad.source?.includes("meta");
+
+  // Detectar Google Video específico (asset_type em minúsculo no banco)
+  const isGoogleVideo = isGooglePlatform && ad.asset_type === "video";
+  const isGoogleText = isGooglePlatform && ad.asset_type === "text";
+  const isGoogleImage = isGooglePlatform && ad.asset_type === "image";
+
+  // Função para extrair ID do YouTube
+  const extractYouTubeId = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/v\/([^&\n?#]+)/,
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
+  };
+
+  // Debug para Google Ads
+  if (isGooglePlatform) {
+    console.log("🎯 Google Ad detectado:", {
+      ad_id: ad.ad_id,
+      asset_type: ad.asset_type,
+      isVideo: isGoogleVideo,
+      source: ad.source
+    });
+  }
 
   // Formatar data
   const formatDate = (dateString: string | null | undefined) => {
@@ -135,14 +182,35 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
       <div className="p-4 border-b">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <img
-              src={`/logos/competitors/${competitorSlug}.jpg`}
-              alt={ad.competitor?.name || "Competidor"}
-              className="w-8 h-8 rounded"
-              onError={(e) => {
-                e.currentTarget.src = "/placeholder-logo.svg";
-              }}
-            />
+            <div className="relative">
+              <img
+                src={`/logos/competitors/${competitorSlug}.jpg`}
+                alt={ad.competitor?.name || "Competidor"}
+                className="w-8 h-8 rounded"
+                onError={(e) => {
+                  e.currentTarget.src = "/placeholder-logo.svg";
+                }}
+              />
+              {/* Logo da Plataforma sobreposto */}
+              {isGooglePlatform && (
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center border border-gray-200">
+                  <img 
+                    src="/logos/google.svg" 
+                    alt="Google" 
+                    className="w-2.5 h-2.5"
+                  />
+                </div>
+              )}
+              {isMetaPlatform && (
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center border border-gray-200">
+                  <img 
+                    src="/logos/meta.svg" 
+                    alt="Meta" 
+                    className="w-2.5 h-2.5"
+                  />
+                </div>
+              )}
+            </div>
             <div>
               <h3 className="font-semibold text-sm">{ad.competitor?.name}</h3>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -185,8 +253,54 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
         className="relative bg-gray-100"
         style={{ aspectRatio: imageAspectRatio }}
       >
-        {/* Aspect ratio dinâmico baseado na detecção da imagem */}
-        {ad.asset_type === "video" &&
+        {/* Google Video - Embed YouTube */}
+        {isGoogleVideo && ad.source ? (
+          (() => {
+            const youtubeId = extractYouTubeId(ad.source!);
+            return youtubeId ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${youtubeId}`}
+                className="w-full h-full border-0"
+                title="Google Video Ad"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center">
+                  <Play className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-600">Vídeo do YouTube</p>
+                  <p className="text-xs text-gray-500">URL inválida</p>
+                </div>
+              </div>
+            );
+          })()
+        ) : /* Google TEXT/IMAGE - Embed link ou HTML */
+        (isGoogleText || isGoogleImage) && ad.source ? (
+          !iframeError ? (
+            <iframe
+              src={ad.source}
+              className="w-full h-full border-0"
+              title="Google Ad"
+              onError={() => {
+                setIframeError(true);
+                fetchGoogleAdHtml(ad.source!);
+              }}
+            />
+          ) : googleAdHtml ? (
+            <div dangerouslySetInnerHTML={{ __html: googleAdHtml }} className="w-full h-full" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <p className="text-sm text-gray-500">Carregando Google Ad...</p>
+            </div>
+          )
+        ) : isGooglePlatform ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <p className="text-sm text-gray-500">Google Ad sem source</p>
+          </div>
+        ) : (
+        /* Se for Meta: display normal */
+        ad.asset_type === "video" &&
         isRecent &&
         ad.source &&
         isDirectMedia(ad.source) &&
@@ -260,6 +374,7 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
               )}
             </div>
           </div>
+        )
         )}
       </div>
 
@@ -284,18 +399,22 @@ export function AdCard({ ad, recencyActiveDays = 2, onClick }: AdCardProps) {
           </div>
         )}
 
-        {/* Botão Meta Ads Library */}
+        {/* Botão para ver fonte original */}
         <Button
           variant="outline"
           size="sm"
           className="w-full"
           onClick={(e) => {
             e.stopPropagation();
-            window.open(metaAdsUrl, "_blank");
+            if (isGooglePlatform && ad.source) {
+              window.open(ad.source, "_blank");
+            } else {
+              window.open(metaAdsUrl, "_blank");
+            }
           }}
         >
           <ExternalLink className="w-4 h-4 mr-2" />
-          Ver na Meta Ads Library
+          {isGooglePlatform ? "Ver Google Ad Original" : "Ver na Meta Ads Library"}
         </Button>
       </div>
     </Card>

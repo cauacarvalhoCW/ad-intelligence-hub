@@ -106,6 +106,7 @@ export function AdDashboard() {
       perspective: currentTheme as any,
       page: currentPage,
       limit: 24,
+      // useMockData: true, // Desativado - usando dados reais do Supabase
       filters: {
         search: filters.searchTerm || undefined,
         competitors:
@@ -115,6 +116,10 @@ export function AdDashboard() {
         assetTypes:
           filters.selectedAdType !== "all"
             ? [filters.selectedAdType]
+            : undefined,
+        platform:
+          filters.selectedPlatform !== "all"
+            ? filters.selectedPlatform
             : undefined,
         dateRange:
           filters.dateFrom || filters.dateTo
@@ -552,7 +557,38 @@ export function AdDashboard() {
                 <div>
                   <h4 className="font-semibold mb-2">Mídia Original</h4>
                   <div className="relative bg-gray-100 rounded-lg overflow-hidden">
-                    {selectedAd.asset_type === "video" &&
+                    {/* Google Video - YouTube Embed */}
+                    {selectedAd.platform === "GOOGLE" && selectedAd.asset_type === "video" && selectedAd.source ? (
+                      (() => {
+                        const extractYouTubeId = (url: string): string | null => {
+                          const patterns = [
+                            /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+                            /youtube\.com\/v\/([^&\n?#]+)/,
+                          ];
+                          for (const pattern of patterns) {
+                            const match = url.match(pattern);
+                            if (match) return match[1];
+                          }
+                          return null;
+                        };
+                        
+                        const youtubeId = extractYouTubeId(selectedAd.source);
+                        return youtubeId ? (
+                          <iframe
+                            src={`https://www.youtube.com/embed/${youtubeId}`}
+                            className="w-full h-96 border-0"
+                            title="Google Video Ad"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <div className="w-full h-48 flex items-center justify-center">
+                            <p className="text-gray-500">URL do YouTube inválida</p>
+                          </div>
+                        );
+                      })()
+                    ) : /* Meta Video - MP4 */
+                    selectedAd.asset_type === "video" &&
                     selectedAd.source.includes(".mp4") ? (
                       <video
                         controls

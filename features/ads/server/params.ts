@@ -42,5 +42,6 @@ export function parseAdsRequestParams(request: NextRequest): AdsRequestParams {
     search: searchParams.get("search") || "",
     dateFrom: searchParams.get("dateFrom") || undefined,
     dateTo: searchParams.get("dateTo") || undefined,
+    platform: searchParams.get("platform") || undefined,
   };
 }

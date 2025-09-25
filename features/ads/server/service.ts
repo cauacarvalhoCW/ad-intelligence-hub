@@ -112,6 +112,7 @@ export async function fetchAds(
         image_description,
         transcription,
         video_image_preview,
+        platform,
         ad_analysis,
         created_at,
         updated_at,
@@ -124,8 +125,7 @@ export async function fetchAds(
       { count: "exact" },
     )
     .not("ad_analysis", "is", null)
-    .neq("ad_analysis", "{}")
-    .in("asset_type", ["video", "image"]);
+    .neq("ad_analysis", "{}");
 
   if (perspectiveIds.length > 0) {
     query = query.in("competitor_id", perspectiveIds);
@@ -136,7 +136,25 @@ export async function fetchAds(
   }
 
   if (params.assetTypes?.length) {
-    query = query.in("asset_type", params.assetTypes);
+    // Debug: ver que tipos estão sendo filtrados
+    console.log("🔍 Filtro assetTypes:", params.assetTypes);
+    
+    // Mapear tipos do filtro para os valores reais do banco
+    const mappedTypes: string[] = [];
+    params.assetTypes.forEach(type => {
+      if (type === "text") {
+        mappedTypes.push("text"); // Google/Meta text (minúsculo)
+      } else if (type === "image") {
+        mappedTypes.push("image"); // Google/Meta image (minúsculo)
+      } else if (type === "video") {
+        mappedTypes.push("video"); // Google/Meta video (minúsculo)
+      } else {
+        mappedTypes.push(type); // Manter original
+      }
+    });
+    
+    console.log("🔍 Tipos mapeados:", mappedTypes);
+    query = query.in("asset_type", mappedTypes);
   }
 
   if (params.products?.length) {
@@ -147,6 +165,12 @@ export async function fetchAds(
     query = query.or(
       `tags.ilike.%${params.search}%,image_description.ilike.%${params.search}%,transcription.ilike.%${params.search}%,product.ilike.%${params.search}%`,
     );
+  }
+
+  if (params.platform) {
+    // Debug: ver que plataforma está sendo filtrada
+    console.log("🔍 Filtro platform:", params.platform);
+    query = query.eq("platform", params.platform);
   }
 
   const fromDate = parseDateBoundary(params.dateFrom, false);
@@ -166,6 +190,19 @@ export async function fetchAds(
     .range(offset, offset + limit - 1);
 
   const { data, error, count } = await query.returns<AdsSupabaseRow[]>();
+
+  // Debug: Log dados retornados
+  console.log("📊 Ads retornados:", {
+    total: count,
+    rows_length: data?.length,
+    platforms: data?.map(r => r.platform).filter(Boolean),
+    asset_types: data?.map(r => r.asset_type).filter(Boolean),
+    sample: data?.slice(0, 2).map(r => ({
+      ad_id: r.ad_id,
+      platform: r.platform,
+      asset_type: r.asset_type
+    }))
+  });
 
   if (error) {
     throw new Error(`Failed to fetch ads: ${error.message}`);
