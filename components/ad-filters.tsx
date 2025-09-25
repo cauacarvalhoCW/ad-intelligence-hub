@@ -34,18 +34,14 @@ export interface FilterState {
 }
 
 const platforms = [
-  { value: "meta", label: "Meta" },
-  // { value: "instagram", label: "Instagram" },
-  // { value: "google", label: "Google" },
-  // { value: "linkedin", label: "LinkedIn" },
-  // { value: "tiktok", label: "TikTok" },
+  { value: "META", label: "Meta" },
+  { value: "GOOGLE", label: "Google" },
 ];
 
 const adTypes = [
-  { value: "image", label: "Imagem" },
   { value: "video", label: "Vídeo" },
-  // { value: "carousel", label: "Carrossel" },
-  // { value: "text", label: "Texto" },
+  { value: "image", label: "Imagem" },
+  { value: "text", label: "Texto" },
 ];
 
 const dateRanges = [

@@ -159,6 +159,7 @@ export const mockAds: Ad[] = [
       "Aceite cartão e PIX na sua loja com a Point do Mercado Pago. Taxa zero no débito e PIX. Peça já a sua!",
     source: "https://example.com/video.mp4",
     asset_type: "video",
+    platform: "META",
     video_image_preview: "https://picsum.photos/400/600", // Imagem vertical (9:16)
     transcription:
       "Aceite cartão e PIX na sua loja com a Point do Mercado Pago. Taxa zero no débito e PIX. Peça já a sua!",
@@ -178,6 +179,7 @@ export const mockAds: Ad[] = [
       "Maquininha Ton da Stone. Sem mensalidade, taxa a partir de 1,99%. Peça já!",
     source: "https://picsum.photos/500/500", // Imagem quadrada (1:1)
     asset_type: "image",
+    platform: "META",
     tags: "maquininha,ton,sem mensalidade,taxa baixa",
     start_date: "2024-03-15T14:20:00Z",
     created_at: "2024-03-15T14:20:00Z",
@@ -210,12 +212,30 @@ export const mockAds: Ad[] = [
       "Conta digital para sua empresa com PIX grátis e cartão sem anuidade. Abra já!",
     source: "https://example.com/cora-video.mp4",
     asset_type: "video",
+    platform: "META",
     // Sem video_image_preview para testar fallback
     tags: "conta digital,empresarial,pix grátis,sem anuidade",
     start_date: "2024-03-12T15:30:00Z",
     created_at: "2024-03-12T15:30:00Z",
     updated_at: "2024-03-12T15:30:00Z",
     competitor: mockCompetitors.find((c) => c.name === "Cora"),
+  },
+
+  // Google Ad de teste
+  {
+    ad_id: "google_test_001",
+    competitor_id: "550e8400-e29b-41d4-a716-446655440001",
+    product: "Teste Google Ad",
+    image_description: "Google Ad de teste para embedding",
+    source: "https://tpc.googlesyndication.com/archive/sadbundle/$csp=archive$/9544934641525606276/index.html",
+    asset_type: "image",
+    platform: "GOOGLE",
+    tags: "teste,google",
+    ad_analysis: {"test": true},
+    start_date: "2024-03-25T10:30:00Z",
+    created_at: "2024-03-25T10:30:00Z",
+    updated_at: "2024-03-25T10:30:00Z",
+    competitor: mockCompetitors.find((c) => c.name === "Mercado Pago"),
   },
 
 ];

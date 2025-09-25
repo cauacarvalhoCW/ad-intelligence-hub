@@ -27,6 +27,7 @@ export interface AdsFilters {
   search?: string;
   dateFrom?: string;
   dateTo?: string;
+  platform?: string; // "GOOGLE" | "META"
 }
 
 export interface AdsRequestParams extends AdsFilters {

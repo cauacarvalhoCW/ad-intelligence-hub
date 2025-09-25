@@ -23,6 +23,7 @@ interface UseAdsOptions {
   filters?: Partial<FilterState>;
   page?: number;
   limit?: number;
+  useMockData?: boolean;
 }
 
 export function useAds(options: UseAdsOptions = {}): UseAdsResult {
@@ -40,6 +41,23 @@ export function useAds(options: UseAdsOptions = {}): UseAdsResult {
     try {
       setLoading(true);
       setError(null);
+
+      // Usar dados mock se solicitado
+      if (options.useMockData) {
+        const { mockAds } = await import("@/lib/mock-data");
+        console.log("🧪 Usando dados mock, total:", mockAds.length);
+        console.log("🎯 Google Ads no mock:", mockAds.filter(ad => ad.platform === "GOOGLE"));
+        
+        setAds(mockAds);
+        setPagination({
+          page: options.page || 1,
+          limit: options.limit || 24,
+          total: mockAds.length,
+          totalPages: Math.ceil(mockAds.length / (options.limit || 24)),
+        });
+        setLoading(false);
+        return;
+      }
 
       // Construir query params
       const params = new URLSearchParams({
@@ -64,6 +82,9 @@ export function useAds(options: UseAdsOptions = {}): UseAdsResult {
       }
       if (options.filters?.search) {
         params.set("search", options.filters.search);
+      }
+      if (options.filters?.platform) {
+        params.set("platform", options.filters.platform);
       }
       if (options.filters?.dateRange?.start) {
         // Converter para formato YYYY-MM-DD
