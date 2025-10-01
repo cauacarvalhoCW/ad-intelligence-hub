@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prebuild": "rm -rf .next",
     "build": "next build",
+    "vercel-build": "rm -rf .next node_modules/.cache && next build",
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start"
