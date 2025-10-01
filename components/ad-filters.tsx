@@ -302,11 +302,13 @@ export function AdFilters({
             onClick={applyFilters}
             disabled={!hasUnappliedChanges}
             className="flex-1"
+            size="lg"
           >
-            {hasUnappliedChanges ? "Aplicar Filtros" : "Filtros Aplicados"}
+            {hasUnappliedChanges ? "🔍 Aplicar Filtros" : "✅ Filtros Aplicados"}
           </Button>
           {hasActiveFilters && (
-            <Button variant="outline" onClick={clearFilters} className="px-4">
+            <Button variant="outline" onClick={clearFilters} size="lg" className="px-6">
+              <X className="h-4 w-4 mr-2" />
               Limpar
             </Button>
           )}

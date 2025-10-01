@@ -2,29 +2,20 @@ import { redirect } from "next/navigation";
 import { ConcorrentePageWrapper } from "@/components/ConcorrentePageWrapper";
 import { isValidPerspective } from "@/lib/utils/url-params";
 
-interface ConcorrentePageProps {
-  params: Promise<{ perspectiva: string }>;
+interface ConcorrenteAdPageProps {
+  params: Promise<{ perspectiva: string; creativeId: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function ConcorrentePage({
+export default async function ConcorrenteAdPage({
   params,
   searchParams,
-}: ConcorrentePageProps) {
+}: ConcorrenteAdPageProps) {
   const { perspectiva } = await params;
-  const urlParams = await searchParams;
 
   // Validar perspectiva
   if (!isValidPerspective(perspectiva)) {
     redirect("/default/concorrente");
-  }
-
-  // Compatibilidade legado: ?ad=<id> → /ad/:id
-  if (urlParams.ad && typeof urlParams.ad === "string") {
-    const { ad, ...rest } = urlParams;
-    const query = new URLSearchParams(rest as Record<string, string>).toString();
-    const newPath = `/${perspectiva}/concorrente/ad/${ad}${query ? `?${query}` : ""}`;
-    redirect(newPath);
   }
 
   return (

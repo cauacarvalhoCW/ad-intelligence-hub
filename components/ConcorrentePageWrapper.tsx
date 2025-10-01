@@ -18,11 +18,9 @@ export function ConcorrentePageWrapper() {
   const searchParams = useSearchParams();
   const { setTheme, currentTheme } = useTheme();
 
-  // Extrair perspectiva da URL
+  // Extrair perspectiva e creativeId da URL
   const perspective = params.perspectiva as Perspective;
-  
-  // Extrair ad ID do query param ?ad=
-  const selectedAdId = searchParams.get('ad');
+  const creativeId = params.creativeId as string | undefined;
 
   // Sync tema com perspectiva da URL
   useEffect(() => {
@@ -37,41 +35,28 @@ export function ConcorrentePageWrapper() {
   // Handler: Mudança de filtros → Atualizar URL
   const handleFiltersChange = useCallback(
     (newFilters: FilterState) => {
-      const currentAd = searchParams.get('ad');
       const query = buildFilterQuery(newFilters, searchParams);
       
-      // Se tem anúncio aberto, preservar ?ad=
-      const params = new URLSearchParams(query);
-      if (currentAd) {
-        params.set('ad', currentAd);
-      }
-      
-      const newPath = params.toString() 
-        ? `/${perspective}/concorrente?${params.toString()}`
-        : `/${perspective}/concorrente`;
-      
+      // Preservar rota atual (com ou sem /ad/:id)
+      const basePath = pathname;
+
+      const newPath = query ? `${basePath}?${query}` : basePath;
       router.push(newPath);
     },
-    [perspective, searchParams, router]
+    [pathname, searchParams, router]
   );
 
-  // Handler: Seleção de anúncio → Atualizar URL com ?ad=<ID>
+  // Handler: Seleção de anúncio → Atualizar URL sem reload
   const handleAdSelect = useCallback(
     (adId: string | null) => {
       const query = buildFilterQuery(filters, searchParams);
-      const params = new URLSearchParams(query);
-      
-      if (adId) {
-        params.set('ad', adId);
-      } else {
-        params.delete('ad');
-      }
-
-      const newPath = params.toString()
-        ? `/${perspective}/concorrente?${params.toString()}`
+      const basePath = adId
+        ? `/${perspective}/concorrente/ad/${adId}`
         : `/${perspective}/concorrente`;
+
+      const newPath = query ? `${basePath}?${query}` : basePath;
       
-      // Usar replace para não adicionar ao histórico
+      // Usar replace em vez de push para evitar reload e não adicionar ao histórico
       router.replace(newPath, { scroll: false });
     },
     [perspective, filters, searchParams, router]
@@ -81,7 +66,7 @@ export function ConcorrentePageWrapper() {
     <AdDashboard
       externalPerspective={perspective}
       externalFilters={filters}
-      externalSelectedAdId={selectedAdId || null}
+      externalSelectedAdId={creativeId || null}
       onFiltersChange={handleFiltersChange}
       onAdSelect={handleAdSelect}
     />

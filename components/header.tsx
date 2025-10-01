@@ -90,10 +90,10 @@ export function Header() {
                   <button
                     key={option.id}
                     onClick={() => {
-                      // Ao trocar perspectiva, resetar URL (sem filtros, sem ad, sem params)
+                      // Navegar para nova perspectiva com URL limpa (sem filtros/params)
                       const newPath = `/${option.id}/concorrente`;
                       router.push(newPath);
-                      setTheme(option.id);
+                      setTheme(option.id as "cloudwalk" | "infinitepay" | "jim" | "default");
                       setIsDropdownOpen(false);
                     }}
                     className={`
