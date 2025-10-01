@@ -1,0 +1,99 @@
+==========================================
+🚀 INSTRUÇÕES FINAIS - DEPLOY VERCEL
+==========================================
+
+📝 ARQUIVOS CRIADOS/MODIFICADOS:
+✅ vercel.json - Build customizado
+✅ .vercelignore - Ignora cache
+✅ package.json - Script vercel-build
+✅ Pasta /ad/ deletada
+
+==========================================
+PASSO 1: COMMIT E PUSH
+==========================================
+
+git add -A
+git commit -m "fix: remove rota /ad e configura build vercel"
+git push origin main
+
+==========================================
+PASSO 2: NA VERCEL (OBRIGATÓRIO!)
+==========================================
+
+1. Acesse: https://vercel.com/seu-projeto
+
+2. Vá em: Settings → General
+
+3. Procure: "Build & Development Settings"
+
+4. Clique em: "Clear Build Cache" 
+   (botão vermelho no final da página)
+
+5. Confirme a limpeza
+
+==========================================
+PASSO 3: REDEPLOY
+==========================================
+
+1. Volte para: Deployments
+
+2. No último deploy que deu erro
+
+3. Click nos 3 pontinhos (•••)
+
+4. Click em: "Redeploy"
+
+5. ❌ DESMARQUE: "Use existing Build Cache"
+
+6. Click em: "Redeploy"
+
+==========================================
+✅ RESULTADO ESPERADO
+==========================================
+
+No log de build você vai ver:
+
+> npm run vercel-build
+> rm -rf .next node_modules/.cache && next build
+
+✓ Compiled successfully
+
+Route (app)
+├ ƒ /[perspectiva]/concorrente     ✅
+├ ○ /access-denied
+└ ...
+
+❌ NÃO DEVE APARECER:
+/[perspectiva]/concorrente/ad/[creativeId]
+
+==========================================
+🎯 TESTE FINAL
+==========================================
+
+https://seu-app.vercel.app/default/concorrente
+✅ Funciona
+
+https://seu-app.vercel.app/default/concorrente?ad=123
+✅ Modal abre
+
+https://seu-app.vercel.app/default/concorrente/ad/123
+❌ 404 (correto!)
+
+==========================================
+🚨 SE AINDA DER ERRO
+==========================================
+
+Última solução (mais radical):
+
+1. Settings → General
+2. Scroll até o final
+3. "Delete Project"
+4. Confirme
+5. Reimporte o projeto do GitHub
+
+Isso força um build 100% limpo.
+
+==========================================
+
+PRONTO! Siga os passos NA ORDEM.
+
