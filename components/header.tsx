@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/components/theme-provider";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/shared/ui/button";
@@ -15,6 +16,8 @@ import {
 } from "@clerk/nextjs";
 
 export function Header() {
+  const router = useRouter();
+  const pathname = usePathname();
   const { currentTheme, setTheme, themes, isLoading } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -87,7 +90,12 @@ export function Header() {
                   <button
                     key={option.id}
                     onClick={() => {
-                      setTheme(option.id as any);
+                      // Manter a view atual (performance ou concorrente) ao trocar perspectiva
+                      const isPerformance = pathname.includes('/performance');
+                      const view = isPerformance ? 'performance' : 'concorrente';
+                      const newPath = `/${option.id}/${view}`;
+                      router.push(newPath);
+                      setTheme(option.id as "cloudwalk" | "infinitepay" | "jim" | "default");
                       setIsDropdownOpen(false);
                     }}
                     className={`
@@ -119,6 +127,32 @@ export function Header() {
             </div>
           )}
         </div>
+
+        {/* Navegação: Performance <-> Concorrentes */}
+        <nav className="hidden md:flex items-center gap-2 ml-6">
+          <Button
+            variant={pathname.includes('/performance') ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => {
+              const perspectiva = pathname.split('/')[1] || 'default';
+              router.push(`/${perspectiva}/performance`);
+            }}
+            className="text-sm"
+          >
+            📊 Performance
+          </Button>
+          <Button
+            variant={pathname.includes('/concorrente') ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => {
+              const perspectiva = pathname.split('/')[1] || 'default';
+              router.push(`/${perspectiva}/concorrente`);
+            }}
+            className="text-sm"
+          >
+            🔍 Concorrentes
+          </Button>
+        </nav>
 
         {/* Status Indicators, Toggle and Authentication */}
         <div className="flex items-center gap-4">

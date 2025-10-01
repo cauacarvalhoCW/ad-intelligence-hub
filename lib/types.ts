@@ -87,3 +87,122 @@ export interface FilterState {
   hasVariations?: boolean; // Apenas anúncios com variações
   hasAnalysis?: boolean; // Apenas anúncios com ad_analysis
 }
+
+// ========================================
+// PERFORMANCE & INTERNAL ADS TYPES
+// ========================================
+
+export type ProductType = "pos" | "tap" | "link" | "jim";
+
+export interface MktAdLooker {
+  id: string; // PK
+  ad_id: number;
+  ad_name: string | null;
+  created_at: string;
+  date: string | null; // date (ISO string)
+  platform: string; // "Meta", "Google", etc.
+  campaign_id: number | null;
+  campaign_name: string | null;
+  cost: number | null;
+  impressions: number | null;
+  clicks: number | null;
+  video_3s: number | null;
+  tap_signup: number | null;
+  tap_activations: number | null;
+  tap_5trx: number | null;
+  tap_cnpj_signups: number | null;
+  pos_sales: number | null;
+  piselli_sales: number | null;
+  install: number | null;
+  signup_web: number | null;
+  activation_app: number | null;
+  activation_web: number | null;
+  link_signup: number | null;
+  link_activations: number | null;
+  product: string | null; // "POS", "TAP", "LINK", "JIM"
+  creative_link: string | null;
+  creative_id: string | null;
+}
+
+// Métricas calculadas
+export interface PerformanceMetrics {
+  // Métricas brutas
+  totalCost: number;
+  totalImpressions: number;
+  totalClicks: number;
+  totalSignups: number;
+  totalActivations: number;
+
+  // Métricas calculadas
+  cac: number; // Cost per Acquisition (custo / ativações)
+  cpm: number; // Cost per Mille (custo / impressões * 1000)
+  cpa: number; // Cost per Action (custo / signups)
+  ctr: number; // Click Through Rate (clicks / impressões * 100)
+  hookRate: number; // (video_3s / impressões * 100)
+  conversionRate: number; // (ativações / signups * 100)
+}
+
+// Evolução temporal de métricas
+export interface MetricsTimeSeries {
+  date: string;
+  cost: number;
+  impressions: number;
+  clicks: number;
+  cac: number;
+  cpm: number;
+  cpa: number;
+  ctr: number;
+  hookRate: number;
+}
+
+// Overview por produto
+export interface ProductOverview {
+  product: ProductType;
+  metrics: PerformanceMetrics;
+  costByPlatform: { platform: string; cost: number }[];
+  topAds: TopPerformingAd[];
+  scaledCreatives: ScaledCreative[];
+  timeSeries: MetricsTimeSeries[];
+}
+
+// Top performing ad
+export interface TopPerformingAd {
+  ad_id: number;
+  ad_name: string | null;
+  creative_link: string | null;
+  creative_id: string | null;
+  metrics: {
+    impressions: number;
+    clicks: number;
+    cost: number;
+    ctr: number;
+    cac: number;
+    cpm: number;
+  };
+  topReasons: string[]; // Top 3 motivos de destaque
+}
+
+// Criativo escalado
+export interface ScaledCreative {
+  creative_id: string;
+  creative_link: string | null;
+  totalSpend: number;
+  totalImpressions: number;
+  performance: {
+    ctr: number;
+    cac: number;
+    cpm: number;
+  };
+  daysActive: number;
+}
+
+// Filtros de performance
+export interface PerformanceFilters {
+  dateRange?: {
+    start: Date | null;
+    end: Date | null;
+  };
+  products?: ProductType[];
+  platforms?: string[];
+  campaigns?: string[];
+}

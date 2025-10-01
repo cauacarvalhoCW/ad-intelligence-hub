@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -23,6 +23,7 @@ import { useTheme } from "@/components/theme-provider";
 import { LogoLoading } from "@/shared/ui/logo-loading";
 import { X } from "lucide-react";
 import type { Ad } from "@/features/ads/types";
+import type { ThemeType } from "@/lib/types";
 
 // Função para formatar e limpar o ad_analysis
 function formatAdAnalysis(analysis: string | any): React.ReactElement {
@@ -83,10 +84,26 @@ function formatAdAnalysis(analysis: string | any): React.ReactElement {
   );
 }
 
-export function AdDashboard() {
-  const [filters, setFilters] = useState<FilterState>({
+// Props opcionais para modo controlado (via URL wrapper)
+interface AdDashboardProps {
+  externalPerspective?: ThemeType;
+  externalFilters?: FilterState;
+  externalSelectedAdId?: string | null;
+  onFiltersChange?: (filters: FilterState) => void;
+  onAdSelect?: (adId: string | null) => void;
+}
+
+export function AdDashboard({
+  externalPerspective,
+  externalFilters,
+  externalSelectedAdId,
+  onFiltersChange,
+  onAdSelect,
+}: AdDashboardProps = {}) {
+  // State local (fallback quando não controlado)
+  const [localFilters, setLocalFilters] = useState<FilterState>({
     searchTerm: "",
-    selectedCompetitors: [], // Array em vez de string
+    selectedCompetitors: [],
     selectedPlatform: "all",
     selectedAdType: "all",
     dateRange: "all",
@@ -99,11 +116,42 @@ export function AdDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Usar dados reais do Supabase
-  const { currentTheme } = useTheme();
+  const { currentTheme: themeFromContext } = useTheme();
+
+  // Perspectiva: props ou context
+  const perspective = externalPerspective || themeFromContext;
+
+  // Filtros: props (controlado) ou state local
+  const filters = externalFilters || localFilters;
+
+  // Handler unificado para mudanças de filtros
+  const handleFiltersChange = useCallback((newFilters: FilterState) => {
+    if (onFiltersChange) {
+      onFiltersChange(newFilters);  // Modo controlado: callback atualiza URL
+    } else {
+      setLocalFilters(newFilters);  // Modo standalone: state local
+    }
+  }, [onFiltersChange]);
+
+  // Handler para seleção/deseleção de anúncio
+  const handleAdClick = useCallback((ad: Ad) => {
+    setSelectedAd(ad);
+    if (onAdSelect) {
+      onAdSelect(ad.ad_id);  // Notifica wrapper para atualizar URL
+    }
+  }, [onAdSelect]);
+
+  const handleAdClose = useCallback(() => {
+    setSelectedAd(null);
+    if (onAdSelect) {
+      onAdSelect(null);  // Notifica wrapper para remover /ad/:id da URL
+    }
+  }, [onAdSelect]);
+
   // Criar opções dinâmicas que sempre refletem o estado atual
   const adsOptions = useMemo(
     () => ({
-      perspective: currentTheme as any,
+      perspective: perspective as any,
       page: currentPage,
       limit: 24,
       // useMockData: true, // Desativado - usando dados reais do Supabase
@@ -130,7 +178,7 @@ export function AdDashboard() {
             : undefined,
       },
     }),
-    [currentTheme, currentPage, filters],
+    [perspective, currentPage, filters],
   );
 
   const {
@@ -142,10 +190,22 @@ export function AdDashboard() {
   } = useAds(adsOptions);
   const { competitors, loading: competitorsLoading } = useCompetitors();
 
+  // Sync selectedAd com externalSelectedAdId (DEPOIS de ads ser declarado)
+  useEffect(() => {
+    if (externalSelectedAdId && ads.length > 0) {
+      const ad = ads.find((a) => a.ad_id === externalSelectedAdId);
+      if (ad) {
+        setSelectedAd(ad);
+      }
+    } else if (!externalSelectedAdId) {
+      setSelectedAd(null);
+    }
+  }, [externalSelectedAdId, ads]);
+
   // Analytics com os mesmos filtros, mas sem paginação
   const analyticsOptions = useMemo(
     () => ({
-      perspective: currentTheme as any,
+      perspective: perspective as any,
       filters: {
         search: filters.searchTerm || undefined,
         competitors:
@@ -165,7 +225,7 @@ export function AdDashboard() {
             : undefined,
       },
     }),
-    [currentTheme, filters],
+    [perspective, filters],
   );
 
   const {
@@ -228,7 +288,7 @@ export function AdDashboard() {
                 competitors.length}{" "}
               competidores
             </Badge>
-            <Badge variant="outline">Tema: {currentTheme}</Badge>
+            <Badge variant="outline">Tema: {perspective}</Badge>
             {analyticsData && (
               <Badge variant="outline" className="text-xs">
                 📊 Análise: {analyticsData.metrics.total_ads} anúncios
@@ -253,7 +313,7 @@ export function AdDashboard() {
               variant="ghost"
               size="sm"
               onClick={() => {
-                setFilters({
+                handleFiltersChange({
                   searchTerm: "",
                   selectedCompetitors: [],
                   selectedPlatform: "all",
@@ -280,7 +340,7 @@ export function AdDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setFilters(prev => ({ ...prev, searchTerm: "" }))}
+                  onClick={() => handleFiltersChange({ ...filters, searchTerm: "" })}
                   className="h-4 w-4 p-0 hover:bg-transparent"
                 >
                   <X className="h-3 w-3" />
@@ -300,10 +360,10 @@ export function AdDashboard() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setFilters(prev => ({ 
-                          ...prev, 
-                          selectedCompetitors: prev.selectedCompetitors.filter(id => id !== competitorId)
-                        }))}
+                        onClick={() => handleFiltersChange({ 
+                          ...filters, 
+                          selectedCompetitors: filters.selectedCompetitors.filter(id => id !== competitorId)
+                        })}
                         className="h-4 w-4 p-0 hover:bg-transparent"
                       >
                         <X className="h-3 w-3" />
@@ -318,7 +378,7 @@ export function AdDashboard() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setFilters(prev => ({ ...prev, selectedCompetitors: [] }))}
+                    onClick={() => handleFiltersChange({ ...filters, selectedCompetitors: [] })}
                     className="h-4 w-4 p-0 hover:bg-transparent"
                   >
                     <X className="h-3 w-3" />
@@ -335,7 +395,7 @@ export function AdDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setFilters(prev => ({ ...prev, selectedAdType: "all" }))}
+                  onClick={() => handleFiltersChange({ ...filters, selectedAdType: "all" })}
                   className="h-4 w-4 p-0 hover:bg-transparent"
                 >
                   <X className="h-3 w-3" />
@@ -352,7 +412,7 @@ export function AdDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setFilters(prev => ({ ...prev, dateFrom: "", dateTo: "" }))}
+                  onClick={() => handleFiltersChange({ ...filters, dateFrom: "", dateTo: "" })}
                   className="h-4 w-4 p-0 hover:bg-transparent"
                 >
                   <X className="h-3 w-3" />
@@ -366,7 +426,7 @@ export function AdDashboard() {
         <div className="bg-muted/30 p-3 rounded-lg border border-dashed">
           <div className="flex items-center gap-2 text-muted-foreground">
             <span className="text-sm">
-              ℹ️ Nenhum filtro ativo - mostrando todos os anúncios da perspectiva <strong>{currentTheme}</strong>
+              ℹ️ Nenhum filtro ativo - mostrando todos os anúncios da perspectiva <strong>{perspective}</strong>
             </span>
           </div>
         </div>
@@ -374,11 +434,8 @@ export function AdDashboard() {
 
       <AdFilters
         competitors={competitors}
-        currentPerspective={currentTheme}
-        onFiltersChange={(newFilters) => {
-          setFilters(newFilters);
-          // O refetch será chamado automaticamente quando adsOptions mudar
-        }}
+        currentPerspective={perspective}
+        onFiltersChange={handleFiltersChange}
       />
 
       <Tabs defaultValue="ads" className="w-full">
@@ -480,7 +537,7 @@ export function AdDashboard() {
               <AdCard 
                 key={ad.ad_id}
                 ad={ad} 
-                onClick={() => setSelectedAd(ad)} 
+                onClick={() => handleAdClick(ad)} 
               />
             ))}
           </div>
@@ -514,14 +571,14 @@ export function AdDashboard() {
         </TabsContent>
 
         <TabsContent value="trends">
-          <TrendAnalysis ads={filteredAds} currentTheme={currentTheme} />
+          <TrendAnalysis ads={filteredAds} currentTheme={perspective} />
         </TabsContent>
       </Tabs>
 
       {selectedAd && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-          onClick={() => setSelectedAd(null)}
+          onClick={handleAdClose}
         >
           <Card
             className="max-w-2xl w-full max-h-[90vh] overflow-y-auto"
@@ -545,7 +602,7 @@ export function AdDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedAd(null)}
+                  onClick={handleAdClose}
                 >
                   ✕
                 </Button>

@@ -2,130 +2,142 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+**Ad Intelligence Hub** is a competitive intelligence platform for analyzing digital ads from competitors. It features:
+- Multi-perspective theme system (CloudWalk, InfinitePay, JIM, Default) with automatic data filtering
+- Real-time analytics and metrics on competitor ads
+- AI-powered conversational chat using LangGraph agents
+- Advanced filtering and search capabilities
+- Rate/pricing extraction and competitive analysis
+
 ## Development Commands
 
 ```bash
-# Development server
-npm run dev
+# Development
+npm run dev              # Start dev server on port 3000
 
-# Build for production
-npm run build
-
-# Start production server
-npm start
+# Build
+npm run build           # Production build (ESLint/TypeScript errors are ignored via next.config.mjs)
 
 # Linting
-npm run lint
+npm run lint            # Run ESLint
+
+# Production
+npm start               # Start production server
 ```
 
-## Architecture Overview
+## Architecture
 
-This is **EspiADinha** (Edge Intelligence Hub), a competitive ad intelligence platform built with Next.js 15 and React 19. The application analyzes competitor ads with different business perspectives and AI-powered analytics.
+### Routing Structure
 
-### Core Architecture Patterns
+The app uses Next.js 15 App Router with a perspective-based routing system:
 
-- **Next.js App Router** with TypeScript for full-stack functionality
-- **Feature-based architecture** in `/features/` directory with modular organization
-- **Multi-theme system** supporting different business perspectives (CloudWalk, InfinitePay, JIM, Default)
-- **AI-powered chat system** with LangGraph agents and RAG pipeline
-- **Authentication** via Clerk with protected routes
-- **Database** integration with Supabase for ads and analytics data
+- **`/[perspectiva]/concorrente`**: Main dashboard route (e.g., `/default/concorrente`, `/cloudwalk/concorrente`)
+  - `perspectiva` is validated via `isValidPerspective()` in [lib/utils/url-params.ts](lib/utils/url-params.ts)
+  - Valid perspectives: `cloudwalk`, `infinitepay`, `jim`, `default`
+  - Invalid perspectives redirect to `/default/concorrente`
 
-### Directory Structure
+- **Legacy route**: `/` redirects to `/default/concorrente`
 
-```
-/
-├── app/                    # Next.js App Router
-│   ├── api/               # API routes (chat, ads, analytics, competitors)
-│   ├── (protected)/       # Protected pages requiring auth
-│   └── sign-in|sign-up/   # Auth pages
-├── components/            # Shared React components
-│   ├── chat/             # Chat widget components
-│   └── providers/        # React providers
-├── features/             # Feature modules (primary architecture)
-│   ├── ads/              # Ad management feature
-│   │   ├── components/   # Ad-specific UI components
-│   │   ├── hooks/        # React hooks
-│   │   ├── server/       # Server-side logic
-│   │   └── types/        # TypeScript definitions
-│   └── analytics/        # Analytics feature
-│       ├── components/   # Analytics UI components
-│       ├── hooks/        # Analytics hooks
-│       ├── server/       # Analytics server logic
-│       └── types/        # Analytics types
-├── hooks/                # Global React hooks
-├── lib/                  # Utilities and configurations
-│   ├── agents/          # AI agents and tools
-│   ├── rag/             # RAG pipeline implementation
-│   ├── supabase/        # Database client/server
-│   └── utils/           # Helper functions
-└── public/              # Static assets
-```
+### Data Architecture
 
-### Key Technologies & Libraries
+**Supabase Tables:**
+- `competitors`: Competitor information (id, name, home_url)
+- `ads`: Ad records (ad_id, competitor_id, asset_type, product, start_date, tags, image_description, transcription, platform)
+- `variations`: Ad variations (variation_id, parent_ad_id, title, description, button_label, button_url)
 
-- **Frontend**: Next.js 15.2.4, React 19, TypeScript, Tailwind CSS 4.1.9
-- **UI Components**: Radix UI (complete design system)
-- **Auth**: Clerk (@clerk/nextjs)
-- **Database**: Supabase (@supabase/supabase-js)
-- **AI/Chat**: LangChain (@langchain/core, @langchain/langgraph, @langchain/openai)
-- **Data Fetching**: TanStack Query (@tanstack/react-query)
-- **Charts**: Recharts
-- **Forms**: React Hook Form + Zod validation
+**Type Definitions**: All core types are in [lib/types.ts](lib/types.ts):
+- `Ad`: Main ad interface with competitor joins
+- `Competitor`: Competitor entity
+- `ThemeConfig`: Theme/perspective configuration
+- `FilterState`: Filter state for ad queries
 
-### Multi-Theme System
+### AI Chat System (LangGraph Agent)
 
-The app supports 4 business perspectives with automatic competitor filtering:
+The chat system uses **LangGraph** for agentic workflows with tool calling:
 
-1. **CloudWalk** - Global view (BR + US competitors)
-2. **InfinitePay** - Brazilian market (PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto)
-3. **JIM** - US market (Square, PayPal, Stripe, Venmo, SumUp)
-4. **Default** - Complete view (all competitors)
+- **Agent**: [lib/agents/chatbot-agent.ts](lib/agents/chatbot-agent.ts)
+  - Implements StateGraph with tool nodes
+  - Configurable via [lib/agents/config/agent-config.ts](lib/agents/config/agent-config.ts)
+  - Session management with conversation history
+  - Recursion limits and tool call budgets
 
-Theme configuration is in `lib/themes.ts` with persistent localStorage and CSS class application.
+- **Tools**: [lib/agents/tools/](lib/agents/tools/)
+  - `supabase-ads.ts`: Query ads (list/count/search) with date ranges and competitor filtering
+  - `supabase-analytics.ts`: Analytics queries (competitor stats, platform distribution, top ads)
+  - `calc.ts`: Math calculations
+  - `datetime.ts`: Date/time utilities
 
-### AI Chat System
+- **API Endpoint**: [app/api/chat/route.ts](app/api/chat/route.ts)
+  - POST: Process messages through LangGraph agent
+  - GET: System health check
+  - DELETE: Clear session history
 
-- **LangGraph agents** in `lib/agents/` with specialized tools for Supabase queries
-- **RAG pipeline** in `lib/rag/` for context-aware responses
-- **Tool system** includes calculators, datetime helpers, and database query tools
-- **Streaming responses** via API routes in `app/api/chat/`
+**Agent System Prompt**: Defined in `CHATBOT_CONFIG.SYSTEM_PROMPT` in [lib/types/chat.ts](lib/types/chat.ts)
 
-### Feature Module Pattern
+### Supabase Integration
 
-Each feature (ads, analytics) follows this structure:
-- `components/` - React components
-- `hooks/` - Custom React hooks
-- `server/` - Server-side logic (services, params, constants)
-- `types/` - TypeScript definitions
-- `index.ts` - Public API exports
+- **Client-side**: `supabaseClient` from [lib/supabase/client.ts](lib/supabase/client.ts) (uses `createBrowserClient`)
+- **Server-side**: `createSupabaseServer()` from [lib/supabase/server.ts](lib/supabase/server.ts) (uses `createServerClient` with service role key)
+- **Environment variables required**:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `OPENAI_API_KEY` (for chat agent)
 
-### Database Schema (Supabase)
+### Theme/Perspective System
 
-Key entities:
-- **ads** - Ad records with competitor_id, asset_type, analysis data
-- **competitors** - Competitor information with home_url
-- **tags** - Tagging system for ads
-- **ad_tags** - Many-to-many relationship
+Themes are configured in [lib/themes.ts](lib/themes.ts) with:
+- Color schemes and logos
+- Metadata (description, competitor scope)
+- Automatic filtering based on `competitorScope`
 
-### Authentication & Routes
+Theme selection persists via context and affects:
+- UI colors and branding
+- Data filtering (competitor scope)
+- Analytics calculations
 
-- **Public routes**: `/sign-in`, `/sign-up`, `/access-denied`
-- **Protected routes**: Everything under `/(protected)/`
-- **API protection**: Server-side auth helpers in `lib/auth-helpers.ts`
+## Important Patterns
 
-### Configuration Notes
+### Date Handling in Tools
 
-- **ESLint/TypeScript**: Builds ignore errors (ignoreDuringBuilds: true, ignoreBuildErrors: true)
-- **Images**: Unoptimized for flexibility
-- **Fonts**: Geist Sans & Mono via geist package
-- **Analytics**: Vercel Analytics integrated
+Tools use `America/Sao_Paulo` timezone. The `supabase-ads` tool supports:
+- Date presets: `today`, `yesterday`, `last_7_days`, `last_30_days`, `this_week`, `this_month`
+- Natural language: Interprets "ontem", "hoje", "últimos 7 dias", etc.
+- Custom ranges: `date_from` and `date_to` in `YYYY-MM-DD` format
 
-### Development Best Practices
+### Ad Display
 
-- Use feature modules for new functionality
-- Follow the established TypeScript patterns in `lib/types.ts`
-- Leverage existing Radix UI components
-- Maintain theme consistency across perspectives
-- Use TanStack Query for server state management
-- Follow the existing API route patterns for new endpoints
+- Facebook Ads Library URL: `https://www.facebook.com/ads/library/?id={ad_id}`
+- Never display the `source` field directly (it may be unavailable)
+- Always include `ad_id` in responses
+
+### Agent Tool Calling
+
+- Tools return structured `ToolResult` with `success`, `data`, `error`, and `metadata`
+- Agent has tool call limits (default 15) and recursion limits (default 25)
+- Friendly error messages for recursion limits: Suggests user to specify competitor and period
+
+## Configuration Notes
+
+- **next.config.mjs**: ESLint and TypeScript errors are ignored during builds (`ignoreDuringBuilds: true`, `ignoreBuildErrors: true`)
+- **Images**: Unoptimized mode enabled
+- **Port**: Default Next.js dev server runs on `localhost:3000`
+
+## Key Components
+
+- **Dashboard**: [components/ad-dashboard.tsx](components/ad-dashboard.tsx) - Main ad grid and filters
+- **Chat**: [components/chat/ChatWidget.tsx](components/chat/ChatWidget.tsx) - Conversational UI
+- **Analytics**: Analytics components are colocated with their feature modules
+- **Header**: [components/header.tsx](components/header.tsx) - Contains theme selector and navigation
+
+## Testing the Chat System
+
+Use the chat to:
+- List ads: "Mostre os últimos anúncios do Mercado Pago"
+- Count ads: "Quantos anúncios a PagBank publicou nos últimos 30 dias?"
+- Search: "Busque anúncios sobre 'taxa zero'"
+- Analytics: "Qual competidor tem mais anúncios esta semana?"
+
+The agent will automatically select appropriate tools and date ranges based on natural language input.
