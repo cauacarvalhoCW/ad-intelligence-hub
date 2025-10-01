@@ -90,12 +90,10 @@ export function Header() {
                   <button
                     key={option.id}
                     onClick={() => {
-                      // Manter a view atual (performance ou concorrente) ao trocar perspectiva
-                      const isPerformance = pathname.includes('/performance');
-                      const view = isPerformance ? 'performance' : 'concorrente';
-                      const newPath = `/${option.id}/${view}`;
+                      // Ao trocar perspectiva, resetar URL (sem filtros, sem ad, sem params)
+                      const newPath = `/${option.id}/concorrente`;
                       router.push(newPath);
-                      setTheme(option.id as "cloudwalk" | "infinitepay" | "jim" | "default");
+                      setTheme(option.id);
                       setIsDropdownOpen(false);
                     }}
                     className={`
@@ -127,32 +125,6 @@ export function Header() {
             </div>
           )}
         </div>
-
-        {/* Navegação: Performance <-> Concorrentes */}
-        <nav className="hidden md:flex items-center gap-2 ml-6">
-          <Button
-            variant={pathname.includes('/performance') ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => {
-              const perspectiva = pathname.split('/')[1] || 'default';
-              router.push(`/${perspectiva}/performance`);
-            }}
-            className="text-sm"
-          >
-            📊 Performance
-          </Button>
-          <Button
-            variant={pathname.includes('/concorrente') ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => {
-              const perspectiva = pathname.split('/')[1] || 'default';
-              router.push(`/${perspectiva}/concorrente`);
-            }}
-            className="text-sm"
-          >
-            🔍 Concorrentes
-          </Button>
-        </nav>
 
         {/* Status Indicators, Toggle and Authentication */}
         <div className="flex items-center gap-4">
