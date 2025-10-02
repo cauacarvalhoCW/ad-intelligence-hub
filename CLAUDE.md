@@ -2,130 +2,299 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Development Commands
+## Project Overview
+
+**EspiADinha** (Edge Intelligence Hub) is a competitive intelligence platform for analyzing digital advertising campaigns. Built with Next.js 15 and React 19, it provides interactive dashboards, automated analytics, and an AI conversational assistant for monitoring competitor ads.
+
+## Essential Commands
 
 ```bash
-# Development server
-npm run dev
+# Development
+npm run dev              # Start dev server on localhost:3000
+npm run build           # Build for production
+npm start               # Start production server
+npm run lint            # Run ESLint
 
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Linting
-npm run lint
+# Testing
+./test-api.sh           # Test API endpoints manually (requires jq)
 ```
 
 ## Architecture Overview
 
-This is **EspiADinha** (Edge Intelligence Hub), a competitive ad intelligence platform built with Next.js 15 and React 19. The application analyzes competitor ads with different business perspectives and AI-powered analytics.
+### Tech Stack
+- **Frontend**: Next.js 15 (App Router), React 19, TypeScript
+- **UI**: Tailwind CSS, Radix UI, shadcn/ui
+- **Auth**: Clerk (restricted to @cloudwalk.io domain)
+- **Database**: Supabase (PostgreSQL)
+- **AI**: OpenAI GPT-4o-mini, LangChain, LangGraph
+- **State**: TanStack Query (React Query)
 
-### Core Architecture Patterns
-
-- **Next.js App Router** with TypeScript for full-stack functionality
-- **Feature-based architecture** in `/features/` directory with modular organization
-- **Multi-theme system** supporting different business perspectives (CloudWalk, InfinitePay, JIM, Default)
-- **AI-powered chat system** with LangGraph agents and RAG pipeline
-- **Authentication** via Clerk with protected routes
-- **Database** integration with Supabase for ads and analytics data
-
-### Directory Structure
+### Project Structure
 
 ```
-/
-├── app/                    # Next.js App Router
-│   ├── api/               # API routes (chat, ads, analytics, competitors)
-│   ├── (protected)/       # Protected pages requiring auth
-│   └── sign-in|sign-up/   # Auth pages
-├── components/            # Shared React components
-│   ├── chat/             # Chat widget components
-│   └── providers/        # React providers
-├── features/             # Feature modules (primary architecture)
-│   ├── ads/              # Ad management feature
-│   │   ├── components/   # Ad-specific UI components
-│   │   ├── hooks/        # React hooks
-│   │   ├── server/       # Server-side logic
-│   │   └── types/        # TypeScript definitions
-│   └── analytics/        # Analytics feature
-│       ├── components/   # Analytics UI components
-│       ├── hooks/        # Analytics hooks
-│       ├── server/       # Analytics server logic
-│       └── types/        # Analytics types
-├── hooks/                # Global React hooks
-├── lib/                  # Utilities and configurations
-│   ├── agents/          # AI agents and tools
-│   ├── rag/             # RAG pipeline implementation
-│   ├── supabase/        # Database client/server
-│   └── utils/           # Helper functions
-└── public/              # Static assets
+ad-intelligence-hub/
+├── app/                          # Next.js App Router
+│   ├── [perspectiva]/           # Dynamic route for business perspectives
+│   │   └── concorrente/         # Competitor ads page
+│   │       ├── page.tsx         # Main competitor view
+│   │       └── ad/              # Deep link ad view
+│   │           └── [creativeId]/
+│   ├── (protected)/             # Protected routes (requires auth)
+│   ├── api/                     # API Routes
+│   │   ├── ads/                 # Ads endpoint
+│   │   ├── analytics/           # Analytics endpoint
+│   │   ├── chat/                # AI chatbot endpoint (LangGraph)
+│   │   │   └── stream/          # Streaming chat endpoint
+│   │   └── competitors/         # Competitors endpoint
+│   ├── sign-in/                 # Authentication pages
+│   ├── sign-up/
+│   ├── access-denied/
+│   └── globals.css              # Global styles
+├── components/                   # Global React components
+│   ├── chat/                    # AI chat widget system
+│   ├── ad-dashboard.tsx         # Main ads dashboard
+│   └── ad-filters.tsx           # Advanced filtering UI
+├── features/                     # Feature modules (collocated code)
+│   ├── ads/                     # Ads feature
+│   │   ├── components/          # Ads-specific UI components
+│   │   ├── hooks/               # React hooks (useAds, etc.)
+│   │   ├── server/              # Server-side logic (service.ts, params.ts)
+│   │   └── types/               # TypeScript types
+│   └── analytics/               # Analytics feature
+│       ├── components/          # Analytics UI
+│       ├── hooks/               # React hooks
+│       └── server/              # Analytics service logic
+├── hooks/                        # Global custom hooks
+│   └── useUrlFilters.ts         # URL state management hook
+├── lib/                         # Shared libraries and utilities
+│   ├── agents/                  # LangGraph AI agent system
+│   │   ├── chatbot-agent.ts     # Main agent class
+│   │   ├── config/              # Agent configuration
+│   │   ├── rag/                 # RAG system (if applicable)
+│   │   └── tools/               # Agent tools (ads_query, analytics_query, datetime, calc)
+│   ├── supabase/                # Supabase client setup
+│   ├── auth-helpers.ts          # Authentication utilities
+│   └── types.ts                 # Shared TypeScript types
+├── shared/                      # Shared UI components
+│   └── ui/                      # shadcn/ui components
+├── middleware.ts                # Clerk authentication middleware
+└── test-api.sh                  # API testing script
 ```
 
-### Key Technologies & Libraries
+## Key Architectural Patterns
 
-- **Frontend**: Next.js 15.2.4, React 19, TypeScript, Tailwind CSS 4.1.9
-- **UI Components**: Radix UI (complete design system)
-- **Auth**: Clerk (@clerk/nextjs)
-- **Database**: Supabase (@supabase/supabase-js)
-- **AI/Chat**: LangChain (@langchain/core, @langchain/langgraph, @langchain/openai)
-- **Data Fetching**: TanStack Query (@tanstack/react-query)
-- **Charts**: Recharts
-- **Forms**: React Hook Form + Zod validation
+### 1. Feature Module Pattern
+The codebase uses a feature-based architecture where related code is colocated:
+- `features/ads/` - Everything related to ads (UI, hooks, API logic, types)
+- `features/analytics/` - Everything related to analytics
 
-### Multi-Theme System
-
-The app supports 4 business perspectives with automatic competitor filtering:
-
-1. **CloudWalk** - Global view (BR + US competitors)
-2. **InfinitePay** - Brazilian market (PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto)
-3. **JIM** - US market (Square, PayPal, Stripe, Venmo, SumUp)
-4. **Default** - Complete view (all competitors)
-
-Theme configuration is in `lib/themes.ts` with persistent localStorage and CSS class application.
-
-### AI Chat System
-
-- **LangGraph agents** in `lib/agents/` with specialized tools for Supabase queries
-- **RAG pipeline** in `lib/rag/` for context-aware responses
-- **Tool system** includes calculators, datetime helpers, and database query tools
-- **Streaming responses** via API routes in `app/api/chat/`
-
-### Feature Module Pattern
-
-Each feature (ads, analytics) follows this structure:
-- `components/` - React components
-- `hooks/` - Custom React hooks
-- `server/` - Server-side logic (services, params, constants)
-- `types/` - TypeScript definitions
+Each feature has:
+- `components/` - Feature-specific React components
+- `hooks/` - Custom React hooks for data fetching
+- `server/` - Server-side business logic (service.ts, params.ts)
+- `types/` - TypeScript type definitions
 - `index.ts` - Public API exports
 
-### Database Schema (Supabase)
+### 2. Authentication Flow
+All routes except `/sign-in`, `/sign-up`, and `/access-denied` are protected by Clerk middleware. Users must have an `@cloudwalk.io` email domain to access the application.
 
-Key entities:
-- **ads** - Ad records with competitor_id, asset_type, analysis data
-- **competitors** - Competitor information with home_url
-- **tags** - Tagging system for ads
-- **ad_tags** - Many-to-many relationship
+**Middleware** (`middleware.ts`):
+- Intercepts all requests
+- Redirects unauthenticated users to `/sign-in`
+- Allows authenticated users to proceed
 
-### Authentication & Routes
+### 3. AI Agent Architecture (LangGraph)
+The chatbot uses LangGraph for structured AI workflows:
 
-- **Public routes**: `/sign-in`, `/sign-up`, `/access-denied`
-- **Protected routes**: Everything under `/(protected)/`
-- **API protection**: Server-side auth helpers in `lib/auth-helpers.ts`
+**Flow**: `START → Agent → Tools → Agent → END`
 
-### Configuration Notes
+**Available Tools**:
+- `ads_query` - Query ads from Supabase database
+- `analytics_query` - Generate metrics and insights
+- `datetime` - Date manipulation utilities
+- `calc` - Mathematical calculations
 
-- **ESLint/TypeScript**: Builds ignore errors (ignoreDuringBuilds: true, ignoreBuildErrors: true)
-- **Images**: Unoptimized for flexibility
-- **Fonts**: Geist Sans & Mono via geist package
-- **Analytics**: Vercel Analytics integrated
+**Agent Configuration** (`lib/agents/config/agent-config.ts`):
+- Model: GPT-4o-mini
+- Temperature: 0.1 (precise answers)
+- Max tokens: 2000
+- Tool call limit: 10
+- Recursion limit: 15
 
-### Development Best Practices
+### 4. Data Fetching Pattern
+Uses TanStack Query (React Query) for server state management:
+- Client components use `useAds()`, `useAnalytics()` hooks
+- Data is cached and synchronized automatically
+- API routes handle server-side data fetching from Supabase
 
-- Use feature modules for new functionality
-- Follow the established TypeScript patterns in `lib/types.ts`
-- Leverage existing Radix UI components
-- Maintain theme consistency across perspectives
-- Use TanStack Query for server state management
-- Follow the existing API route patterns for new endpoints
+### 5. Perspective System & URL-Based Routing
+The application supports multiple business perspectives via dynamic routing:
+- **CloudWalk** - All markets (default perspective)
+- **InfinitePay** - Brazil focus (PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto)
+- **JIM** - International (Square, PayPal, Stripe, Venmo, SumUp)
+- **Default** - General market view
+
+**URL Structure:**
+```
+/:perspectiva/concorrente                    # Main competitor page
+/:perspectiva/concorrente/ad/:creativeId     # Deep link to specific ad
+```
+
+**Examples:**
+- `/cloudwalk/concorrente?platform=META&search=taxas`
+- `/infinitepay/concorrente/ad/123456?assetType=video`
+
+**URL State Management:**
+- All filters are synced with URL query parameters (search, competitors, platform, assetType, dateFrom, dateTo, tags)
+- URL is the source of truth for application state
+- Navigation preserves UTM parameters
+- Custom hook `useUrlFilters` manages synchronization
+- Search input has 250ms debounce before updating URL
+
+## Database Schema
+
+### Key Tables
+
+**`competitors`**
+- `id` (PK)
+- `name`
+- `home_url`
+- `created_at`, `updated_at`
+
+**`ads`**
+- `ad_id` (PK)
+- `competitor_id` (FK)
+- `source`
+- `asset_type` (enum: 'image', 'video', 'text')
+- `product`
+- `platform` (enum: 'GOOGLE', 'META')
+- `start_date`
+- `tags`
+- `image_description`
+- `transcription`
+- `ad_analysis` (jsonb)
+- `created_at`
+
+## Environment Variables
+
+Required in `.env.local`:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+
+# OpenAI
+OPENAI_API_KEY=
+```
+
+## Important Notes
+
+### Path Aliases
+TypeScript paths are configured with `@/*` mapping to the root directory:
+```typescript
+import { supabaseClient } from "@/lib/supabase/client"
+import { useAds } from "@/features/ads"
+```
+
+### Build Configuration
+The Next.js config (`next.config.mjs`) has:
+- ESLint ignored during builds
+- TypeScript errors ignored during builds
+- Image optimization disabled
+
+This is intentional for rapid development but should be addressed before production.
+
+### Styling
+- Uses Tailwind CSS 4.x with custom configuration
+- Dark/light theme support via `next-themes`
+- shadcn/ui components in `shared/ui/`
+- Global styles in `app/globals.css`
+
+### API Route Pattern
+All API routes follow this structure:
+```typescript
+// app/api/[feature]/route.ts
+export async function GET(request: Request) {
+  // Extract search params
+  // Call service layer (features/[feature]/server/service.ts)
+  // Return JSON response
+}
+```
+
+Service layer handles all business logic and database queries.
+
+## Common Development Tasks
+
+### Adding a New Feature Module
+1. Create directory: `features/[feature-name]/`
+2. Add subdirectories: `components/`, `hooks/`, `server/`, `types/`
+3. Create `index.ts` for public exports
+4. Add API route in `app/api/[feature-name]/route.ts`
+5. Implement service logic in `server/service.ts`
+
+### Working with the AI Agent
+The chatbot agent is in `lib/agents/chatbot-agent.ts`:
+- To add new tools, create them in `lib/agents/tools/`
+- Register tools in `lib/agents/tools/index.ts`
+- Update agent configuration in `lib/agents/config/agent-config.ts`
+
+### Testing the API
+Use the provided test script:
+```bash
+./test-api.sh
+```
+
+This tests all major API endpoints with various filter combinations.
+
+### Working with URL State
+The application uses a custom hook `useUrlFilters` for URL synchronization:
+
+```typescript
+// In page components
+const {
+  filters,         // Current filter state
+  updateFilters,   // Update filters (debounced for search)
+  openAd,          // Open ad modal (updates URL)
+  closeAd,         // Close ad modal (updates URL)
+  clearFilters     // Clear all filters (preserves UTMs)
+} = useUrlFilters({ perspectiva, creativeId, searchParams });
+```
+
+Key principles:
+- URL is always the source of truth
+- Filters sync bidirectionally with URL
+- Browser history works correctly (back/forward)
+- UTM parameters are always preserved
+- Search has 250ms debounce to prevent excessive URL updates
+
+## Deployment
+
+The application is deployed on Vercel with automatic deployments from the `main` branch. The project uses:
+- Vercel Analytics for performance monitoring
+- Next.js 15 streaming and concurrent features
+- React 19 server components
+
+## Additional Documentation
+
+For detailed information on specific features, see:
+- **[ROUTING_AND_FILTERS.md](ROUTING_AND_FILTERS.md)** - Comprehensive routing and URL filter documentation
+- **CORREÇÕES_UX.md** - UX improvements and corrections (if applicable)
+- **README.md** - Project overview in Portuguese
+
+## Recent Changes
+
+Based on git history, recent work includes:
+- Implemented dynamic routing with `[perspectiva]` parameter
+- Added deep linking for ads via `/:perspectiva/concorrente/ad/:creativeId`
+- Created URL-based state management with `useUrlFilters` hook
+- Refactored analytics module into feature-based structure
+- Added Google Display cards (video, text, image)
+- Added platform logos (Meta, Google)
+- Implemented image/video preview functionality
+- Synchronized all filters with URL query parameters

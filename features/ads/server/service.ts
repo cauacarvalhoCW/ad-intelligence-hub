@@ -14,6 +14,7 @@ interface AdsSupabaseRow {
   source?: string | null;
   asset_type: "video" | "image";
   product?: string | null;
+  platform?: string | null; // "GOOGLE" | "META"
   start_date?: string | null;
   display_format?: string | null;
   tags?: string | null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import {
@@ -18,8 +18,10 @@ import type { Competitor } from "@/lib/types";
 interface AdFiltersProps {
   competitors: Competitor[];
   onFiltersChange: (filters: FilterState) => void;
+  onApplyFilters: (filters: FilterState) => void;
   className?: string;
   currentPerspective?: string; // Adicionar perspectiva atual
+  initialFilters?: FilterState; // Filters from URL
 }
 
 export interface FilterState {
@@ -62,20 +64,32 @@ const PERSPECTIVE_COMPETITORS: Record<string, string[]> = {
 export function AdFilters({
   competitors,
   onFiltersChange,
+  onApplyFilters,
   className,
   currentPerspective = "default",
+  initialFilters,
 }: AdFiltersProps) {
-  // Estado local - o que o usuário está preenchendo
-  const [localFilters, setLocalFilters] = useState<FilterState>({
-    searchTerm: "",
-    selectedCompetitors: [], // Array vazio
-    selectedPlatform: "all",
-    selectedAdType: "all",
-    dateRange: "all",
-    dateFrom: "",
-    dateTo: "",
-    tags: [],
-  });
+  // Estado local - o que o usuário está preenchendo (synchronized with URL)
+  const [localFilters, setLocalFilters] = useState<FilterState>(
+    initialFilters || {
+      searchTerm: "",
+      selectedCompetitors: [], // Array vazio
+      selectedPlatform: "all",
+      selectedAdType: "all",
+      dateRange: "all",
+      dateFrom: "",
+      dateTo: "",
+      tags: [],
+    }
+  );
+
+  // Sync with external filters (from URL)
+  useEffect(() => {
+    if (initialFilters) {
+      setLocalFilters(initialFilters);
+      setAppliedFilters(initialFilters);
+    }
+  }, [initialFilters]);
 
   // Estado aplicado - o que foi enviado para a API
   const [appliedFilters, setAppliedFilters] = useState<FilterState>({
@@ -90,12 +104,15 @@ export function AdFilters({
   });
 
   const updateLocalFilters = (newFilters: Partial<FilterState>) => {
-    setLocalFilters((prev) => ({ ...prev, ...newFilters }));
+    const updated = { ...localFilters, ...newFilters };
+    setLocalFilters(updated);
+    // Don't notify parent yet - only on apply
   };
 
   const applyFilters = () => {
     setAppliedFilters(localFilters);
-    onFiltersChange(localFilters);
+    onFiltersChange(localFilters); // Update parent state
+    onApplyFilters(localFilters); // Trigger API call
   };
 
   const clearFilters = () => {
@@ -111,7 +128,8 @@ export function AdFilters({
     };
     setLocalFilters(clearedFilters);
     setAppliedFilters(clearedFilters);
-    onFiltersChange(clearedFilters);
+    onFiltersChange(clearedFilters); // Update parent state
+    onApplyFilters(clearedFilters); // Clear applies immediately
   };
 
   const hasActiveFilters =
@@ -325,6 +343,7 @@ export function AdFilters({
                     setAppliedFilters(updated);
                     setLocalFilters(updated);
                     onFiltersChange(updated);
+                    onApplyFilters(updated);
                   }}
                 />
               </Badge>
@@ -342,6 +361,7 @@ export function AdFilters({
                     setAppliedFilters(updated);
                     setLocalFilters(updated);
                     onFiltersChange(updated);
+                    onApplyFilters(updated);
                   }}
                 />
               </Badge>
@@ -363,6 +383,7 @@ export function AdFilters({
                     setAppliedFilters(updated);
                     setLocalFilters(updated);
                     onFiltersChange(updated);
+                    onApplyFilters(updated);
                   }}
                 />
               </Badge>

@@ -28,3 +28,5 @@ next-env.d.ts
 
 
 .playwright-mcp
+# clerk configuration (can include secrets)
+/.clerk/

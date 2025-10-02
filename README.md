@@ -1,277 +1,342 @@
-# Projeto - Ad Hub
+# EspiADinha - AD Intelligence Hub
 
-## Versões
+Uma plataforma avançada de inteligência competitiva para análise de anúncios digitais, desenvolvida com Next.js 15, React 19 e tecnologias de ponta.
 
-### v1
+## 🎯 Visão Geral
 
-- Escolha de perspectiva de vizualição de dados e tema (Cloudwalk, InfinitePay, JIM. Padrão)
-- Analytics e Métricas sobre os ads dos concorrentes
-- Filtro para buscaa de ads especificos
+O **EspiADinha** é uma ferramenta de business intelligence especializada em monitoramento e análise de campanhas publicitárias de concorrentes. A plataforma oferece insights estratégicos através de dashboards interativos, análises automatizadas e um assistente de IA conversacional.
 
-### v2
+### Principais Funcionalidades
 
-- Chat conversacional que com base nas perguntas listam os ads relacionados
-- Adicionar os dados reais do BD (Supabase)
-- Corrigir algumas issues na aplicação
-- Scrape de um concorrente especifico
-- Print Imagens
+- 📊 **Dashboard Interativo**: Visualização em tempo real de anúncios de concorrentes
+- 🤖 **Assistente IA**: Chatbot inteligente com acesso aos dados via LangGraph
+- 📈 **Analytics Avançados**: Métricas detalhadas e análises competitivas
+- 🎨 **Multi-Perspectiva**: Visualização personalizada por empresa (CloudWalk, InfinitePay, JIM)
+- 🔍 **Busca Inteligente**: Filtros avançados por competidor, tipo de mídia, período e conteúdo
+- 📱 **Responsivo**: Interface otimizada para desktop e mobile
 
-# 🎯 Edge Intelligence Hub - Ad Hub
+## 🏗️ Arquitetura
 
-> **Plataforma inteligente para análise competitiva de anúncios digitais com múltiplas perspectivas de mercado**
+### Stack Tecnológico
 
-## 📋 Sobre o Projeto
+- **Frontend**: Next.js 15 (App Router), React 19, TypeScript
+- **UI/UX**: Tailwind CSS, Radix UI, shadcn/ui
+- **Autenticação**: Clerk (com controle de domínio @cloudwalk.io)
+- **Banco de Dados**: Supabase (PostgreSQL)
+- **IA/ML**: OpenAI GPT, LangChain, LangGraph
+- **Estado**: TanStack Query (React Query)
+- **Deployment**: Vercel
 
-O **Edge Intelligence Hub** é uma plataforma avançada de análise competitiva que permite monitorar, analisar e extrair insights de anúncios digitais de concorrentes. Com foco em empresas de fintech, a plataforma oferece diferentes perspectivas de visualização baseadas em contextos específicos de mercado.
-
----
-
-## 🚀 Versão 0 (v0) - Features Implementadas
-
-### 🎨 **Sistema de Temas e Perspectivas**
-
-- **4 Perspectivas Disponíveis:**
-  - **🌍 CloudWalk**: Visão global (competidores BR + US)
-  - **💚 InfinitePay**: Foco no mercado brasileiro (PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto)
-  - **🟣 JIM**: Foco no mercado americano (Square, PayPal, Stripe, Venmo, SumUp)
-  - **🏠 Padrão**: Visão completa de todos os competidores
-
-- **Funcionalidades do Sistema de Temas:**
-  - Seleção de perspectiva via dropdown no header
-  - Filtragem automática de dados por tema
-  - Cores e branding personalizados por empresa
-  - Logos e identidade visual específica
-  - Persistência da escolha do usuário
-
-### 📊 **Dashboard Principal**
-
-- **Visão Geral Dinâmica:**
-  - Contador de anúncios filtrados por tema
-  - Estatísticas de competidores ativos
-  - Interface responsiva e moderna
-  - Navegação por abas organizadas
-
-### 🔍 **Sistema de Filtros Avançados**
-
-- **Filtros Disponíveis:**
-  - Busca textual (título, descrição, texto extraído)
-  - Filtro por competidor específico
-  - Filtro por plataforma (Facebook, Google, Instagram, LinkedIn, TikTok)
-  - Filtro por tipo de anúncio (Imagem, Vídeo, Carrossel, Texto)
-  - Filtro por período/data
-  - Filtro por tags
-
-### 📈 **Analytics e Métricas**
-
-- **Análise Estatística:**
-  - Distribuição por plataformas
-  - Análise de concorrentes
-  - Métricas de engajamento
-  - Análise de tipos de anúncio
-  - Top tags mais frequentes
-
-- **Análise de Taxas:**
-  - Detecção automática de taxas em anúncios
-  - Extração de percentuais (0%, 2%, etc.)
-  - Identificação de valores monetários
-  - Palavras-chave relacionadas a ofertas
-  - Estatísticas de competitividade de taxas
-
-### 🎯 **Análise Competitiva Avançada**
-
-- **Insights de Concorrentes:**
-  - Score de sentiment automático
-  - Classificação de posicionamento (Agressivo, Equilibrado, Conservador)
-  - Análise de competitividade de taxas (Alta, Média, Baixa)
-  - Identificação de estratégias principais
-  - Matriz de posicionamento competitivo
-
-- **Análise de Conteúdo:**
-  - Temas mais frequentes por competidor
-  - Análise de palavras-chave estratégicas
-  - Insights sobre abordagem de mercado
-  - Comparação entre concorrentes
-
-### 📊 **Análise de Tendências**
-
-- **Tendências Temporais:**
-  - Gráficos de linha para evolução semanal
-  - Análise de 8 semanas de dados
-  - Tendências de anúncios com taxas
-  - Distribuição por plataforma ao longo do tempo
-
-- **Tendências de Taxas:**
-  - Identificação de taxas em alta/baixa
-  - Cálculo de mudanças percentuais
-  - Frequência de ofertas específicas
-  - Resumo semanal automatizado
-
-### 🔧 **Extrator Inteligente de Taxas**
-
-- **Funcionalidades de Extração:**
-  - Regex avançado para percentuais
-  - Detecção de valores monetários (R$, $)
-  - Identificação de palavras-chave promocionais
-  - Análise contextual de ofertas
-  - Categorização automática de benefícios
-
-### 🎴 **Visualização de Anúncios**
-
-- **Cards Interativos:**
-  - Preview completo do anúncio
-  - Informações do competidor
-  - Tags e categorização
-  - Modal detalhado para análise
-  - Links para landing pages
-
-- **Modal de Detalhes:**
-  - Descrição completa do anúncio
-  - Análise automática de taxas
-  - Texto extraído de imagens
-  - Sistema de tags
-  - Acesso direto à landing page
-
-### 🌓 **Sistema de Temas Dark/Light**
-
-- **Funcionalidades:**
-  - Toggle dark/light mode
-  - Persistência da preferência
-  - Compatibilidade com todos os temas
-  - Transições suaves
-  - Acessibilidade otimizada
-
-### 🎨 **Interface e UX**
-
-- **Design System:**
-  - Componentes baseados em Radix UI
-  - Estilização com Tailwind CSS
-  - Animações e transições fluidas
-  - Layout responsivo
-  - Acessibilidade (WCAG)
-
----
-
-## 🛠️ **Stack Tecnológica**
-
-### **Frontend**
-
-- **Next.js 15.2.4** - Framework React com App Router
-- **React 19** - Biblioteca de interface
-- **TypeScript** - Tipagem estática
-- **Tailwind CSS 4.1.9** - Framework de estilização
-- **Radix UI** - Componentes acessíveis
-- **Lucide React** - Ícones modernos
-
-### **Visualização de Dados**
-
-- **Recharts** - Gráficos e charts interativos
-- **React Hook Form** - Gerenciamento de formulários
-- **Zod** - Validação de schemas
-
-### **Estado e Temas**
-
-- **Next Themes** - Gerenciamento de temas
-- **Context API** - Estado global
-- **Local Storage** - Persistência de preferências
-
-### **Ferramentas de Desenvolvimento**
-
-- **ESLint** - Linting de código
-- **PostCSS** - Processamento CSS
-- **Vercel Analytics** - Métricas de uso
-
----
-
-## 📁 **Estrutura do Projeto**
+### Estrutura do Projeto
 
 ```
-edge-intelligence-hub/
-├── app/                    # App Router (Next.js 13+)
-├── components/            # Componentes React
-│   ├── ui/               # Componentes base (Radix UI)
-│   ├── ads/              # Componentes específicos de anúncios
-│   ├── ad-dashboard.tsx  # Dashboard principal
-│   ├── features/analytics/components/ad-analytics.tsx  # Componente de analytics
-│   ├── competitive-analysis.tsx # Análise competitiva
-│   ├── trend-analysis.tsx # Análise de tendências
-│   └── rate-extractor.tsx # Extrator de taxas
-├── hooks/                # Custom hooks
-├── lib/                  # Utilitários e configurações
-│   ├── types.ts         # Definições TypeScript
-│   ├── themes.ts        # Configuração de temas
-│   ├── mock-data.ts     # Dados de exemplo
-│   └── utils/           # Funções utilitárias
-└── public/              # Assets estáticos
+ad-intelligence-hub/
+├── app/                          # Next.js App Router
+│   ├── (protected)/             # Rotas protegidas por autenticação
+│   ├── api/                     # API Routes
+│   │   ├── ads/                 # Endpoint de anúncios
+│   │   ├── analytics/           # Endpoint de analytics
+│   │   └── chat/                # Endpoint do chatbot IA
+│   ├── sign-in/                 # Páginas de autenticação
+│   └── sign-up/
+├── components/                   # Componentes React globais
+│   ├── chat/                    # Sistema de chat IA
+│   └── ad-dashboard.tsx         # Dashboard principal
+├── features/                     # Módulos de funcionalidades
+│   ├── ads/                     # Sistema de anúncios
+│   │   ├── components/          # Componentes específicos
+│   │   ├── hooks/               # React hooks
+│   │   ├── server/              # Lógica server-side
+│   │   └── types/               # Tipos TypeScript
+│   └── analytics/               # Sistema de analytics
+├── lib/                         # Bibliotecas e utilitários
+│   ├── agents/                  # Sistema de IA (LangGraph)
+│   │   ├── chatbot-agent.ts     # Agente principal
+│   │   └── tools/               # Ferramentas do agente
+│   ├── supabase/                # Cliente Supabase
+│   └── auth-helpers.ts          # Helpers de autenticação
+├── shared/                      # Componentes UI compartilhados
+│   └── ui/                      # shadcn/ui components
+└── middleware.ts                # Middleware de autenticação
 ```
 
----
+## 🚀 Funcionalidades Detalhadas
 
-## 🎯 **Principais Diferenciais da v0**
+### 1. Dashboard de Anúncios
 
-### ✅ **Análise Multi-Perspectiva**
+O dashboard principal oferece:
 
-- Visualização contextualizada por empresa/mercado
-- Filtragem automática baseada em escopo de negócio
-- Branding personalizado por perspectiva
+- **Visualização em Grid**: Cards interativos com preview de anúncios
+- **Filtros Avançados**: Por competidor, tipo de mídia, período, plataforma
+- **Paginação Inteligente**: Navegação otimizada para grandes volumes
+- **Modal Detalhado**: Visualização completa com análise IA
 
-### ✅ **Inteligência de Taxas**
+### 2. Sistema de Analytics
 
-- Extração automática de ofertas e taxas
-- Análise competitiva de pricing
-- Tendências de mercado em tempo real
+Múltiplas visões analíticas:
 
-### ✅ **Analytics Avançados**
+- **Analytics Geral**: Métricas agregadas e tendências
+- **Análise Competitiva**: Comparação entre concorrentes
+- **Análise de Tendências**: Padrões temporais e sazonalidade
+- **Extração de Taxas**: Identificação automática de preços e ofertas
 
-- Métricas de sentiment automático
-- Classificação de estratégias competitivas
-- Insights acionáveis para tomada de decisão
+### 3. Assistente IA (EspiADinha)
 
-### ✅ **UX/UI Premium**
+Chatbot inteligente com:
 
-- Interface moderna e responsiva
-- Sistema de temas consistente
-- Navegação intuitiva e acessível
+- **LangGraph Agent**: Arquitetura de agente conversacional
+- **Ferramentas Especializadas**: Acesso direto ao banco de dados
+- **Contexto Persistente**: Histórico de conversas por sessão
+- **Interface Responsiva**: Chat widget redimensionável
 
----
+### 4. Sistema de Perspectivas
 
-## 🚀 **Como Executar**
+Visualização personalizada por empresa:
+
+- **CloudWalk**: Perspectiva padrão
+- **InfinitePay**: Foco em concorrentes específicos
+- **JIM**: Análise direcionada
+- **Padrão**: Visão geral do mercado
+
+## 🔧 Configuração e Instalação
+
+### Pré-requisitos
+
+- Node.js 18+
+- npm/pnpm
+- Conta Supabase
+- Conta Clerk
+- API Key OpenAI
+
+### Variáveis de Ambiente
+
+Crie um arquivo `.env.local`:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
+
+# Vercel Analytics (opcional)
+VERCEL_ANALYTICS_ID=your_analytics_id
+```
+
+### Instalação
 
 ```bash
-# Instalar dependências
-npm install
+# Clone o repositório
+git clone https://github.com/your-org/edge-intelligence-hub.git
+cd edge-intelligence-hub
 
-# Executar em modo desenvolvimento
-npm run dev
+# Instale as dependências
+pnpm install
+
+# Execute em desenvolvimento
+pnpm dev
 
 # Build para produção
-npm run build
-
-# Executar versão de produção
-npm start
+pnpm build
+pnpm start
 ```
 
+## 📊 Estrutura do Banco de Dados
+
+### Tabelas Principais
+
+#### `competitors`
+```sql
+- id: string (PK)
+- name: string
+- home_url: string
+- created_at: timestamp
+- updated_at: timestamp
+```
+
+#### `ads`
+```sql
+- ad_id: string (PK)
+- competitor_id: string (FK)
+- source: string
+- asset_type: enum('image', 'video', 'text')
+- product: string
+- platform: enum('GOOGLE', 'META')
+- start_date: date
+- tags: text
+- image_description: text
+- transcription: text
+- ad_analysis: jsonb
+- created_at: timestamp
+```
+
+## 🤖 Sistema de IA
+
+### Arquitetura do Agente
+
+O assistente IA utiliza **LangGraph** para criar um fluxo conversacional estruturado:
+
+```typescript
+// Fluxo do Agente
+START → Agent → Tools → Agent → END
+```
+
+### Ferramentas Disponíveis
+
+1. **ads_query**: Consulta anúncios no banco
+2. **analytics_query**: Gera métricas e insights
+3. **datetime**: Manipulação de datas
+4. **calc**: Cálculos matemáticos
+
+### Configuração do Agente
+
+```typescript
+const agentConfig = {
+  model: {
+    name: "gpt-4o-mini",
+    temperature: 0.1,
+    maxTokens: 2000
+  },
+  limits: {
+    toolCalls: 10,
+    recursion: 15
+  },
+  tools: {
+    enabled: ["ads_query", "analytics_query", "datetime", "calc"]
+  }
+}
+```
+
+## 🔐 Autenticação e Segurança
+
+### Sistema de Autenticação
+
+- **Clerk**: Gerenciamento completo de usuários
+- **Controle de Domínio**: Acesso restrito a emails @cloudwalk.io
+- **Middleware**: Proteção automática de rotas
+- **Redirects**: Fluxo inteligente de autenticação
+
+### Estrutura de Proteção
+
+```typescript
+// Middleware de autenticação
+export default clerkMiddleware(async (auth, req) => {
+  if (isPublicRoute(req)) return NextResponse.next();
+  
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.redirect(new URL("/sign-in", req.url));
+  }
+  
+  return NextResponse.next();
+});
+```
+
+## 📱 Interface e UX
+
+### Design System
+
+- **Tema Adaptativo**: Dark/Light mode
+- **Componentes Reutilizáveis**: shadcn/ui
+- **Responsividade**: Mobile-first approach
+- **Acessibilidade**: WCAG 2.1 compliance
+
+### Componentes Principais
+
+- **AdCard**: Card de anúncio com preview
+- **AdFilters**: Sistema de filtros avançados
+- **ChatWidget**: Interface do assistente IA
+- **AnalyticsDashboard**: Dashboards de métricas
+
+## 🔄 Fluxo de Dados
+
+### Arquitetura de Estado
+
+```
+UI Components → React Query → API Routes → Supabase
+                    ↓
+              Cache & Sync ← Server State
+```
+
+### Hooks Personalizados
+
+- `useAds()`: Gerencia dados de anúncios
+- `useAnalytics()`: Controla métricas
+- `useChat()`: Estado do chatbot
+- `useCompetitors()`: Lista de concorrentes
+
+## 🚀 Deploy e Produção
+
+### Vercel Deployment
+
+```bash
+# Deploy automático via Git
+git push origin main
+
+# Deploy manual
+vercel --prod
+```
+
+### Otimizações
+
+- **Next.js 15**: App Router com streaming
+- **React 19**: Concurrent features
+- **Image Optimization**: Next.js Image component
+- **Bundle Splitting**: Lazy loading de componentes
+
+## 📈 Monitoramento
+
+### Analytics
+
+- **Vercel Analytics**: Métricas de performance
+- **Console Logging**: Debug estruturado
+- **Error Boundaries**: Tratamento de erros
+
+### Performance
+
+- **Core Web Vitals**: Otimização contínua
+- **Caching**: React Query + Supabase
+- **Lazy Loading**: Componentes sob demanda
+
+## 🤝 Contribuição
+
+### Padrões de Código
+
+- **TypeScript**: Tipagem estrita
+- **ESLint**: Linting automático
+- **Prettier**: Formatação consistente
+- **Conventional Commits**: Padronização de commits
+
+### Estrutura de Features
+
+```typescript
+features/
+└── feature-name/
+    ├── components/     # Componentes específicos
+    ├── hooks/         # React hooks
+    ├── server/        # Lógica server-side
+    ├── types/         # Tipos TypeScript
+    └── index.ts       # Exports públicos
+```
+
+## 📄 Licença
+
+Este projeto é propriedade da CloudWalk e está sob licença proprietária.
+
+## 🆘 Suporte
+
+Para suporte técnico ou dúvidas:
+
+- **Email**: dev@cloudwalk.io
+- **Slack**: #edge-intelligence-hub
+- **Documentação**: [Internal Wiki]
+
 ---
 
-## 📊 **Métricas da v0**
-
-- **4 Perspectivas** de visualização implementadas
-- **5+ Tipos de análise** (Analytics, Competitiva, Tendências, Taxas)
-- **10+ Filtros** disponíveis
-- **20+ Componentes** reutilizáveis
-- **100% Responsivo** em todos os dispositivos
-- **Acessibilidade WCAG** implementada
-
----
-
-## 🎯 **Próximos Passos (v1)**
-
-- [ ] Integração com APIs reais de anúncios
-- [ ] Sistema de alertas e notificações
-- [ ] Exportação de relatórios (PDF/Excel)
-- [ ] Dashboard de ROI e performance
-- [ ] Análise de sentiment com IA
-- [ ] Integração com ferramentas de BI
-
----
-
-**Desenvolvido com ❤️ para análise competitiva inteligente**
+**EspiADinha** - Transformando dados de anúncios em inteligência competitiva 🚀

@@ -23,6 +23,7 @@ import { useTheme } from "@/components/theme-provider";
 import { LogoLoading } from "@/shared/ui/logo-loading";
 import { X } from "lucide-react";
 import type { Ad } from "@/features/ads/types";
+import { useUrlFilters } from "@/hooks/useUrlFilters";
 
 // Função para formatar e limpar o ad_analysis
 function formatAdAnalysis(analysis: string | any): React.ReactElement {
@@ -83,23 +84,27 @@ function formatAdAnalysis(analysis: string | any): React.ReactElement {
   );
 }
 
-export function AdDashboard() {
-  const [filters, setFilters] = useState<FilterState>({
-    searchTerm: "",
-    selectedCompetitors: [], // Array em vez de string
-    selectedPlatform: "all",
-    selectedAdType: "all",
-    dateRange: "all",
-    dateFrom: "",
-    dateTo: "",
-    tags: [],
+interface AdDashboardProps {
+  perspectiva: string;
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export function AdDashboard({ perspectiva, searchParams }: AdDashboardProps) {
+  // Get ad ID from query param
+  const adIdFromUrl = searchParams?.ad as string | undefined;
+  
+  // Use URL-based filters
+  const { filters, updateFilters, applyFilters, openAd, closeAd, clearFilters } = useUrlFilters({
+    perspectiva,
+    creativeId: adIdFromUrl,
+    searchParams,
   });
 
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Usar dados reais do Supabase
-  const { currentTheme } = useTheme();
+  // Use perspectiva from URL instead of theme context
+  const currentTheme = perspectiva;
   // Criar opções dinâmicas que sempre refletem o estado atual
   const adsOptions = useMemo(
     () => ({
@@ -177,6 +182,22 @@ export function AdDashboard() {
   // Usar ads diretamente da API (já filtrados)
   const filteredAds = ads;
 
+  // Load ad from URL when ad ID is present in query params
+  useEffect(() => {
+    if (adIdFromUrl && ads.length > 0) {
+      const ad = ads.find(a => a.ad_id === adIdFromUrl);
+      if (ad) {
+        setSelectedAd(ad);
+      } else {
+        // Try to fetch the specific ad if not in current page
+        // For now, just clear it
+        setSelectedAd(null);
+      }
+    } else {
+      setSelectedAd(null);
+    }
+  }, [adIdFromUrl, ads]);
+
   // useAds agora reage automaticamente às mudanças de adsOptions
 
   // Loading state
@@ -253,16 +274,7 @@ export function AdDashboard() {
               variant="ghost"
               size="sm"
               onClick={() => {
-                setFilters({
-                  searchTerm: "",
-                  selectedCompetitors: [],
-                  selectedPlatform: "all",
-                  selectedAdType: "all",
-                  dateRange: "all",
-                  dateFrom: "",
-                  dateTo: "",
-                  tags: [],
-                });
+                clearFilters();
                 setCurrentPage(1);
               }}
               className="text-xs h-7"
@@ -280,7 +292,7 @@ export function AdDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setFilters(prev => ({ ...prev, searchTerm: "" }))}
+                  onClick={() => updateFilters({ searchTerm: "" })}
                   className="h-4 w-4 p-0 hover:bg-transparent"
                 >
                   <X className="h-3 w-3" />
@@ -300,10 +312,9 @@ export function AdDashboard() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setFilters(prev => ({ 
-                          ...prev, 
-                          selectedCompetitors: prev.selectedCompetitors.filter(id => id !== competitorId)
-                        }))}
+                        onClick={() => updateFilters({ 
+                          selectedCompetitors: filters.selectedCompetitors.filter(id => id !== competitorId)
+                        })}
                         className="h-4 w-4 p-0 hover:bg-transparent"
                       >
                         <X className="h-3 w-3" />
@@ -318,7 +329,7 @@ export function AdDashboard() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setFilters(prev => ({ ...prev, selectedCompetitors: [] }))}
+                    onClick={() => updateFilters({ selectedCompetitors: [] })}
                     className="h-4 w-4 p-0 hover:bg-transparent"
                   >
                     <X className="h-3 w-3" />
@@ -335,7 +346,7 @@ export function AdDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setFilters(prev => ({ ...prev, selectedAdType: "all" }))}
+                  onClick={() => updateFilters({ selectedAdType: "all" })}
                   className="h-4 w-4 p-0 hover:bg-transparent"
                 >
                   <X className="h-3 w-3" />
@@ -352,7 +363,7 @@ export function AdDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setFilters(prev => ({ ...prev, dateFrom: "", dateTo: "" }))}
+                  onClick={() => updateFilters({ dateFrom: "", dateTo: "" })}
                   className="h-4 w-4 p-0 hover:bg-transparent"
                 >
                   <X className="h-3 w-3" />
@@ -375,9 +386,16 @@ export function AdDashboard() {
       <AdFilters
         competitors={competitors}
         currentPerspective={currentTheme}
+        initialFilters={filters}
         onFiltersChange={(newFilters) => {
-          setFilters(newFilters);
-          // O refetch será chamado automaticamente quando adsOptions mudar
+          // This is called AFTER apply button is clicked
+          // Update hook state with applied filters
+          updateFilters(newFilters);
+        }}
+        onApplyFilters={(newFilters) => {
+          // Apply filters to URL and trigger API call
+          applyFilters(newFilters);
+          setCurrentPage(1);
         }}
       />
 
@@ -480,7 +498,10 @@ export function AdDashboard() {
               <AdCard 
                 key={ad.ad_id}
                 ad={ad} 
-                onClick={() => setSelectedAd(ad)} 
+                onClick={() => {
+                  setSelectedAd(ad);
+                  openAd(ad.ad_id);
+                }} 
               />
             ))}
           </div>
@@ -521,7 +542,10 @@ export function AdDashboard() {
       {selectedAd && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-          onClick={() => setSelectedAd(null)}
+          onClick={() => {
+            setSelectedAd(null);
+            closeAd();
+          }}
         >
           <Card
             className="max-w-2xl w-full max-h-[90vh] overflow-y-auto"
@@ -545,7 +569,10 @@ export function AdDashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedAd(null)}
+                  onClick={() => {
+                    setSelectedAd(null);
+                    closeAd();
+                  }}
                 >
                   ✕
                 </Button>
