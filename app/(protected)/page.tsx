@@ -1,6 +1,0 @@
-import { redirect } from "next/navigation";
-
-export default function HomePage() {
-  // Redirect to new route structure
-  redirect("/default/concorrente");
-}
