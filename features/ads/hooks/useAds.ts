@@ -132,6 +132,7 @@ export function useAds(options: UseAdsOptions = {}): UseAdsResult {
     options.filters?.assetTypes,
     options.filters?.products,
     options.filters?.search,
+    options.filters?.platform,
     options.filters?.dateRange?.start,
     options.filters?.dateRange?.end,
     options.page,
@@ -141,12 +142,7 @@ export function useAds(options: UseAdsOptions = {}): UseAdsResult {
   // Fazer fetch quando as opções mudarem (mas evitar loop infinito)
   useEffect(() => {
     fetchAds();
-  }, [
-    options.perspective,
-    options.page,
-    options.limit,
-    JSON.stringify(options.filters), // Usar JSON.stringify para comparar objetos
-  ]);
+  }, [fetchAds]); // fetchAds já tem todas as dependências no useCallback
 
   return {
     ads,

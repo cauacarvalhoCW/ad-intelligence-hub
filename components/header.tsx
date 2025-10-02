@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTheme } from "@/components/theme-provider";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/shared/ui/button";
@@ -15,16 +16,29 @@ import {
 } from "@clerk/nextjs";
 
 export function Header() {
-  const { currentTheme, setTheme, themes, isLoading } = useTheme();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { themes } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  // Extract perspectiva from URL
+  const getPerspectiveFromUrl = (): "default" | "cloudwalk" | "infinitepay" | "jim" => {
+    const match = pathname?.match(/^\/([^\/]+)/);
+    const perspectiva = match?.[1];
+    const validPerspectives = ["default", "cloudwalk", "infinitepay", "jim"] as const;
+    return validPerspectives.includes(perspectiva as any) ? (perspectiva as any) : "default";
+  };
+
+  const currentTheme = getPerspectiveFromUrl();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   // Durante a hidratação, usar tema padrão para evitar mismatch
-  const safeTheme = isMounted ? currentTheme : "default";
+  const safeTheme: "default" | "cloudwalk" | "infinitepay" | "jim" = isMounted ? currentTheme : "default";
   const currentThemeConfig = themes[safeTheme];
 
   const themeOptions = [
@@ -87,7 +101,9 @@ export function Header() {
                   <button
                     key={option.id}
                     onClick={() => {
-                      setTheme(option.id as any);
+                      // Navigate to new perspective route WITHOUT query params (clean slate)
+                      const newPath = `/${option.id}/concorrente`;
+                      router.push(newPath);
                       setIsDropdownOpen(false);
                     }}
                     className={`
