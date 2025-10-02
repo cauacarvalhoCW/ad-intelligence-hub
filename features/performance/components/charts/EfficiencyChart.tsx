@@ -1,0 +1,136 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { 
+  ChartContainer, 
+  ChartTooltip, 
+  ChartTooltipContent,
+  type ChartConfig 
+} from "@/shared/ui/chart";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import type { ChartDataPoint } from "../../types";
+import { TrendingUp } from "lucide-react";
+
+interface EfficiencyChartProps {
+  data: ChartDataPoint[];
+  isLoading?: boolean;
+}
+
+type MetricType = "cac" | "cpm" | "cpa" | "ctr" | "hookRate";
+
+const METRICS: { value: MetricType; label: string }[] = [
+  { value: "cac", label: "CAC (Custo por Ativação)" },
+  { value: "cpm", label: "CPM (Custo por Mil)" },
+  { value: "cpa", label: "CPA (Custo por Signup)" },
+  { value: "ctr", label: "CTR (%)" },
+  { value: "hookRate", label: "Hook Rate (%)" },
+];
+
+const chartConfig = {
+  cac: {
+    label: "CAC",
+    color: "hsl(var(--chart-1))",
+  },
+  cpm: {
+    label: "CPM",
+    color: "hsl(var(--chart-2))",
+  },
+  cpa: {
+    label: "CPA",
+    color: "hsl(var(--chart-3))",
+  },
+  ctr: {
+    label: "CTR",
+    color: "hsl(var(--chart-4))",
+  },
+  hookRate: {
+    label: "Hook Rate",
+    color: "hsl(var(--chart-5))",
+  },
+} satisfies ChartConfig;
+
+export function EfficiencyChart({ data, isLoading }: EfficiencyChartProps) {
+  const [selectedMetric, setSelectedMetric] = useState<MetricType>("cac");
+
+  const currentMetric = METRICS.find((m) => m.value === selectedMetric)!;
+
+  if (isLoading || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Eficiência no Tempo</CardTitle>
+          <CardDescription>Selecione uma métrica para visualizar</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center border-2 border-dashed rounded-lg">
+            <p className="text-muted-foreground">
+              {isLoading ? "Carregando..." : "Sem dados"}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Eficiência no Tempo</CardTitle>
+            <CardDescription>
+              Evolução de {currentMetric.label} ao longo do período
+            </CardDescription>
+          </div>
+          <Select value={selectedMetric} onValueChange={(v) => setSelectedMetric(v as MetricType)}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {METRICS.map((metric) => (
+                <SelectItem key={metric.value} value={metric.value}>
+                  {metric.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <AreaChart accessibilityLayer data={data}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 5)}
+            />
+            <YAxis
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Area
+              dataKey={selectedMetric}
+              type="monotone"
+              fill={`var(--color-${selectedMetric})`}
+              fillOpacity={0.4}
+              stroke={`var(--color-${selectedMetric})`}
+              strokeWidth={2}
+            />
+          </AreaChart>
+        </ChartContainer>
+        <div className="flex items-center gap-2 pt-4 text-sm text-muted-foreground">
+          <TrendingUp className="h-4 w-4" />
+          Tendência de {currentMetric.label.toLowerCase()} no período selecionado
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+

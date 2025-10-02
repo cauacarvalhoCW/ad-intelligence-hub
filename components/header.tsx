@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTheme } from "@/components/theme-provider";
 import { applyTheme } from "@/lib/themes";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, BarChart3, Users } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { ThemeToggle } from "./theme-toggle";
 import {
@@ -142,6 +142,34 @@ export function Header() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Performance/Concorrentes Switch */}
+        <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-lg">
+          <Button
+            variant={pathname?.includes("/performance") ? "default" : "ghost"}
+            size="sm"
+            onClick={() => {
+              const perspective = getPerspectiveFromUrl();
+              router.push(`/${perspective}/performance`);
+            }}
+            className="gap-2"
+          >
+            <BarChart3 className="h-4 w-4" />
+            Performance
+          </Button>
+          <Button
+            variant={pathname?.includes("/concorrente") ? "default" : "ghost"}
+            size="sm"
+            onClick={() => {
+              const perspective = getPerspectiveFromUrl();
+              router.push(`/${perspective}/concorrente`);
+            }}
+            className="gap-2"
+          >
+            <Users className="h-4 w-4" />
+            Concorrentes
+          </Button>
         </div>
 
         {/* Status Indicators, Toggle and Authentication */}

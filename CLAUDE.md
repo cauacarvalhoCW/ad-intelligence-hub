@@ -34,14 +34,21 @@ npm run lint            # Run ESLint
 ```
 ad-intelligence-hub/
 ├── app/                          # Next.js App Router
+│   ├── [perspectiva]/           # Dynamic route for business perspectives
+│   │   └── concorrente/         # Competitor ads page
+│   │       ├── page.tsx         # Main competitor view
+│   │       └── ad/              # Deep link ad view
+│   │           └── [creativeId]/
 │   ├── (protected)/             # Protected routes (requires auth)
-│   │   └── page.tsx             # Main dashboard page
 │   ├── api/                     # API Routes
 │   │   ├── ads/                 # Ads endpoint
 │   │   ├── analytics/           # Analytics endpoint
 │   │   ├── chat/                # AI chatbot endpoint (LangGraph)
+│   │   │   └── stream/          # Streaming chat endpoint
 │   │   └── competitors/         # Competitors endpoint
 │   ├── sign-in/                 # Authentication pages
+│   ├── sign-up/
+│   ├── access-denied/
 │   └── globals.css              # Global styles
 ├── components/                   # Global React components
 │   ├── chat/                    # AI chat widget system
@@ -57,17 +64,21 @@ ad-intelligence-hub/
 │       ├── components/          # Analytics UI
 │       ├── hooks/               # React hooks
 │       └── server/              # Analytics service logic
+├── hooks/                        # Global custom hooks
+│   └── useUrlFilters.ts         # URL state management hook
 ├── lib/                         # Shared libraries and utilities
 │   ├── agents/                  # LangGraph AI agent system
 │   │   ├── chatbot-agent.ts     # Main agent class
 │   │   ├── config/              # Agent configuration
+│   │   ├── rag/                 # RAG system (if applicable)
 │   │   └── tools/               # Agent tools (ads_query, analytics_query, datetime, calc)
 │   ├── supabase/                # Supabase client setup
 │   ├── auth-helpers.ts          # Authentication utilities
 │   └── types.ts                 # Shared TypeScript types
 ├── shared/                      # Shared UI components
 │   └── ui/                      # shadcn/ui components
-└── middleware.ts                # Clerk authentication middleware
+├── middleware.ts                # Clerk authentication middleware
+└── test-api.sh                  # API testing script
 ```
 
 ## Key Architectural Patterns
@@ -116,14 +127,29 @@ Uses TanStack Query (React Query) for server state management:
 - Data is cached and synchronized automatically
 - API routes handle server-side data fetching from Supabase
 
-### 5. Perspective System
-The application supports multiple business perspectives:
-- **CloudWalk** (default)
-- **InfinitePay**
-- **JIM**
-- **Default** (general market view)
+### 5. Perspective System & URL-Based Routing
+The application supports multiple business perspectives via dynamic routing:
+- **CloudWalk** - All markets (default perspective)
+- **InfinitePay** - Brazil focus (PagBank, Stone, Cora, Ton, Mercado Pago, Jeitto)
+- **JIM** - International (Square, PayPal, Stripe, Venmo, SumUp)
+- **Default** - General market view
 
-Each perspective filters competitors and customizes the dashboard view.
+**URL Structure:**
+```
+/:perspectiva/concorrente                    # Main competitor page
+/:perspectiva/concorrente/ad/:creativeId     # Deep link to specific ad
+```
+
+**Examples:**
+- `/cloudwalk/concorrente?platform=META&search=taxas`
+- `/infinitepay/concorrente/ad/123456?assetType=video`
+
+**URL State Management:**
+- All filters are synced with URL query parameters (search, competitors, platform, assetType, dateFrom, dateTo, tags)
+- URL is the source of truth for application state
+- Navigation preserves UTM parameters
+- Custom hook `useUrlFilters` manages synchronization
+- Search input has 250ms debounce before updating URL
 
 ## Database Schema
 
@@ -226,6 +252,27 @@ Use the provided test script:
 
 This tests all major API endpoints with various filter combinations.
 
+### Working with URL State
+The application uses a custom hook `useUrlFilters` for URL synchronization:
+
+```typescript
+// In page components
+const {
+  filters,         // Current filter state
+  updateFilters,   // Update filters (debounced for search)
+  openAd,          // Open ad modal (updates URL)
+  closeAd,         // Close ad modal (updates URL)
+  clearFilters     // Clear all filters (preserves UTMs)
+} = useUrlFilters({ perspectiva, creativeId, searchParams });
+```
+
+Key principles:
+- URL is always the source of truth
+- Filters sync bidirectionally with URL
+- Browser history works correctly (back/forward)
+- UTM parameters are always preserved
+- Search has 250ms debounce to prevent excessive URL updates
+
 ## Deployment
 
 The application is deployed on Vercel with automatic deployments from the `main` branch. The project uses:
@@ -233,11 +280,21 @@ The application is deployed on Vercel with automatic deployments from the `main`
 - Next.js 15 streaming and concurrent features
 - React 19 server components
 
+## Additional Documentation
+
+For detailed information on specific features, see:
+- **[ROUTING_AND_FILTERS.md](ROUTING_AND_FILTERS.md)** - Comprehensive routing and URL filter documentation
+- **CORREÇÕES_UX.md** - UX improvements and corrections (if applicable)
+- **README.md** - Project overview in Portuguese
+
 ## Recent Changes
 
 Based on git history, recent work includes:
+- Implemented dynamic routing with `[perspectiva]` parameter
+- Added deep linking for ads via `/:perspectiva/concorrente/ad/:creativeId`
+- Created URL-based state management with `useUrlFilters` hook
 - Refactored analytics module into feature-based structure
 - Added Google Display cards (video, text, image)
 - Added platform logos (Meta, Google)
 - Implemented image/video preview functionality
-- Collocated analytics UI/hooks and API into feature modules
+- Synchronized all filters with URL query parameters
