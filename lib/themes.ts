@@ -93,7 +93,7 @@ export const themes: Record<ThemeType, ThemeConfig> = {
   },
 };
 
-export function applyTheme(theme: ThemeType) {
+export function applyTheme(theme: ThemeType, saveToLocalStorage: boolean = true) {
   // Verificar se estamos no cliente
   if (typeof window === "undefined") return;
 
@@ -114,8 +114,10 @@ export function applyTheme(theme: ThemeType) {
       document.body.classList.add(`theme-${theme}`);
     }
 
-    // Store current theme in localStorage for persistence
-    localStorage.setItem("edge-intelligence-theme", theme);
+    // Store current theme in localStorage for persistence (only if requested)
+    if (saveToLocalStorage) {
+      localStorage.setItem("edge-intelligence-theme", theme);
+    }
   });
 }
 

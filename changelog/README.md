@@ -39,6 +39,11 @@ YYYY-MM-DD-NN-titulo-descritivo.md
    - `useCallback` faltando `options.filters?.platform` nas deps
    - Correção: Adicionada dependência, simplificado `useEffect`
 
+6. **[Fix: Vercel Build e Aplicação de Temas](./2025-10-02-06-fix-vercel-build-e-temas.md)**
+   - Erro ENOENT no build do Vercel
+   - Temas não sendo aplicados nas páginas de perspectiva
+   - Correção: Deletado conflito de roteamento, sincronizado tema com URL
+
 ## 🎯 Como Usar Este Changelog
 
 ### Para Desenvolvedores

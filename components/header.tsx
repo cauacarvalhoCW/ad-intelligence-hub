@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTheme } from "@/components/theme-provider";
+import { applyTheme } from "@/lib/themes";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { ThemeToggle } from "./theme-toggle";
@@ -36,6 +37,13 @@ export function Header() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Aplicar tema baseado na perspectiva da URL (sem salvar no localStorage)
+  useEffect(() => {
+    if (isMounted && currentTheme) {
+      applyTheme(currentTheme, false);
+    }
+  }, [currentTheme, isMounted]);
 
   // Durante a hidratação, usar tema padrão para evitar mismatch
   const safeTheme: "default" | "cloudwalk" | "infinitepay" | "jim" = isMounted ? currentTheme : "default";
