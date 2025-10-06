@@ -13,12 +13,19 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Badge } from "@/shared/ui/badge";
-import { Filter, Search, X } from "lucide-react";
+import { Filter, Search, X, Check } from "lucide-react";
 import { DateRangePicker } from "./DateRangePicker";
 import type { Platform, RangePreset, DateRangeFilter } from "../types";
 
 interface PerfFiltersProps {
-  onFiltersChange?: (filters: {
+  // Controlled component - receive values as props
+  value: {
+    platforms: Platform[];
+    range: RangePreset;
+    dateRange?: DateRangeFilter;
+    searchQuery?: string;
+  };
+  onChange: (filters: {
     platforms: Platform[];
     range: RangePreset;
     dateRange?: DateRangeFilter;
@@ -34,46 +41,80 @@ const RANGES: { value: RangePreset; label: string }[] = [
   { value: "custom", label: "Período customizado" },
 ];
 
-export function PerfFilters({ onFiltersChange }: PerfFiltersProps) {
-  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([...PLATFORMS]);
-  const [selectedRange, setSelectedRange] = useState<RangePreset>("7d");
-  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>();
-  const [searchQuery, setSearchQuery] = useState("");
+export function PerfFilters({ value, onChange }: PerfFiltersProps) {
+  // Local state for temporary filters (before applying)
+  const [tempPlatforms, setTempPlatforms] = useState<Platform[]>(value.platforms);
+  const [tempRange, setTempRange] = useState<RangePreset>(value.range);
+  const [tempDateRange, setTempDateRange] = useState<DateRangeFilter | undefined>(value.dateRange);
+  const [tempSearchQuery, setTempSearchQuery] = useState<string>(value.searchQuery || "");
 
-  // Notify parent when filters change
+  // Sync with external value changes
   useEffect(() => {
-    const dateRange = customDateRange?.from && customDateRange?.to
-      ? { from: customDateRange.from, to: customDateRange.to }
-      : undefined;
+    setTempPlatforms(value.platforms);
+    setTempRange(value.range);
+    setTempDateRange(value.dateRange);
+    setTempSearchQuery(value.searchQuery || "");
+  }, [value.platforms, value.range, value.dateRange, value.searchQuery]);
 
-    onFiltersChange?.({
-      platforms: selectedPlatforms,
-      range: selectedRange,
-      dateRange,
-      searchQuery: searchQuery.trim() || undefined,
-    });
-  }, [selectedPlatforms, selectedRange, customDateRange, searchQuery, onFiltersChange]);
+  // Check if there are pending changes
+  const hasPendingChanges = 
+    JSON.stringify(tempPlatforms) !== JSON.stringify(value.platforms) ||
+    tempRange !== value.range ||
+    JSON.stringify(tempDateRange) !== JSON.stringify(value.dateRange) ||
+    tempSearchQuery !== (value.searchQuery || "");
 
   const togglePlatform = (platform: Platform) => {
-    setSelectedPlatforms((prev) => {
-      if (prev.includes(platform)) {
-        return prev.filter((p) => p !== platform);
-      } else {
-        return [...prev, platform];
-      }
-    });
+    const newPlatforms = tempPlatforms.includes(platform)
+      ? tempPlatforms.filter((p) => p !== platform)
+      : [...tempPlatforms, platform];
+    setTempPlatforms(newPlatforms);
   };
 
   const handleRangeChange = (range: RangePreset) => {
-    setSelectedRange(range);
+    setTempRange(range);
     if (range !== "custom") {
-      setCustomDateRange(undefined);
+      setTempDateRange(undefined);
     }
   };
 
-  const clearSearch = () => {
-    setSearchQuery("");
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    if (range?.from && range?.to) {
+      setTempRange("custom");
+      setTempDateRange({ from: range.from, to: range.to });
+    } else {
+      setTempDateRange(undefined);
+    }
   };
+
+  const handleSearchChange = (query: string) => {
+    setTempSearchQuery(query);
+  };
+
+  const clearSearch = () => {
+    setTempSearchQuery("");
+  };
+
+  // Apply filters button
+  const applyFilters = () => {
+    onChange({
+      platforms: tempPlatforms,
+      range: tempRange,
+      dateRange: tempDateRange,
+      searchQuery: tempSearchQuery.trim() || undefined,
+    });
+  };
+
+  // Reset to current applied filters
+  const resetFilters = () => {
+    setTempPlatforms(value.platforms);
+    setTempRange(value.range);
+    setTempDateRange(value.dateRange);
+    setTempSearchQuery(value.searchQuery || "");
+  };
+
+  const customDateRangeValue = tempDateRange
+    ? { from: tempDateRange.from, to: tempDateRange.to }
+    : undefined;
 
   return (
     <div className="space-y-4">
@@ -85,9 +126,9 @@ export function PerfFilters({ onFiltersChange }: PerfFiltersProps) {
             <Button variant="outline" className="gap-2">
               <Filter className="h-4 w-4" />
               Plataformas
-              {selectedPlatforms.length > 0 && selectedPlatforms.length < PLATFORMS.length && (
+              {tempPlatforms.length > 0 && tempPlatforms.length < PLATFORMS.length && (
                 <Badge variant="secondary" className="ml-1">
-                  {selectedPlatforms.length}
+                  {tempPlatforms.length}
                 </Badge>
               )}
             </Button>
@@ -98,7 +139,7 @@ export function PerfFilters({ onFiltersChange }: PerfFiltersProps) {
             {PLATFORMS.map((platform) => (
               <DropdownMenuCheckboxItem
                 key={platform}
-                checked={selectedPlatforms.includes(platform)}
+                checked={tempPlatforms.includes(platform)}
                 onCheckedChange={() => togglePlatform(platform)}
               >
                 {platform}
@@ -112,7 +153,7 @@ export function PerfFilters({ onFiltersChange }: PerfFiltersProps) {
           {RANGES.filter((r) => r.value !== "custom").map((range) => (
             <Button
               key={range.value}
-              variant={selectedRange === range.value ? "default" : "outline"}
+              variant={tempRange === range.value ? "default" : "outline"}
               size="sm"
               onClick={() => handleRangeChange(range.value)}
             >
@@ -123,13 +164,8 @@ export function PerfFilters({ onFiltersChange }: PerfFiltersProps) {
 
         {/* Custom Date Range */}
         <DateRangePicker
-          value={customDateRange}
-          onChange={(range) => {
-            setCustomDateRange(range);
-            if (range?.from && range?.to) {
-              setSelectedRange("custom");
-            }
-          }}
+          value={customDateRangeValue}
+          onChange={handleDateRangeChange}
         />
 
         {/* Search by Name */}
@@ -138,11 +174,16 @@ export function PerfFilters({ onFiltersChange }: PerfFiltersProps) {
           <Input
             type="text"
             placeholder="Buscar por campanha ou anúncio..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={tempSearchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                applyFilters();
+              }
+            }}
             className="pl-9 pr-9"
           />
-          {searchQuery && (
+          {tempSearchQuery && (
             <Button
               variant="ghost"
               size="sm"
@@ -153,18 +194,45 @@ export function PerfFilters({ onFiltersChange }: PerfFiltersProps) {
             </Button>
           )}
         </div>
+
+        {/* Apply Filters Button */}
+        {hasPendingChanges && (
+          <div className="flex gap-2">
+            <Button
+              onClick={applyFilters}
+              size="default"
+              className="gap-2 font-semibold"
+            >
+              <Check className="h-4 w-4" />
+              Aplicar Filtros
+            </Button>
+            <Button
+              onClick={resetFilters}
+              variant="outline"
+              size="default"
+            >
+              Cancelar
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Active Filters Display */}
       <div className="flex flex-wrap items-center gap-2">
-        {selectedPlatforms.length > 0 && selectedPlatforms.length < PLATFORMS.length && (
+        {value.platforms.length > 0 && value.platforms.length < PLATFORMS.length && (
           <>
             <span className="text-sm text-muted-foreground">Plataformas:</span>
-            {selectedPlatforms.map((platform) => (
+            {value.platforms.map((platform) => (
               <Badge key={platform} variant="secondary" className="gap-1">
                 {platform}
                 <button
-                  onClick={() => togglePlatform(platform)}
+                  onClick={() => {
+                    const newPlatforms = value.platforms.filter((p) => p !== platform);
+                    onChange({
+                      ...value,
+                      platforms: newPlatforms,
+                    });
+                  }}
                   className="ml-1 hover:text-destructive"
                 >
                   <X className="h-3 w-3" />
@@ -174,13 +242,22 @@ export function PerfFilters({ onFiltersChange }: PerfFiltersProps) {
           </>
         )}
 
-        {searchQuery && (
+        {value.searchQuery && (
           <Badge variant="secondary" className="gap-1">
             <Search className="h-3 w-3" />
-            "{searchQuery}"
-            <button onClick={clearSearch} className="ml-1 hover:text-destructive">
+            "{value.searchQuery}"
+            <button 
+              onClick={() => onChange({ ...value, searchQuery: undefined })} 
+              className="ml-1 hover:text-destructive"
+            >
               <X className="h-3 w-3" />
             </button>
+          </Badge>
+        )}
+
+        {hasPendingChanges && (
+          <Badge variant="outline" className="text-amber-600 border-amber-600">
+            ⚠️ Filtros não aplicados
           </Badge>
         )}
       </div>

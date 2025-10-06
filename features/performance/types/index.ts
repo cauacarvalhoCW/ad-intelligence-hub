@@ -6,6 +6,8 @@ export type Platform = "META" | "GOOGLE" | "TIKTOK";
 export type Product = "POS" | "TAP" | "LINK" | "JIM";
 export type Perspective = "default" | "cloudwalk" | "infinitepay" | "jim";
 export type RangePreset = "yesterday" | "7d" | "30d" | "custom";
+export type ViewGranularity = "day" | "week" | "month" | "alltime";
+export type KPIContext = "overview" | "pos" | "tap" | "link" | "jim";
 
 // Date range for custom filters
 export interface DateRangeFilter {
@@ -42,6 +44,8 @@ export interface MktAdsLookerRow {
   product: Product | null;
   creative_link: string | null;
   creative_id: string | null;
+  link_update_at: string | null; // Timestamp when creative_link was last fetched (for cache)
+  image_preview_link: string | null; // Preview image/thumbnail URL from N8N
 }
 
 // AdData with calculated metrics (used in components)
@@ -63,11 +67,17 @@ export interface KPIMetrics {
   clicks: number;
   signups: number;
   activations: number;
-  pos_sales: number;
-  piselli_sales: number;
-  piselli_percentage: number | null;
-  fifth_transaction: number;
-  installs?: number; // Only for JIM
+  // POS-specific
+  pos_sales?: number;
+  piselli_sales?: number;
+  piselli_percentage?: number | null;
+  // TAP-specific
+  tap_cnpj_signups?: number;
+  cnpj_percentage?: number | null;
+  fifth_transaction?: number;
+  // JIM-specific
+  installs?: number;
+  // Calculated metrics
   ctr: number;
   cpm: number;
   hook_rate: number;

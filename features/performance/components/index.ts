@@ -7,3 +7,4 @@ export { KpiRow } from "./KpiRow";
 export { BestAds } from "./BestAds";
 export { PerformanceTable } from "./PerformanceTable";
 export * from "./charts";
+export * from "./shared";

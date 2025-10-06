@@ -1,11 +1,13 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Define routes publics (sign-in, sign-up, and access-denied)
+// Define routes publics (sign-in, sign-up, access-denied, and performance APIs)
 const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/access-denied",
+  "/api/performance(.*)",
+  "/api/analytics(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

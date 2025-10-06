@@ -21,15 +21,27 @@ interface CostByPlatformChartProps {
 const chartConfig = {
   META: {
     label: "Meta",
-    color: "#1877F2",
+    color: "hsl(var(--chart-1))",
+    theme: {
+      light: "hsl(221, 83%, 53%)", // #1877F2
+      dark: "hsl(206, 100%, 65%)",  // Azul vibrante para dark
+    },
   },
   GOOGLE: {
     label: "Google",
-    color: "#4285F4",
+    color: "hsl(var(--chart-2))",
+    theme: {
+      light: "hsl(217, 89%, 61%)", // #4285F4
+      dark: "hsl(142, 71%, 45%)",  // Verde Google vibrante
+    },
   },
   TIKTOK: {
     label: "TikTok",
-    color: "#000000",
+    color: "hsl(var(--chart-3))",
+    theme: {
+      light: "hsl(0, 0%, 0%)",     // Preto
+      dark: "hsl(348, 83%, 65%)",  // Rosa TikTok vibrante
+    },
   },
 } satisfies ChartConfig;
 

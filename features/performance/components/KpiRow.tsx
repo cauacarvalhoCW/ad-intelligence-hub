@@ -64,7 +64,10 @@ function KpiCard({ title, value, subtitle, trend, isLoading }: KpiCardProps) {
 }
 
 export function KpiRow({ metrics, isLoading, showInstalls }: KpiRowProps) {
+  console.log("🎯 [KpiRow] Render state:", { isLoading, hasMetrics: !!metrics, metrics });
+  
   if (isLoading || !metrics) {
+    console.log("🎯 [KpiRow] Showing loading state:", { isLoading, metrics });
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {Array.from({ length: 5 }).map((_, i) => (
@@ -73,6 +76,8 @@ export function KpiRow({ metrics, isLoading, showInstalls }: KpiRowProps) {
       </div>
     );
   }
+  
+  console.log("🎯 [KpiRow] Rendering metrics:", metrics);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">

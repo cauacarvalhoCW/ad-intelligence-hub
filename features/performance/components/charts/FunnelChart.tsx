@@ -11,11 +11,12 @@ interface FunnelChartProps {
   isLoading?: boolean;
 }
 
+// Colors that work well in both light and dark modes
 const STAGE_COLORS = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
+  "hsl(var(--chart-1))", // Impressões: Laranja/Roxo
+  "hsl(var(--chart-2))", // Clicks: Azul/Verde  
+  "hsl(var(--chart-3))", // Signups: Azul escuro/Amarelo
+  "hsl(var(--chart-4))", // Ativações: Amarelo/Rosa
 ];
 
 export function FunnelChart({ data, isLoading }: FunnelChartProps) {
