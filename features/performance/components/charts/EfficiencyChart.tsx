@@ -78,14 +78,19 @@ export function EfficiencyChart({ data, isLoading }: EfficiencyChartProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Eficiência no Tempo</CardTitle>
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <CardTitle>Eficiência ao Longo do Tempo</CardTitle>
+              <span className="text-xs text-muted-foreground font-normal">
+                (Selecione uma métrica →)
+              </span>
+            </div>
             <CardDescription>
               Evolução de {currentMetric.label} ao longo do período
             </CardDescription>
           </div>
           <Select value={selectedMetric} onValueChange={(v) => setSelectedMetric(v as MetricType)}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[240px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

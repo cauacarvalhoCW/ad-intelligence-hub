@@ -117,7 +117,10 @@ export function prepareCostByPlatformData(
       };
 
       bucketRows.forEach((row) => {
-        platformCosts[row.platform] += row.cost || 0;
+        const platformKey = row.platform.toUpperCase() as keyof typeof platformCosts;
+        if (platformKey in platformCosts) {
+          platformCosts[platformKey] += row.cost || 0;
+        }
       });
 
       point.META = platformCosts.META;

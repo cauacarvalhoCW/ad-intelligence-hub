@@ -24,12 +24,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/ui/dialog";
 import { Badge } from "@/shared/ui/badge";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Button } from "@/shared/ui/button";
-import { ArrowUpDown, ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
+import { ArrowUpDown, ChevronLeft, ChevronRight, Settings2, Eye } from "lucide-react";
 import type { AdData, Product } from "../types";
 import { formatNumber, formatPercentage, formatCurrency } from "../utils";
+import { AdPreviewModal } from "./AdPreviewModal";
 
 interface PerformanceTableProps {
   product: Product;
@@ -40,7 +48,7 @@ interface PerformanceTableProps {
 
 type ColumnKey =
   | "date"
-  | "creative_id"
+  | "ad_id"
   | "ad_name"
   | "campaign_name"
   | "platform"
@@ -71,7 +79,7 @@ interface ColumnConfig {
 
 const COLUMNS: ColumnConfig[] = [
   { key: "date", label: "Data", defaultVisible: true, sortable: true },
-  { key: "creative_id", label: "Criativo ID", defaultVisible: true, sortable: false },
+  { key: "ad_id", label: "Ad ID", defaultVisible: true, sortable: false },
   { key: "ad_name", label: "Nome do Anúncio", defaultVisible: true, sortable: true },
   { key: "campaign_name", label: "Campanha", defaultVisible: true, sortable: true },
   { key: "platform", label: "Plataforma", defaultVisible: true, sortable: true },
@@ -98,7 +106,17 @@ export function PerformanceTable({ product, data, isLoading, searchQuery }: Perf
   const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(
     new Set(COLUMNS.filter((c) => c.defaultVisible).map((c) => c.key))
   );
+  const [previewAd, setPreviewAd] = useState<AdData | null>(null);
   const itemsPerPage = 10;
+
+  // 🔍 DEBUG: Log table data
+  console.log("🎯 [PerformanceTable] Render state:", {
+    product,
+    dataLength: data.length,
+    isLoading,
+    searchQuery,
+    sampleAd: data[0],
+  });
 
   // Filter data by search query (MUST be before early return!)
   const filteredData = useMemo(() => {
@@ -198,11 +216,19 @@ export function PerformanceTable({ product, data, isLoading, searchQuery }: Perf
   const renderCellValue = (ad: AdData, column: ColumnConfig) => {
     const value = ad[column.key];
 
+    // 🔍 DEBUG: Log specific metric values
+    if (["ctr", "hook_rate", "cpm", "cost", "impressions"].includes(column.key)) {
+      console.log(`🔍 [PerformanceTable] ${column.key} for ${ad.creative_id?.toString().slice(0, 8)}:`, {
+        rawValue: value,
+        formatted: column.format ? column.format(value) : value,
+      });
+    }
+
     // Special rendering for specific columns
-    if (column.key === "creative_id") {
+    if (column.key === "ad_id") {
       return (
-        <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
-          {value?.toString().slice(0, 12) || "N/A"}...
+        <code className="text-xs bg-muted px-1.5 py-0.5 rounded whitespace-nowrap">
+          {value?.toString() || "N/A"}
         </code>
       );
     }
@@ -213,7 +239,7 @@ export function PerformanceTable({ product, data, isLoading, searchQuery }: Perf
 
     if (column.key === "ad_name" || column.key === "campaign_name") {
       return (
-        <div className="max-w-[200px] truncate" title={value?.toString()}>
+        <div className="min-w-[250px] whitespace-normal break-words" title={value?.toString()}>
           {value || "—"}
         </div>
       );
@@ -268,10 +294,12 @@ export function PerformanceTable({ product, data, isLoading, searchQuery }: Perf
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
+                {/* Preview column (first) */}
+                <TableHead className="w-[80px] text-center">Preview</TableHead>
                 {visibleColumnConfigs.map((column) => (
                   <TableHead key={column.key} className={column.sortable ? "cursor-pointer" : ""}>
                     <SortButton column={column} />
@@ -282,6 +310,18 @@ export function PerformanceTable({ product, data, isLoading, searchQuery }: Perf
             <TableBody>
               {paginatedData.map((ad, idx) => (
                 <TableRow key={`${ad.creative_id}-${ad.date}-${idx}`}>
+                  {/* Preview button (first) */}
+                  <TableCell className="text-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setPreviewAd(ad)}
+                      className="h-8 w-8 p-0"
+                      title="Ver anúncio"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                   {visibleColumnConfigs.map((column) => (
                     <TableCell key={column.key} className={column.key === "cost" || column.key === "cpa" || column.key === "cac" ? "font-medium" : ""}>
                       {renderCellValue(ad, column)}
@@ -292,6 +332,12 @@ export function PerformanceTable({ product, data, isLoading, searchQuery }: Perf
             </TableBody>
           </Table>
         </div>
+
+        {/* Preview Modal with N8N Integration */}
+        <AdPreviewModal 
+          ad={previewAd} 
+          onClose={() => setPreviewAd(null)} 
+        />
 
         {/* Pagination */}
         <div className="flex items-center justify-between mt-4">

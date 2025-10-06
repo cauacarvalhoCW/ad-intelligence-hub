@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "test:supabase": "npx tsx test-supabase-performance.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "6.31.10",
@@ -51,7 +52,6 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
-    "dotenv": "^17.2.2",
     "embla-carousel-react": "8.5.1",
     "express": "^5.1.0",
     "geist": "latest",
@@ -79,6 +79,7 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "9.35.0",
     "eslint-config-next": "15.5.2",
     "postcss": "^8.5",

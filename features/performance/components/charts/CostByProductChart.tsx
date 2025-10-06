@@ -16,11 +16,12 @@ interface CostByProductChartProps {
   isLoading?: boolean;
 }
 
+// Use CSS variables que já têm dark mode support no globals.css
 const PRODUCT_COLORS: Record<string, string> = {
-  POS: "hsl(var(--chart-1))",
-  TAP: "hsl(var(--chart-2))",
-  LINK: "hsl(var(--chart-3))",
-  JIM: "hsl(var(--chart-4))",
+  POS: "hsl(var(--chart-1))",  // Laranja/Roxo (light/dark)
+  TAP: "hsl(var(--chart-2))",  // Azul/Verde (light/dark)
+  LINK: "hsl(var(--chart-3))", // Azul escuro/Amarelo (light/dark)
+  JIM: "hsl(var(--chart-4))",  // Amarelo/Rosa (light/dark)
 };
 
 const chartConfig = {

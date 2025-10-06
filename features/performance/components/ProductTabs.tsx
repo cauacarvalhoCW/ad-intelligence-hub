@@ -50,7 +50,6 @@ export function ProductTabs({ perspective, activeProduct }: ProductTabsProps) {
             <TabsTrigger
               key={product}
               value={product}
-              disabled={products.length === 1}
               className={
                 isOverviewPage
                   ? "text-lg px-8 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"

@@ -62,7 +62,235 @@ export const calculatePiselliPercentage = (
 };
 
 /**
- * Calculate total Signups from raw data
+ * Calculate CNPJ Percentage (TAP)
+ * % CNPJ = tap_cnpj_signups / tap_signup
+ */
+export const calculateCNPJPercentage = (
+  cnpjSignups: number,
+  totalSignups: number
+): number | null => {
+  if (totalSignups === 0) return null;
+  return (cnpjSignups / totalSignups) * 100;
+};
+
+// ============================================
+// PRODUCT-SPECIFIC KPI CALCULATIONS
+// ============================================
+
+/**
+ * Calculate KPIs for InfinitePay Overview (POS + TAP + LINK only, NO JIM)
+ */
+export const calculateInfinitePayKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
+  const cost = rows.reduce((sum, row) => sum + (row.cost || 0), 0);
+  const impressions = rows.reduce((sum, row) => sum + (row.impressions || 0), 0);
+  const clicks = rows.reduce((sum, row) => sum + (row.clicks || 0), 0);
+  const video3s = rows.reduce((sum, row) => sum + (row.video_3s || 0), 0);
+
+  // Signups: TAP (tap signup + tap cnpj signups) + LINK (link_signup)
+  // NÃO incluir signup_web (JIM)
+  const tapSignups = rows.reduce((sum, row) => {
+    if (row.product === "TAP") {
+      return sum + (row["tap signup"] || 0) + (row["tap cnpj signups"] || 0);
+    }
+    return sum;
+  }, 0);
+
+  const linkSignups = rows.reduce((sum, row) => {
+    if (row.product === "LINK") {
+      return sum + (row.link_signup || 0);
+    }
+    return sum;
+  }, 0);
+
+  const signups = tapSignups + linkSignups;
+
+  // Activations: TAP (tap activations) + LINK (link_activations)
+  // NÃO incluir activation_web/activation_app (JIM)
+  const tapActivations = rows.reduce((sum, row) => {
+    if (row.product === "TAP") {
+      return sum + (row["tap activations"] || 0);
+    }
+    return sum;
+  }, 0);
+
+  const linkActivations = rows.reduce((sum, row) => {
+    if (row.product === "LINK") {
+      return sum + (row.link_activations || 0);
+    }
+    return sum;
+  }, 0);
+
+  const activations = tapActivations + linkActivations;
+
+  // POS Sales
+  const posSales = rows.reduce((sum, row) => {
+    if (row.product === "POS") {
+      return sum + (row.pos_sales || 0);
+    }
+    return sum;
+  }, 0);
+
+  const piselliSales = rows.reduce((sum, row) => {
+    if (row.product === "POS") {
+      return sum + (row.piselli_sales || 0);
+    }
+    return sum;
+  }, 0);
+
+  // Fifth Transaction (TAP only)
+  const fifthTransaction = rows.reduce((sum, row) => {
+    if (row.product === "TAP") {
+      return sum + (row["tap 5trx"] || 0);
+    }
+    return sum;
+  }, 0);
+
+  return {
+    cost,
+    impressions,
+    clicks,
+    signups,
+    activations,
+    pos_sales: posSales,
+    piselli_sales: piselliSales,
+    piselli_percentage: calculatePiselliPercentage(piselliSales, posSales),
+    fifth_transaction: fifthTransaction,
+    ctr: calculateCTR(clicks, impressions),
+    cpm: calculateCPM(cost, impressions),
+    hook_rate: calculateHookRate(video3s, impressions),
+    cpa: calculateCPA(cost, signups),
+    cac: calculateCAC(cost, activations),
+  };
+};
+
+/**
+ * Calculate KPIs for JIM
+ */
+export const calculateJimKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
+  const cost = rows.reduce((sum, row) => sum + (row.cost || 0), 0);
+  const impressions = rows.reduce((sum, row) => sum + (row.impressions || 0), 0);
+  const clicks = rows.reduce((sum, row) => sum + (row.clicks || 0), 0);
+  const video3s = rows.reduce((sum, row) => sum + (row.video_3s || 0), 0);
+
+  // JIM metrics
+  const installs = rows.reduce((sum, row) => sum + (row.install || 0), 0);
+  const signupWeb = rows.reduce((sum, row) => sum + (row.signup_web || 0), 0);
+  const activationApp = rows.reduce((sum, row) => sum + (row.activation_app || 0), 0);
+  const activationWeb = rows.reduce((sum, row) => sum + (row.activation_web || 0), 0);
+
+  const signups = signupWeb;
+  const activations = activationApp + activationWeb;
+
+  return {
+    cost,
+    impressions,
+    clicks,
+    signups,
+    activations,
+    installs,
+    ctr: calculateCTR(clicks, impressions),
+    cpm: calculateCPM(cost, impressions),
+    hook_rate: calculateHookRate(video3s, impressions),
+    cpa: calculateCPA(cost, signups),
+    cac: calculateCAC(cost, activations),
+  };
+};
+
+/**
+ * Calculate KPIs for POS
+ */
+export const calculatePosKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
+  const cost = rows.reduce((sum, row) => sum + (row.cost || 0), 0);
+  const impressions = rows.reduce((sum, row) => sum + (row.impressions || 0), 0);
+  const clicks = rows.reduce((sum, row) => sum + (row.clicks || 0), 0);
+  const video3s = rows.reduce((sum, row) => sum + (row.video_3s || 0), 0);
+
+  const posSales = rows.reduce((sum, row) => sum + (row.pos_sales || 0), 0);
+  const piselliSales = rows.reduce((sum, row) => sum + (row.piselli_sales || 0), 0);
+
+  return {
+    cost,
+    impressions,
+    clicks,
+    signups: 0, // POS não tem signups diretos
+    activations: 0, // POS não tem activations diretos
+    pos_sales: posSales,
+    piselli_sales: piselliSales,
+    piselli_percentage: calculatePiselliPercentage(piselliSales, posSales),
+    ctr: calculateCTR(clicks, impressions),
+    cpm: calculateCPM(cost, impressions),
+    hook_rate: calculateHookRate(video3s, impressions),
+    cpa: null,
+    cac: null,
+  };
+};
+
+/**
+ * Calculate KPIs for TAP
+ */
+export const calculateTapKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
+  const cost = rows.reduce((sum, row) => sum + (row.cost || 0), 0);
+  const impressions = rows.reduce((sum, row) => sum + (row.impressions || 0), 0);
+  const clicks = rows.reduce((sum, row) => sum + (row.clicks || 0), 0);
+  const video3s = rows.reduce((sum, row) => sum + (row.video_3s || 0), 0);
+
+  const tapSignup = rows.reduce((sum, row) => sum + (row["tap signup"] || 0), 0);
+  const tapCnpjSignups = rows.reduce((sum, row) => sum + (row["tap cnpj signups"] || 0), 0);
+  const tapActivations = rows.reduce((sum, row) => sum + (row["tap activations"] || 0), 0);
+  const fifthTransaction = rows.reduce((sum, row) => sum + (row["tap 5trx"] || 0), 0);
+
+  const signups = tapSignup + tapCnpjSignups;
+  const activations = tapActivations;
+
+  return {
+    cost,
+    impressions,
+    clicks,
+    signups,
+    activations,
+    tap_cnpj_signups: tapCnpjSignups,
+    cnpj_percentage: calculateCNPJPercentage(tapCnpjSignups, tapSignup),
+    fifth_transaction: fifthTransaction,
+    ctr: calculateCTR(clicks, impressions),
+    cpm: calculateCPM(cost, impressions),
+    hook_rate: calculateHookRate(video3s, impressions),
+    cpa: calculateCPA(cost, signups),
+    cac: calculateCAC(cost, activations),
+  };
+};
+
+/**
+ * Calculate KPIs for LINK
+ */
+export const calculateLinkKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
+  const cost = rows.reduce((sum, row) => sum + (row.cost || 0), 0);
+  const impressions = rows.reduce((sum, row) => sum + (row.impressions || 0), 0);
+  const clicks = rows.reduce((sum, row) => sum + (row.clicks || 0), 0);
+  const video3s = rows.reduce((sum, row) => sum + (row.video_3s || 0), 0);
+
+  const linkSignup = rows.reduce((sum, row) => sum + (row.link_signup || 0), 0);
+  const linkActivations = rows.reduce((sum, row) => sum + (row.link_activations || 0), 0);
+
+  return {
+    cost,
+    impressions,
+    clicks,
+    signups: linkSignup,
+    activations: linkActivations,
+    ctr: calculateCTR(clicks, impressions),
+    cpm: calculateCPM(cost, impressions),
+    hook_rate: calculateHookRate(video3s, impressions),
+    cpa: calculateCPA(cost, linkSignup),
+    cac: calculateCAC(cost, linkActivations),
+  };
+};
+
+// ============================================
+// LEGACY / GENERIC CALCULATION (fallback)
+// ============================================
+
+/**
+ * Calculate total Signups from raw data (LEGACY - use product-specific functions instead)
  * Signups = TAP(tap signup + tap cnpj signups) + LINK(link_signup) + JIM(signup_web)
  */
 export const calculateSignups = (rows: MktAdsLookerRow[]): number => {
@@ -82,7 +310,7 @@ export const calculateSignups = (rows: MktAdsLookerRow[]): number => {
 };
 
 /**
- * Calculate total Activations from raw data
+ * Calculate total Activations from raw data (LEGACY - use product-specific functions instead)
  * Activations = TAP(tap activations) + LINK(link_activations) + JIM(activation_app + activation_web)
  */
 export const calculateActivations = (rows: MktAdsLookerRow[]): number => {
@@ -102,7 +330,8 @@ export const calculateActivations = (rows: MktAdsLookerRow[]): number => {
 };
 
 /**
- * Calculate aggregate KPIs from raw data
+ * Calculate aggregate KPIs from raw data (LEGACY - use product-specific functions instead)
+ * @deprecated Use product-specific functions instead
  */
 export const calculateKPIMetrics = (
   rows: MktAdsLookerRow[],
@@ -145,6 +374,10 @@ export const calculateKPIMetrics = (
   return metrics;
 };
 
+// ============================================
+// FORMATTING UTILITIES
+// ============================================
+
 /**
  * Format currency (BRL)
  */
@@ -174,17 +407,26 @@ export const formatPercentage = (value: number | null | undefined, decimals: num
 
 /**
  * Get products available for a perspective
+ * - jim: apenas JIM
+ * - infinitepay: POS + TAP + LINK (sem JIM)
+ * - default / cloudwalk: todos (POS + TAP + LINK + JIM)
  */
 export const getProductsForPerspective = (perspective: string): Product[] => {
   switch (perspective) {
-    case "infinitepay":
-      return ["POS", "TAP", "LINK"];
     case "jim":
       return ["JIM"];
-    case "cloudwalk":
+    case "infinitepay":
+      return ["POS", "TAP", "LINK"];
     case "default":
+    case "cloudwalk":
     default:
-      return ["POS", "TAP", "LINK", "JIM"];
+      return ["POS", "TAP", "LINK", "JIM"]; // Todos os produtos
   }
 };
 
+/**
+ * Get InfinitePay products (excludes JIM)
+ */
+export const getInfinitePayProducts = (): Product[] => {
+  return ["POS", "TAP", "LINK"];
+};
