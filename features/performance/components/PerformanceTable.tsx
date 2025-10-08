@@ -334,10 +334,11 @@ export function PerformanceTable({ product, data, isLoading, searchQuery }: Perf
         </div>
 
         {/* Preview Modal with N8N Integration */}
-        <AdPreviewModal 
-          ad={previewAd} 
-          onClose={() => setPreviewAd(null)} 
-        />
+            <AdPreviewModal 
+              ad={previewAd} 
+              onClose={() => setPreviewAd(null)}
+              product={product}
+            />
 
         {/* Pagination */}
         <div className="flex items-center justify-between mt-4">

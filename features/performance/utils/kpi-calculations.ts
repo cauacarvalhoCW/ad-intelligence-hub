@@ -379,13 +379,21 @@ export const calculateKPIMetrics = (
 // ============================================
 
 /**
- * Format currency (BRL)
+ * Format currency (BRL for BR products, USD for JIM)
+ * @param value - Value to format
+ * @param product - Product name (optional, defaults to BRL)
  */
-export const formatCurrency = (value: number | null | undefined): string => {
+export const formatCurrency = (value: number | null | undefined, product?: Product): string => {
   if (value === null || value === undefined || isNaN(value)) return "—";
-  return new Intl.NumberFormat("pt-BR", {
+  
+  // 🇺🇸 JIM uses USD ($), others use BRL (R$)
+  const isJIM = product === "JIM";
+  
+  return new Intl.NumberFormat(isJIM ? "en-US" : "pt-BR", {
     style: "currency",
-    currency: "BRL",
+    currency: isJIM ? "USD" : "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 };
 

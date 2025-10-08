@@ -5,8 +5,11 @@ import { ProductTabs } from "./ProductTabs";
 import { PerfFilters } from "./PerfFilters";
 import { KpiRow } from "./KpiRow";
 import { PerformanceTable } from "./PerformanceTable";
+import { CreativeTable } from "./CreativeTable";
+import { CreativeCampaignTable } from "./CreativeCampaignTable";
 import { WinnersSection } from "./WinnersSection";
 import { EfficiencyChart, CostByPlatformChart, FunnelChart } from "./charts";
+import { TaxonomyCharts } from "./charts/TaxonomyCharts";
 import { EmptyState, ErrorState } from "./shared";
 import { usePerformanceDataAPI, usePerformanceUrlFilters } from "../hooks";
 import { Button } from "@/shared/ui/button";
@@ -114,20 +117,59 @@ export function DrilldownContent({ perspective, product }: DrilldownContentProps
       <HeaderSection />
 
       {/* 1. KPI Row */}
-      <KpiRow metrics={kpiMetrics} isLoading={isLoading} showInstalls={showInstalls} />
+      <KpiRow metrics={kpiMetrics} isLoading={isLoading} showInstalls={showInstalls} product={product} />
 
-      {/* 2. Performance Table (moved up, after KPIs) */}
-      <PerformanceTable
-        product={product}
-        data={rawData}
-        isLoading={isLoading}
-        searchQuery={filters.searchQuery}
-      />
+      {/* 2. New Tables based on View Mode and Dimension */}
+      {filters.viewMode === "ad" && (
+        <>
+          {/* Table 1: Creative-only aggregation */}
+          <CreativeTable 
+            data={rawData}
+            isLoading={isLoading}
+            product={product}
+            dimension={filters.dimension || "total"}
+          />
+          
+          {/* Taxonomy Charts after Table 1 (only for Soma Total) */}
+          <TaxonomyCharts
+            data={rawData}
+            isLoading={isLoading}
+            dimension={filters.dimension || "total"}
+            position="after-table1"
+          />
+          
+          {/* Table 2: Creative + Campaign aggregation */}
+          <CreativeCampaignTable
+            data={rawData}
+            isLoading={isLoading}
+            product={product}
+            dimension={filters.dimension || "total"}
+          />
+          
+          {/* Taxonomy Charts after Table 2 (only for Soma Total) */}
+          <TaxonomyCharts
+            data={rawData}
+            isLoading={isLoading}
+            dimension={filters.dimension || "total"}
+            position="after-table2"
+          />
+        </>
+      )}
 
-      {/* 3. Main Chart (Performance over time) */}
+      {/* 3. Original Performance Table (keeping for now, hidden) */}
+      {false && (
+        <PerformanceTable
+          product={product}
+          data={rawData}
+          isLoading={isLoading}
+          searchQuery={filters.searchQuery}
+        />
+      )}
+
+      {/* 4. Main Chart (Performance over time) */}
       <EfficiencyChart data={efficiencyData} isLoading={isLoading} />
 
-      {/* 4. Top 5 Winners por Plataforma */}
+      {/* 5. Top 5 Winners por Plataforma */}
       <WinnersSection 
         ads={rawData} 
         mode="drilldown"
@@ -135,7 +177,7 @@ export function DrilldownContent({ perspective, product }: DrilldownContentProps
         isLoading={isLoading}
       />
 
-      {/* 5. Other Charts */}
+      {/* 6. Other Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CostByPlatformChart data={costByPlatformData} isLoading={isLoading} />
         <FunnelChart data={funnelData} isLoading={isLoading} />

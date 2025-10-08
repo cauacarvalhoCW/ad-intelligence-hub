@@ -3,13 +3,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import type { KPIMetrics } from "../types";
+import type { KPIMetrics, Product } from "../types";
 import { formatCurrency, formatNumber, formatPercentage } from "../utils";
 
 interface KpiRowProps {
   metrics: KPIMetrics | null;
   isLoading?: boolean;
   showInstalls?: boolean; // For JIM product
+  product?: Product; // To determine currency (USD for JIM, BRL for others)
 }
 
 interface KpiCardProps {
@@ -63,8 +64,8 @@ function KpiCard({ title, value, subtitle, trend, isLoading }: KpiCardProps) {
   );
 }
 
-export function KpiRow({ metrics, isLoading, showInstalls }: KpiRowProps) {
-  console.log("🎯 [KpiRow] Render state:", { isLoading, hasMetrics: !!metrics, metrics });
+export function KpiRow({ metrics, isLoading, showInstalls, product }: KpiRowProps) {
+  console.log("🎯 [KpiRow] Render state:", { isLoading, hasMetrics: !!metrics, metrics, product });
   
   if (isLoading || !metrics) {
     console.log("🎯 [KpiRow] Showing loading state:", { isLoading, metrics });
@@ -84,8 +85,8 @@ export function KpiRow({ metrics, isLoading, showInstalls }: KpiRowProps) {
       {/* Cost */}
       <KpiCard
         title="Custo Total"
-        value={formatCurrency(metrics.cost)}
-        subtitle={`CPM: ${formatCurrency(metrics.cpm)}`}
+        value={formatCurrency(metrics.cost, product)}
+        subtitle={`CPM: ${formatCurrency(metrics.cpm, product)}`}
       />
 
       {/* Impressions */}
@@ -106,14 +107,14 @@ export function KpiRow({ metrics, isLoading, showInstalls }: KpiRowProps) {
       <KpiCard
         title="Signups"
         value={formatNumber(metrics.signups)}
-        subtitle={`CPA: ${formatCurrency(metrics.cpa)}`}
+        subtitle={`CPA: ${formatCurrency(metrics.cpa, product)}`}
       />
 
       {/* Activations */}
       <KpiCard
         title="Ativações"
         value={formatNumber(metrics.activations)}
-        subtitle={`CAC: ${formatCurrency(metrics.cac)}`}
+        subtitle={`CAC: ${formatCurrency(metrics.cac, product)}`}
       />
 
       {/* POS Sales (if has data) */}

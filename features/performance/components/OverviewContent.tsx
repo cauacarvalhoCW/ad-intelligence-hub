@@ -133,8 +133,8 @@ export function OverviewContent({ perspective }: OverviewContentProps) {
           </p>
         </div>
 
-        {/* Filters */}
-        <PerfFilters value={filters} onChange={setFilters} />
+        {/* Filters - Hide View/Dimension (only for drilldown) */}
+        <PerfFilters value={filters} onChange={setFilters} hideViewMode={true} />
       </div>
 
       {/* Product Tabs - Navigate to drilldown (no selection) */}
