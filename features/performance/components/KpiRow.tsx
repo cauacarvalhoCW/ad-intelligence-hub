@@ -126,8 +126,8 @@ export function KpiRow({ metrics, isLoading, showInstalls, product }: KpiRowProp
         />
       )}
 
-      {/* Piselli % (if applicable) */}
-      {metrics.piselli_percentage !== null && (
+      {/* Piselli % (APENAS para POS, não para TAP) */}
+      {product === "POS" && metrics.piselli_percentage !== null && (
         <KpiCard
           title="% Piselli"
           value={formatPercentage(metrics.piselli_percentage)}
@@ -144,8 +144,8 @@ export function KpiRow({ metrics, isLoading, showInstalls, product }: KpiRowProp
         />
       )}
 
-      {/* Installs (JIM only) */}
-      {showInstalls && metrics.installs !== undefined && (
+      {/* Installs (JIM only) - mostrar sempre se for JIM */}
+      {(showInstalls || product === "JIM") && metrics.installs !== undefined && (
         <KpiCard
           title="Instalações"
           value={formatNumber(metrics.installs)}

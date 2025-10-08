@@ -11,19 +11,20 @@ import { Eye, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from 
 import { aggregateByCreativeAndCampaign, type AggregatedRow } from "../utils/aggregation-v2";
 import { getProductMetrics, formatMetricValue, type MetricKey } from "../utils/product-metrics";
 import { AdPreviewModal } from "./AdPreviewModal";
-import type { AdData, Product, DimensionMode } from "../types";
+import type { AdData, Product, DimensionMode, PerformanceFilters } from "../types";
 
 interface CreativeCampaignTableProps {
   data: AdData[];
   isLoading?: boolean;
   product: Product;
   dimension: DimensionMode;
+  filters?: PerformanceFilters; // Para passar período ao modal
 }
 
 type SortKey = MetricKey | "ad_name" | "campaign_name" | "date" | "days_active";
 type SortOrder = "asc" | "desc";
 
-export function CreativeCampaignTable({ data, isLoading, product, dimension }: CreativeCampaignTableProps) {
+export function CreativeCampaignTable({ data, isLoading, product, dimension, filters }: CreativeCampaignTableProps) {
   const [previewAd, setPreviewAd] = useState<AdData | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("cost");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -132,9 +133,9 @@ export function CreativeCampaignTable({ data, isLoading, product, dimension }: C
     const adData: AdData = {
       id: `agg-${row.ad_id}`,
       ad_id: row.ad_id || 0,
-      ad_name: row.ad_name,
-      campaign_id: row.campaign_id,
-      campaign_name: row.campaign_name,
+      ad_name: (row.ad_name || null) as string | null,
+      campaign_id: (row.campaign_id || null) as string | null,
+      campaign_name: (row.campaign_name || null) as string | null,
       platform: row.platform as any,
       product: row.product as any,
       date: row.last_date,
@@ -155,10 +156,10 @@ export function CreativeCampaignTable({ data, isLoading, product, dimension }: C
       activation_web: row.activation_web,
       link_signup: row.link_signup,
       link_activations: row.link_activations,
-      creative_link: row.creative_link,
+      creative_link: row.creative_link || null,
       creative_id: row.creative_id,
-      image_preview_link: row.image_preview_link,
-      link_update_at: row.link_update_at,
+      image_preview_link: row.image_preview_link || null,
+      link_update_at: row.link_update_at || null,
       ctr: row.ctr,
       hook_rate: row.hook_rate,
       cpm: row.cpm,
@@ -422,7 +423,7 @@ export function CreativeCampaignTable({ data, isLoading, product, dimension }: C
         </div>
 
         {/* Preview Modal */}
-        <AdPreviewModal ad={previewAd} onClose={() => setPreviewAd(null)} product={product} />
+        <AdPreviewModal ad={previewAd} onClose={() => setPreviewAd(null)} product={product} filters={filters} />
       </CardContent>
     </Card>
   );

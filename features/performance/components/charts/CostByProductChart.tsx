@@ -16,12 +16,12 @@ interface CostByProductChartProps {
   isLoading?: boolean;
 }
 
-// Use CSS variables que já têm dark mode support no globals.css
+// Cores vibrantes e fixas para cada produto
 const PRODUCT_COLORS: Record<string, string> = {
-  POS: "hsl(var(--chart-1))",  // Laranja/Roxo (light/dark)
-  TAP: "hsl(var(--chart-2))",  // Azul/Verde (light/dark)
-  LINK: "hsl(var(--chart-3))", // Azul escuro/Amarelo (light/dark)
-  JIM: "hsl(var(--chart-4))",  // Amarelo/Rosa (light/dark)
+  POS: "hsl(24 100% 50%)",   // Laranja vibrante
+  TAP: "hsl(142 71% 45%)",   // Verde InfinitePay
+  LINK: "hsl(221 83% 53%)",  // Azul
+  JIM: "hsl(270 70% 60%)",   // Roxo
 };
 
 const chartConfig = {

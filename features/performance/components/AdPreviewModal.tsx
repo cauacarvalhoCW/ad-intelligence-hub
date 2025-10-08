@@ -7,16 +7,19 @@ import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent } from "@/shared/ui/card";
 import { ExternalLink, Loader2, Youtube, Facebook } from "lucide-react";
 import { useCreativeLink } from "../hooks/useCreativeLink";
-import { AdData, Product } from "../types";
+import { AdData, Product, PerformanceFilters } from "../types";
 import { formatCurrency, formatNumber, formatPercentage } from "../utils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface AdPreviewModalProps {
   ad: AdData | null;
   onClose: () => void;
   product?: Product;
+  filters?: PerformanceFilters; // Para mostrar período correto
 }
 
-export function AdPreviewModal({ ad, onClose, product }: AdPreviewModalProps) {
+export function AdPreviewModal({ ad, onClose, product, filters }: AdPreviewModalProps) {
   const [showConfirmation, setShowConfirmation] = useState(true);
   const { creativeLink, previewImage, isLoading, error, fetchCreativeLink } = useCreativeLink();
 
@@ -24,6 +27,28 @@ export function AdPreviewModal({ ad, onClose, product }: AdPreviewModalProps) {
   const isMeta = platform === "META";
   const isGoogle = platform === "GOOGLE";
   const isSupported = isMeta || isGoogle;
+
+  // Formatar período dos filtros
+  const getPeriodText = () => {
+    if (!filters) return null;
+    
+    if (filters.range === "custom" && filters.dateRange?.from && filters.dateRange?.to) {
+      const from = format(filters.dateRange.from, "dd/MM/yyyy", { locale: ptBR });
+      const to = format(filters.dateRange.to, "dd/MM/yyyy", { locale: ptBR });
+      return `${from} a ${to}`;
+    }
+    
+    const rangeLabels: Record<string, string> = {
+      "7d": "Últimos 7 dias",
+      "30d": "Últimos 30 dias",
+      "90d": "Últimos 90 dias",
+      "ytd": "Ano até hoje",
+    };
+    
+    return rangeLabels[filters.range] || filters.range;
+  };
+
+  const periodText = getPeriodText();
 
   const youtubeId = useMemo(() => {
     if (!isGoogle || !ad?.creative_link) return null;
@@ -73,23 +98,24 @@ export function AdPreviewModal({ ad, onClose, product }: AdPreviewModalProps) {
   if (isGoogle) {
     return (
       <Dialog open={!!ad} onOpenChange={handleClose}>
-        <DialogContent className="w-[90vw] max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="text-lg flex items-center gap-2">
-              <Youtube className="h-5 w-5 text-red-600 flex-shrink-0" />
-              <span className="truncate">{ad.ad_name || "Preview do Anúncio"}</span>
-            </DialogTitle>
-            <DialogDescription className="mt-2">
-              <p className="text-sm">Campanha: {ad.campaign_name || "—"}</p>
-              <p className="text-xs mt-1">
-                Ad ID: {ad.ad_id} • <Badge variant="outline" className="inline">GOOGLE</Badge> • {ad.date}
-              </p>
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="w-[98vw] max-w-[1800px] h-auto max-h-none overflow-y-auto p-4 md:p-8">
+          <div className="w-full space-y-4 overflow-x-hidden">
+            <DialogHeader>
+              <DialogTitle className="text-base md:text-lg flex items-center gap-2 break-words pr-8">
+                <Youtube className="h-4 w-4 md:h-5 md:w-5 text-red-600 flex-shrink-0" />
+                <span className="break-words leading-tight">{ad.ad_name || "Preview do Anúncio"}</span>
+              </DialogTitle>
+              <DialogDescription className="mt-2">
+                <p className="text-xs md:text-sm break-words">Campanha: {ad.campaign_name || "—"}</p>
+                <p className="text-xs mt-1 break-words">
+                  Ad ID: {ad.ad_id} • <Badge variant="outline" className="inline text-xs">GOOGLE</Badge>
+                  {periodText && ` • Período: ${periodText}`}
+                </p>
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="space-y-4 overflow-y-auto flex-1 pr-2">
             {youtubeId ? (
-              <div className="aspect-video bg-black rounded-lg overflow-hidden">
+              <div className="w-full aspect-video bg-black rounded-lg overflow-hidden">
                 <iframe
                   src={`https://www.youtube.com/embed/${youtubeId}?rel=0`}
                   title={ad.ad_name || "YouTube video"}
@@ -114,11 +140,12 @@ export function AdPreviewModal({ ad, onClose, product }: AdPreviewModalProps) {
                 </CardContent>
               </Card>
             )}
+            
             <MetricsGrid ad={ad} product={product} />
-          </div>
 
-          <div className="flex justify-end pt-4 border-t flex-shrink-0">
-            <Button onClick={handleClose}>Fechar</Button>
+            <div className="flex justify-end pt-4 border-t">
+              <Button onClick={handleClose} size="sm">Fechar</Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -127,25 +154,25 @@ export function AdPreviewModal({ ad, onClose, product }: AdPreviewModalProps) {
 
   return (
     <Dialog open={!!ad} onOpenChange={handleClose}>
-      <DialogContent className="w-[90vw] max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-lg flex items-center gap-2">
-            <Facebook className="h-5 w-5 text-blue-600 flex-shrink-0" />
-            <span className="truncate">{ad.ad_name || "Preview do Anúncio"}</span>
-          </DialogTitle>
-          <DialogDescription className="mt-2">
-            <p className="text-sm">Campanha: {ad.campaign_name || "—"}</p>
-            <p className="text-xs mt-1">
-              Ad ID: {ad.ad_id} • <Badge variant="outline" className="inline">META</Badge> • {ad.date}
-            </p>
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-y-auto pr-2">
+      <DialogContent className="w-[98vw] max-w-[1800px] h-auto max-h-none overflow-y-auto p-4 md:p-8">
+        <div className="w-full space-y-4 overflow-x-hidden">
+          <DialogHeader>
+            <DialogTitle className="text-base md:text-lg flex items-center gap-2 break-words pr-8">
+              <Facebook className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+              <span className="break-words leading-tight">{ad.ad_name || "Preview do Anúncio"}</span>
+            </DialogTitle>
+            <DialogDescription className="mt-2">
+              <p className="text-xs md:text-sm break-words">Campanha: {ad.campaign_name || "—"}</p>
+              <p className="text-xs mt-1 break-words">
+                Ad ID: {ad.ad_id} • <Badge variant="outline" className="inline text-xs">META</Badge>
+                {periodText && ` • Período: ${periodText}`}
+              </p>
+            </DialogDescription>
+          </DialogHeader>
           {showConfirmation && (
             <div className="space-y-4">
-              <div className="bg-muted/30 rounded-lg p-6 text-center space-y-4">
-                <div className="text-sm text-muted-foreground">
+              <div className="bg-muted/30 rounded-lg p-4 md:p-6 text-center space-y-4">
+                <div className="text-xs md:text-sm text-muted-foreground">
                   Deseja carregar o preview visual deste anúncio?
                 </div>
                 <div className="text-xs text-muted-foreground">
@@ -153,8 +180,8 @@ export function AdPreviewModal({ ad, onClose, product }: AdPreviewModalProps) {
                 </div>
               </div>
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-                <Button onClick={handleConfirm}>Sim, ver preview</Button>
+                <Button variant="outline" onClick={handleClose} size="sm">Cancelar</Button>
+                <Button onClick={handleConfirm} size="sm">Sim, ver preview</Button>
               </div>
             </div>
           )}
@@ -192,10 +219,9 @@ export function AdPreviewModal({ ad, onClose, product }: AdPreviewModalProps) {
           )}
 
           {!showConfirmation && !isLoading && !error && (creativeLink || previewImage) && (
-            <div className="space-y-4">
-              {/* Se tiver creative_link, mostrar o embed do vídeo META */}
+            <>
               {creativeLink ? (
-                <div className="bg-black rounded-lg overflow-hidden">
+                <div className="w-full bg-black rounded-lg overflow-hidden">
                   <div className="aspect-video w-full">
                     <iframe
                       src={creativeLink}
@@ -208,39 +234,37 @@ export function AdPreviewModal({ ad, onClose, product }: AdPreviewModalProps) {
                   </div>
                 </div>
               ) : previewImage ? (
-                // Se não tiver embed, mostrar apenas a imagem
-                <div className="bg-muted/30 rounded-lg overflow-hidden">
+                <div className="w-full bg-muted/30 rounded-lg overflow-hidden">
                   <img
                     src={previewImage}
                     alt={ad.ad_name || "Preview"}
-                    className="w-full h-auto object-contain max-h-[500px]"
+                    className="w-full h-auto object-contain max-h-[400px] md:max-h-[500px]"
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 </div>
               ) : null}
               
-              {/* Link para META Ads Library */}
-              {creativeLink && (
-                <div className="flex justify-center">
-                  <Button asChild variant="outline" size="sm">
-                    <a href={creativeLink} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Ver anúncio completo na META Ads Library
-                    </a>
-                  </Button>
-                </div>
-              )}
-              
               <MetricsGrid ad={ad} product={product} />
-            </div>
+              
+              {ad.platform?.toUpperCase() === "META" && ad.ad_id && (
+                <Button asChild className="w-full" size="sm">
+                  <a
+                    href={`https://www.facebook.com/ads/library/?id=${ad.ad_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Ver na Meta Ads Library
+                  </a>
+                </Button>
+              )}
+            </>
           )}
-        </div>
 
-        {!showConfirmation && !isLoading && !error && (creativeLink || previewImage) && (
-          <div className="flex justify-end pt-4 border-t flex-shrink-0">
-            <Button onClick={handleClose}>Fechar</Button>
+          <div className="flex justify-end pt-4 border-t">
+            <Button onClick={handleClose} size="sm">Fechar</Button>
           </div>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -258,7 +282,7 @@ function MetricsGrid({ ad, product }: { ad: AdData; product?: Product }) {
           <MetricCard label="CTR" value={formatPercentage(ad.ctr)} />
           <MetricCard label="Hook Rate" value={formatPercentage(ad.hook_rate)} />
           <MetricCard label="CPM" value={formatCurrency(ad.cpm, product)} />
-          <MetricCard label="CPC" value={formatCurrency(ad.cpc, product)} />
+          <MetricCard label="CPC" value={formatCurrency((ad as any).cpc || 0, product)} />
           <MetricCard label="Signups" value={formatNumber(ad.signups)} />
           <MetricCard label="Ativações" value={formatNumber(ad.activations)} />
           <MetricCard label="CAC" value={formatCurrency(ad.cac, product)} />

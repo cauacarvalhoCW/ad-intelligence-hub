@@ -35,7 +35,7 @@ export function EfficiencyChart({ data, isLoading, product }: EfficiencyChartPro
 
   // Cor baseada no produto - usa CSS variables com fallback
   const getColor = () => {
-    if (!product) return "hsl(var(--chart-1))";
+    if (!product) return "hsl(142 71% 45%)"; // Verde padrão (InfinitePay) para overview
     
     switch (product) {
       case "JIM":
@@ -45,7 +45,7 @@ export function EfficiencyChart({ data, isLoading, product }: EfficiencyChartPro
       case "LINK":
         return "hsl(142 71% 50%)"; // Verde InfinitePay
       default:
-        return "hsl(var(--chart-1))";
+        return "hsl(142 71% 45%)";
     }
   };
 

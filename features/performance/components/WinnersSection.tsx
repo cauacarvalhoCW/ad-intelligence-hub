@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/sha
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { Badge } from "@/shared/ui/badge";
 import { Trophy, TrendingUp } from "lucide-react";
-import { AdData, Product } from "../types";
+import { AdData, Product, PerformanceFilters } from "../types";
 import { getWinnersByPlatform, getTop5ByPlatform } from "../utils/winners-logic";
 import { WinnerCard } from "./WinnerCard";
 import { useWinnersCreativeLinks } from "../hooks/useWinnersCreativeLinks";
@@ -22,9 +22,10 @@ interface WinnersSectionProps {
   mode: "overview" | "drilldown";
   product?: Product;
   isLoading?: boolean;
+  filters?: PerformanceFilters; // Para passar período aos cards
 }
 
-export function WinnersSection({ ads, mode, product, isLoading }: WinnersSectionProps) {
+export function WinnersSection({ ads, mode, product, isLoading, filters }: WinnersSectionProps) {
   const winners = useMemo(() => {
     if (ads.length === 0) return null;
 
@@ -113,6 +114,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                   creativeLink={creativeLink}
                   previewImage={previewImage}
                   loadingCreative={loading}
+                  filters={filters}
                 />
               );
             })() : (
@@ -131,6 +133,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                   creativeLink={creativeLink}
                   previewImage={previewImage}
                   loadingCreative={loading}
+                  filters={filters}
                 />
               );
             })() : (
@@ -149,6 +152,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                   creativeLink={creativeLink}
                   previewImage={previewImage}
                   loadingCreative={loading}
+                  filters={filters}
                 />
               );
             })() : (
@@ -209,6 +213,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                       creativeLink={creativeLink}
                       previewImage={previewImage}
                       loadingCreative={loading}
+                      filters={filters}
                     />
                   );
                 })}
@@ -234,6 +239,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                       creativeLink={creativeLink}
                       previewImage={previewImage}
                       loadingCreative={loading}
+                      filters={filters}
                     />
                   );
                 })}
@@ -259,6 +265,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                       creativeLink={creativeLink}
                       previewImage={previewImage}
                       loadingCreative={loading}
+                      filters={filters}
                     />
                   );
                 })}

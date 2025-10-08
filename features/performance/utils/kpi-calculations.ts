@@ -198,6 +198,7 @@ export const calculateJimKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
 
 /**
  * Calculate KPIs for POS
+ * CAC para POS = custo / vendas POS (não ativações)
  */
 export const calculatePosKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
   const cost = rows.reduce((sum, row) => sum + (row.cost || 0), 0);
@@ -221,7 +222,7 @@ export const calculatePosKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
     cpm: calculateCPM(cost, impressions),
     hook_rate: calculateHookRate(video3s, impressions),
     cpa: null,
-    cac: null,
+    cac: posSales > 0 ? cost / posSales : null, // CAC = custo / vendas POS
   };
 };
 
