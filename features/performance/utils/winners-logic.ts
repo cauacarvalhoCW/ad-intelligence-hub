@@ -94,6 +94,22 @@ function aggregateAdsByPeriod(ads: AdData[]): AdData[] {
     const signups = ad.signups || 0;
     const activations = ad.activations || 0;
     const video_3s = ad.video_3s || 0;
+    const pos_sales = ad.pos_sales || 0;
+
+    // 🎯 CAC específico por produto
+    let cac = null;
+    if (ad.product === "POS") {
+      // POS: CAC = custo / vendas POS
+      cac = pos_sales > 0 ? cost / pos_sales : null;
+      
+      // Debug: Log CAC calculation for POS ads
+      if (Math.random() < 0.1 && cost > 0) { // Log 10% of POS ads
+        console.log(`📊 [POS CAC] ${ad.ad_name?.slice(0, 30)}: cost=${cost.toFixed(2)}, pos_sales=${pos_sales}, CAC=${cac?.toFixed(2) || 'null'}`);
+      }
+    } else {
+      // TAP, LINK, JIM: CAC = custo / ativações
+      cac = activations > 0 ? cost / activations : null;
+    }
 
     return {
       ...ad,
@@ -107,8 +123,8 @@ function aggregateAdsByPeriod(ads: AdData[]): AdData[] {
       hook_rate: impressions > 0 ? video_3s / impressions : 0,
       // Recalcular CPA
       cpa: signups > 0 ? cost / signups : null,
-      // Recalcular CAC
-      cac: activations > 0 ? cost / activations : null,
+      // Recalcular CAC (produto-específico)
+      cac,
     };
   });
 
