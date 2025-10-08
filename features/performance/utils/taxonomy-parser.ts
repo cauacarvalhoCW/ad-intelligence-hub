@@ -142,38 +142,41 @@ export function getDestinationLabel(destination: Destination): string {
 
 /**
  * Get color for company (for charts)
+ * Cores vibrantes para light e dark mode
  */
 export function getCompanyColor(company: Company): string {
   const colors: Record<Company, string> = {
-    SAMY: "hsl(var(--chart-1))", // Laranja/Roxo
-    ENGAJA: "hsl(var(--chart-2))", // Azul/Verde
-    AMPLIFY: "hsl(var(--chart-3))", // Azul escuro/Amarelo
-    INTERNO: "hsl(var(--chart-4))", // Amarelo/Rosa
-    UNKNOWN: "hsl(var(--muted))", // Cinza
+    SAMY: "hsl(24 100% 50%)", // Laranja vibrante
+    ENGAJA: "hsl(142 71% 45%)", // Verde
+    AMPLIFY: "hsl(221 83% 53%)", // Azul
+    INTERNO: "hsl(270 70% 60%)", // Roxo
+    UNKNOWN: "hsl(0 0% 50%)", // Cinza
   };
   return colors[company];
 }
 
 /**
  * Get color for funnel stage (for charts)
+ * Cores vibrantes para light e dark mode
  */
 export function getFunnelStageColor(stage: FunnelStage): string {
   const colors: Record<FunnelStage, string> = {
-    TOFU: "hsl(var(--chart-1))",
-    BOFU: "hsl(var(--chart-2))",
-    UNKNOWN: "hsl(var(--muted))",
+    TOFU: "hsl(24 100% 50%)", // Laranja vibrante (topo do funil)
+    BOFU: "hsl(142 71% 45%)", // Verde (fundo do funil)
+    UNKNOWN: "hsl(0 0% 50%)", // Cinza
   };
   return colors[stage];
 }
 
 /**
  * Get color for destination (for charts)
+ * Cores vibrantes para light e dark mode
  */
 export function getDestinationColor(destination: Destination): string {
   const colors: Record<Destination, string> = {
-    "_APP_": "hsl(var(--chart-1))",
-    "_WEB_": "hsl(var(--chart-2))",
-    UNKNOWN: "hsl(var(--muted))",
+    "_APP_": "hsl(270 70% 60%)", // Roxo para APP
+    "_WEB_": "hsl(142 71% 45%)", // Verde para WEB
+    UNKNOWN: "hsl(0 0% 50%)", // Cinza
   };
   return colors[destination];
 }

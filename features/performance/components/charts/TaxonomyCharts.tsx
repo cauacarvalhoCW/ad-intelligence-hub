@@ -1,21 +1,41 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Legend, Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
 import { parseTaxonomy, getCompanyColor, getFunnelStageColor, getDestinationColor } from "../../utils/taxonomy-parser";
-import type { AdData, DimensionMode } from "../../types";
+import { getProductColor } from "../../utils/chart-colors";
+import type { AdData, DimensionMode, Product } from "../../types";
 
 interface TaxonomyChartsProps {
   data: AdData[];
   isLoading?: boolean;
   dimension: DimensionMode;
   position: "after-table1" | "after-table2";
+  product?: Product; // Para cores dinâmicas
 }
 
-export function TaxonomyCharts({ data, isLoading, dimension, position }: TaxonomyChartsProps) {
+export function TaxonomyCharts({ data, isLoading, dimension, position, product }: TaxonomyChartsProps) {
+  // Cor baseada no produto - usa cores diretas
+  const getColor = () => {
+    if (!product) return "hsl(var(--chart-1))";
+    
+    switch (product) {
+      case "JIM":
+        return "hsl(270 70% 60%)"; // Roxo
+      case "POS":
+      case "TAP":
+      case "LINK":
+        return "hsl(142 71% 50%)"; // Verde InfinitePay
+      default:
+        return "hsl(var(--chart-1))";
+    }
+  };
+
+  const chartColor = getColor();
+
   // Only show charts in "total" dimension mode
   if (dimension !== "total") {
     return null;
@@ -106,15 +126,14 @@ export function TaxonomyCharts({ data, isLoading, dimension, position }: Taxonom
       }))
       .sort((a, b) => b.value - a.value);
 
-    // Top scaled ads (highest cost)
+    // Top scaled ads (highest cost) - MANTÉM NOME COMPLETO
     const scaledAds = Array.from(adCostMap.entries())
       .map(([name, cost]) => ({ 
-        name: name.length > 40 ? name.substring(0, 40) + "..." : name,
-        fullName: name,
+        name, // Nome completo, sem truncar
         cost 
       }))
       .sort((a, b) => b.cost - a.cost)
-      .slice(0, 5); // Top 5
+      .slice(0, 10); // Top 10 para o gráfico de barras
 
     return {
       totalAds,
@@ -274,40 +293,68 @@ export function TaxonomyCharts({ data, isLoading, dimension, position }: Taxonom
             </Card>
           )}
 
-          {/* Scale Ranking */}
+          {/* Scale Ranking - GRÁFICO DE BARRAS HORIZONTAL */}
           {scaledAds.length > 0 && (
-            <Card>
+            <Card className="lg:col-span-3">
               <CardHeader>
-                <CardTitle>Escala (Top 5)</CardTitle>
-                <CardDescription>Anúncios que mais gastaram</CardDescription>
+                <CardTitle>Escala (Top 10 - Quem Escalou)</CardTitle>
+                <CardDescription>Anúncios que mais gastaram (gasto total)</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {scaledAds.map((ad, index) => (
-                    <div key={ad.fullName} className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={index === 0 ? "default" : "outline"}>
-                            #{index + 1}
-                          </Badge>
-                          <span 
-                            className="text-sm truncate max-w-[200px]" 
-                            title={ad.fullName}
-                          >
-                            {ad.name}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-right text-sm font-medium">
-                        {new Intl.NumberFormat("pt-BR", {
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart
+                    data={scaledAds}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                    <XAxis 
+                      type="number"
+                      tickFormatter={(value) => 
+                        new Intl.NumberFormat("pt-BR", {
                           style: "currency",
                           currency: "BRL",
                           notation: "compact",
-                        }).format(ad.cost)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                          maximumFractionDigits: 0,
+                        }).format(value)
+                      }
+                    />
+                    <YAxis 
+                      type="category"
+                      dataKey="name"
+                      width={300}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip
+                      formatter={(value: number) => 
+                        new Intl.NumberFormat("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        }).format(value)
+                      }
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '6px',
+                      }}
+                    />
+                    <Bar 
+                      dataKey="cost" 
+                      fill={chartColor}
+                      radius={[0, 4, 4, 0]}
+                      label={{ 
+                        position: 'right', 
+                        formatter: (value: number) => 
+                          new Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                            notation: "compact",
+                          }).format(value),
+                        fontSize: 11,
+                      }}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           )}

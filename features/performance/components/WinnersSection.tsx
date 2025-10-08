@@ -103,10 +103,12 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* META Winner */}
             {winners.META.length > 0 ? (() => {
-              const { creativeLink, previewImage, loading } = getCreativeData(winners.META[0]);
+              const ad = winners.META[0];
+              const { creativeLink, previewImage, loading } = getCreativeData(ad);
               return (
                 <WinnerCard 
-                  ad={winners.META[0]} 
+                  key={`overview-meta-${ad.ad_id}-${ad.date || "0"}`}
+                  ad={ad} 
                   badge="META Winner" 
                   creativeLink={creativeLink}
                   previewImage={previewImage}
@@ -119,10 +121,12 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
 
             {/* GOOGLE Winner */}
             {winners.GOOGLE.length > 0 ? (() => {
-              const { creativeLink, previewImage, loading } = getCreativeData(winners.GOOGLE[0]);
+              const ad = winners.GOOGLE[0];
+              const { creativeLink, previewImage, loading } = getCreativeData(ad);
               return (
                 <WinnerCard 
-                  ad={winners.GOOGLE[0]} 
+                  key={`overview-google-${ad.ad_id}-${ad.date || "0"}`}
+                  ad={ad} 
                   badge="GOOGLE Winner" 
                   creativeLink={creativeLink}
                   previewImage={previewImage}
@@ -135,10 +139,12 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
 
             {/* TIKTOK Winner */}
             {winners.TIKTOK.length > 0 ? (() => {
-              const { creativeLink, previewImage, loading } = getCreativeData(winners.TIKTOK[0]);
+              const ad = winners.TIKTOK[0];
+              const { creativeLink, previewImage, loading } = getCreativeData(ad);
               return (
                 <WinnerCard 
-                  ad={winners.TIKTOK[0]} 
+                  key={`overview-tiktok-${ad.ad_id}-${ad.date || "0"}`}
+                  ad={ad} 
                   badge="TIKTOK Winner" 
                   creativeLink={creativeLink}
                   previewImage={previewImage}
@@ -196,7 +202,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                   const { creativeLink, previewImage, loading } = getCreativeData(ad);
                   return (
                     <WinnerCard 
-                      key={`meta-${ad.ad_id}-${ad.date || index}`} 
+                      key={`meta-${index}-${ad.ad_id}-${ad.date || ""}`} 
                       ad={ad} 
                       rank={index + 1} 
                       badge="META"
@@ -221,7 +227,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                   const { creativeLink, previewImage, loading } = getCreativeData(ad);
                   return (
                     <WinnerCard 
-                      key={`google-${ad.ad_id}-${ad.date || index}`} 
+                      key={`google-${index}-${ad.ad_id}-${ad.date || ""}`} 
                       ad={ad} 
                       rank={index + 1} 
                       badge="GOOGLE"
@@ -246,7 +252,7 @@ export function WinnersSection({ ads, mode, product, isLoading }: WinnersSection
                   const { creativeLink, previewImage, loading } = getCreativeData(ad);
                   return (
                     <WinnerCard 
-                      key={`tiktok-${ad.ad_id}-${ad.date || index}`} 
+                      key={`tiktok-${index}-${ad.ad_id}-${ad.date || ""}`} 
                       ad={ad} 
                       rank={index + 1} 
                       badge="TIKTOK"

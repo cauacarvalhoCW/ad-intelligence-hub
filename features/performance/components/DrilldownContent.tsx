@@ -136,6 +136,7 @@ export function DrilldownContent({ perspective, product }: DrilldownContentProps
             isLoading={isLoading}
             dimension={filters.dimension || "total"}
             position="after-table1"
+            product={product}
           />
           
           {/* Table 2: Creative + Campaign aggregation */}
@@ -152,6 +153,7 @@ export function DrilldownContent({ perspective, product }: DrilldownContentProps
             isLoading={isLoading}
             dimension={filters.dimension || "total"}
             position="after-table2"
+            product={product}
           />
         </>
       )}
@@ -167,7 +169,7 @@ export function DrilldownContent({ perspective, product }: DrilldownContentProps
       )}
 
       {/* 4. Main Chart (Performance over time) */}
-      <EfficiencyChart data={efficiencyData} isLoading={isLoading} />
+      <EfficiencyChart data={efficiencyData} isLoading={isLoading} product={product} />
 
       {/* 5. Top 5 Winners por Plataforma */}
       <WinnersSection 
