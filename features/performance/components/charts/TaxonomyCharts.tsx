@@ -98,11 +98,6 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
 
   const chartColor = getColor();
 
-  // Only show charts in "total" dimension mode
-  if (dimension !== "total") {
-    return null;
-  }
-
   // Helper function para agregar valores baseado na métrica
   const aggregateMetric = useCallback((rows: AdData[], metricType: MetricType): number => {
     const metricConfig = getMetricConfig(metricType);
@@ -235,6 +230,11 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
       uniqueCombinations,
     };
   }, [data, companyMetric, funnelMetric, destinationMetric, scaleMetric, aggregateMetric]);
+
+  // Only show charts in "total" dimension mode (EARLY RETURN AFTER ALL HOOKS)
+  if (dimension !== "total") {
+    return null;
+  }
 
   if (isLoading) {
     return (
