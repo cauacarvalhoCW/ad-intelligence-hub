@@ -198,6 +198,7 @@ export const calculateJimKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
 
 /**
  * Calculate KPIs for POS
+ * CAC para POS = custo / vendas POS (não ativações)
  */
 export const calculatePosKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
   const cost = rows.reduce((sum, row) => sum + (row.cost || 0), 0);
@@ -221,7 +222,7 @@ export const calculatePosKPIs = (rows: MktAdsLookerRow[]): KPIMetrics => {
     cpm: calculateCPM(cost, impressions),
     hook_rate: calculateHookRate(video3s, impressions),
     cpa: null,
-    cac: null,
+    cac: posSales > 0 ? cost / posSales : null, // CAC = custo / vendas POS
   };
 };
 
@@ -379,13 +380,21 @@ export const calculateKPIMetrics = (
 // ============================================
 
 /**
- * Format currency (BRL)
+ * Format currency (BRL for BR products, USD for JIM)
+ * @param value - Value to format
+ * @param product - Product name (optional, defaults to BRL)
  */
-export const formatCurrency = (value: number | null | undefined): string => {
+export const formatCurrency = (value: number | null | undefined, product?: Product): string => {
   if (value === null || value === undefined || isNaN(value)) return "—";
-  return new Intl.NumberFormat("pt-BR", {
+  
+  // 🇺🇸 JIM uses USD ($), others use BRL (R$)
+  const isJIM = product === "JIM";
+  
+  return new Intl.NumberFormat(isJIM ? "en-US" : "pt-BR", {
     style: "currency",
-    currency: "BRL",
+    currency: isJIM ? "USD" : "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 };
 

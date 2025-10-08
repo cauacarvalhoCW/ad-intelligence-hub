@@ -1,266 +1,316 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { DateRange } from "react-day-picker";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
-import { Button } from "@/shared/ui/button";
+import { useState, useEffect, useMemo } from "react";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Label } from "@/shared/ui/label";
 import { Input } from "@/shared/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Badge } from "@/shared/ui/badge";
-import { Filter, Search, X, Check } from "lucide-react";
+import { Button } from "@/shared/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/shared/ui/toggle-group";
+import { Search, X, Check, AlertTriangle, Calendar as CalendarIcon, Eye, Layers3 } from "lucide-react";
 import { DateRangePicker } from "./DateRangePicker";
-import type { Platform, RangePreset, DateRangeFilter } from "../types";
+import { DateRange } from "react-day-picker";
+import type { PerformanceFilters, Platform, RangePreset, DateRangeFilter, ViewMode, DimensionMode } from "../types";
 
 interface PerfFiltersProps {
-  // Controlled component - receive values as props
-  value: {
-    platforms: Platform[];
-    range: RangePreset;
-    dateRange?: DateRangeFilter;
-    searchQuery?: string;
-  };
-  onChange: (filters: {
-    platforms: Platform[];
-    range: RangePreset;
-    dateRange?: DateRangeFilter;
-    searchQuery?: string;
-  }) => void;
+  value: PerformanceFilters;
+  onChange: (filters: PerformanceFilters) => void;
+  hidePlatformFilter?: boolean; // For overview page (since we show all platforms)
+  hideViewMode?: boolean; // Hide view mode selector if needed
 }
 
-const PLATFORMS: Platform[] = ["META", "GOOGLE", "TIKTOK"];
-const RANGES: { value: RangePreset; label: string }[] = [
+const RANGE_OPTIONS: { value: RangePreset; label: string }[] = [
   { value: "yesterday", label: "Ontem" },
   { value: "7d", label: "Últimos 7 dias" },
   { value: "30d", label: "Últimos 30 dias" },
-  { value: "custom", label: "Período customizado" },
+  { value: "custom", label: "Período Customizado" },
 ];
 
-export function PerfFilters({ value, onChange }: PerfFiltersProps) {
-  // Local state for temporary filters (before applying)
-  const [tempPlatforms, setTempPlatforms] = useState<Platform[]>(value.platforms);
-  const [tempRange, setTempRange] = useState<RangePreset>(value.range);
-  const [tempDateRange, setTempDateRange] = useState<DateRangeFilter | undefined>(value.dateRange);
-  const [tempSearchQuery, setTempSearchQuery] = useState<string>(value.searchQuery || "");
+const PLATFORM_OPTIONS: { value: Platform; label: string }[] = [
+  { value: "META", label: "Meta" },
+  { value: "GOOGLE", label: "Google" },
+  { value: "TIKTOK", label: "TikTok" },
+];
 
-  // Sync with external value changes
+export function PerfFilters({ value, onChange, hidePlatformFilter = false, hideViewMode = false }: PerfFiltersProps) {
+  // Local state for pending changes
+  const [localFilters, setLocalFilters] = useState(value);
+
+  // Check if filters have pending changes (not applied yet)
+  const isDirty = useMemo(() => {
+    return JSON.stringify(localFilters) !== JSON.stringify(value);
+  }, [localFilters, value]);
+
+  // Sync local state with prop changes (when filters are applied externally)
   useEffect(() => {
-    setTempPlatforms(value.platforms);
-    setTempRange(value.range);
-    setTempDateRange(value.dateRange);
-    setTempSearchQuery(value.searchQuery || "");
-  }, [value.platforms, value.range, value.dateRange, value.searchQuery]);
+    setLocalFilters(value);
+  }, [value]);
 
-  // Check if there are pending changes
-  const hasPendingChanges = 
-    JSON.stringify(tempPlatforms) !== JSON.stringify(value.platforms) ||
-    tempRange !== value.range ||
-    JSON.stringify(tempDateRange) !== JSON.stringify(value.dateRange) ||
-    tempSearchQuery !== (value.searchQuery || "");
-
-  const togglePlatform = (platform: Platform) => {
-    const newPlatforms = tempPlatforms.includes(platform)
-      ? tempPlatforms.filter((p) => p !== platform)
-      : [...tempPlatforms, platform];
-    setTempPlatforms(newPlatforms);
-  };
-
-  const handleRangeChange = (range: RangePreset) => {
-    setTempRange(range);
-    if (range !== "custom") {
-      setTempDateRange(undefined);
-    }
-  };
-
-  const handleDateRangeChange = (range: DateRange | undefined) => {
-    if (range?.from && range?.to) {
-      setTempRange("custom");
-      setTempDateRange({ from: range.from, to: range.to });
-    } else {
-      setTempDateRange(undefined);
-    }
-  };
-
-  const handleSearchChange = (query: string) => {
-    setTempSearchQuery(query);
-  };
-
-  const clearSearch = () => {
-    setTempSearchQuery("");
-  };
-
-  // Apply filters button
+  // Apply filters
   const applyFilters = () => {
-    onChange({
-      platforms: tempPlatforms,
-      range: tempRange,
-      dateRange: tempDateRange,
-      searchQuery: tempSearchQuery.trim() || undefined,
+    console.log("🔍 [PerfFilters] Applying filters:", localFilters);
+    onChange(localFilters);
+  };
+
+  // Cancel changes
+  const cancelFilters = () => {
+    console.log("🔍 [PerfFilters] Cancelling filter changes");
+    setLocalFilters(value);
+  };
+
+  // Handle range change
+  const handleRangeChange = (range: RangePreset) => {
+    setLocalFilters((prev) => ({
+      ...prev,
+      range,
+      dateRange: range === "custom" ? prev.dateRange : undefined,
+    }));
+  };
+
+  // Handle date range change (for custom range)
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    if (!range || !range.from || !range.to) {
+      setLocalFilters((prev) => ({
+        ...prev,
+        dateRange: undefined,
+      }));
+      return;
+    }
+    
+    const dateRange: DateRangeFilter = {
+      from: range.from,
+      to: range.to,
+    };
+    
+    setLocalFilters((prev) => ({
+      ...prev,
+      dateRange,
+    }));
+  };
+
+  // Handle platform toggle
+  const handlePlatformToggle = (platform: Platform) => {
+    setLocalFilters((prev) => {
+      const currentPlatforms = prev.platforms || [];
+      const isSelected = currentPlatforms.includes(platform);
+
+      // Toggle platform
+      const newPlatforms = isSelected
+        ? currentPlatforms.filter((p) => p !== platform)
+        : [...currentPlatforms, platform];
+
+      return {
+        ...prev,
+        platforms: newPlatforms.length > 0 ? newPlatforms : [],
+      };
     });
   };
 
-  // Reset to current applied filters
-  const resetFilters = () => {
-    setTempPlatforms(value.platforms);
-    setTempRange(value.range);
-    setTempDateRange(value.dateRange);
-    setTempSearchQuery(value.searchQuery || "");
+  // Handle search input
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim();
+    setLocalFilters((prev) => ({
+      ...prev,
+      searchQuery: value || undefined,
+    }));
   };
 
-  const customDateRangeValue = tempDateRange
-    ? { from: tempDateRange.from, to: tempDateRange.to }
-    : undefined;
+  // Clear search
+  const handleClearSearch = () => {
+    setLocalFilters((prev) => ({
+      ...prev,
+      searchQuery: undefined,
+    }));
+  };
+
+  // Handle view mode change
+  const handleViewModeChange = (viewMode: ViewMode) => {
+    setLocalFilters((prev) => ({
+      ...prev,
+      viewMode,
+    }));
+  };
+
+  // Handle dimension change
+  const handleDimensionChange = (dimension: DimensionMode) => {
+    setLocalFilters((prev) => ({
+      ...prev,
+      dimension,
+    }));
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Primary Filters Row */}
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Platform Multi-Select */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              Plataformas
-              {tempPlatforms.length > 0 && tempPlatforms.length < PLATFORMS.length && (
-                <Badge variant="secondary" className="ml-1">
-                  {tempPlatforms.length}
-                </Badge>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuLabel>Selecione as plataformas</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {PLATFORMS.map((platform) => (
-              <DropdownMenuCheckboxItem
-                key={platform}
-                checked={tempPlatforms.includes(platform)}
-                onCheckedChange={() => togglePlatform(platform)}
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex flex-col gap-6">
+          {/* Row 1: View Mode + Dimension (NEW!) */}
+          {!hideViewMode && (
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Eye className="h-4 w-4 text-muted-foreground" />
+                  <Label>View</Label>
+                </div>
+                <ToggleGroup
+                  type="single"
+                  value={localFilters.viewMode || "ad"}
+                  onValueChange={(v) => v && handleViewModeChange(v as ViewMode)}
+                  className="justify-start"
+                >
+                  <ToggleGroupItem value="ad" aria-label="View por Anúncio">
+                    Anúncios (Ad)
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="campaign" aria-label="View por Campanha" disabled>
+                    Campanhas
+                    <Badge variant="outline" className="ml-2 text-xs">Em breve</Badge>
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Layers3 className="h-4 w-4 text-muted-foreground" />
+                  <Label>Dimensão</Label>
+                </div>
+                <ToggleGroup
+                  type="single"
+                  value={localFilters.dimension || "total"}
+                  onValueChange={(v) => v && handleDimensionChange(v as DimensionMode)}
+                  className="justify-start"
+                >
+                  <ToggleGroupItem value="total" aria-label="Soma Total">
+                    Soma Total
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="daily" aria-label="Diarizada">
+                    Diarizada
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+            </div>
+          )}
+
+          {/* Row 2: Range Selector + Date Range */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="range-select">Período</Label>
+              <Select
+                value={localFilters.range || "7d"}
+                onValueChange={(v) => handleRangeChange(v as RangePreset)}
               >
-                {platform}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <SelectTrigger id="range-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {RANGE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        {/* Quick Range Buttons */}
-        <div className="flex gap-2">
-          {RANGES.filter((r) => r.value !== "custom").map((range) => (
-            <Button
-              key={range.value}
-              variant={tempRange === range.value ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleRangeChange(range.value)}
-            >
-              {range.label}
-            </Button>
-          ))}
-        </div>
+            {/* Date Range Picker (only show if custom range) */}
+            {localFilters.range === "custom" && (
+              <div className="flex-1 space-y-2">
+                <Label>Data Início → Data Fim</Label>
+                <DateRangePicker
+                  value={localFilters.dateRange ? {
+                    from: localFilters.dateRange.from,
+                    to: localFilters.dateRange.to
+                  } : undefined}
+                  onChange={handleDateRangeChange}
+                />
+              </div>
+            )}
+          </div>
 
-        {/* Custom Date Range */}
-        <DateRangePicker
-          value={customDateRangeValue}
-          onChange={handleDateRangeChange}
-        />
+          {/* Row 3: Platform Filter (if not hidden) */}
+          {!hidePlatformFilter && (
+            <div className="space-y-2">
+              <Label>Plataformas</Label>
+              <div className="flex flex-wrap gap-2">
+                {PLATFORM_OPTIONS.map((platform) => {
+                  const isSelected = localFilters.platforms?.includes(platform.value);
+                  return (
+                    <Badge
+                      key={platform.value}
+                      variant={isSelected ? "default" : "outline"}
+                      className="cursor-pointer hover:bg-primary/80 transition-colors"
+                      onClick={() => handlePlatformToggle(platform.value)}
+                    >
+                      {platform.label}
+                    </Badge>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
-        {/* Search by Name */}
-        <div className="relative flex-1 min-w-[250px] max-w-[400px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Buscar por campanha ou anúncio..."
-            value={tempSearchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                applyFilters();
-              }
-            }}
-            className="pl-9 pr-9"
-          />
-          {tempSearchQuery && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearSearch}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
-            >
-              <X className="h-3 w-3" />
-            </Button>
+          {/* Row 4: Search Input */}
+          <div className="space-y-2">
+            <Label htmlFor="search-input">
+              Buscar Anúncio ou Campanha
+              {localFilters.searchQuery && (
+                <span className="ml-2 text-xs text-primary font-semibold">
+                  (🔍 Filtrando toda a página)
+                </span>
+              )}
+            </Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="search-input"
+                type="text"
+                placeholder="Buscar por campanha ou anúncio..."
+                value={localFilters.searchQuery || ""}
+                onChange={handleSearchChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && isDirty) {
+                    applyFilters();
+                  }
+                }}
+                className="pl-9 pr-9"
+              />
+              {localFilters.searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearSearch}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                  title="Limpar busca"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            {localFilters.searchQuery && (
+              <p className="text-xs text-muted-foreground">
+                💡 Este filtro afeta <strong>toda a página</strong>: KPIs, tabelas, charts e análises.
+              </p>
+            )}
+          </div>
+
+          {/* Apply/Cancel Buttons (only show when dirty) */}
+          {isDirty && (
+            <div className="flex items-center gap-3 pt-2 border-t">
+              <Badge variant="destructive" className="gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                Filtros não aplicados
+              </Badge>
+              <div className="flex-1" />
+              <Button variant="outline" size="sm" onClick={cancelFilters}>
+                Cancelar
+              </Button>
+              <Button size="sm" onClick={applyFilters}>
+                <Check className="h-4 w-4 mr-2" />
+                Aplicar Filtros
+              </Button>
+            </div>
           )}
         </div>
-
-        {/* Apply Filters Button */}
-        {hasPendingChanges && (
-          <div className="flex gap-2">
-            <Button
-              onClick={applyFilters}
-              size="default"
-              className="gap-2 font-semibold"
-            >
-              <Check className="h-4 w-4" />
-              Aplicar Filtros
-            </Button>
-            <Button
-              onClick={resetFilters}
-              variant="outline"
-              size="default"
-            >
-              Cancelar
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Active Filters Display */}
-      <div className="flex flex-wrap items-center gap-2">
-        {value.platforms.length > 0 && value.platforms.length < PLATFORMS.length && (
-          <>
-            <span className="text-sm text-muted-foreground">Plataformas:</span>
-            {value.platforms.map((platform) => (
-              <Badge key={platform} variant="secondary" className="gap-1">
-                {platform}
-                <button
-                  onClick={() => {
-                    const newPlatforms = value.platforms.filter((p) => p !== platform);
-                    onChange({
-                      ...value,
-                      platforms: newPlatforms,
-                    });
-                  }}
-                  className="ml-1 hover:text-destructive"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </>
-        )}
-
-        {value.searchQuery && (
-          <Badge variant="secondary" className="gap-1">
-            <Search className="h-3 w-3" />
-            "{value.searchQuery}"
-            <button 
-              onClick={() => onChange({ ...value, searchQuery: undefined })} 
-              className="ml-1 hover:text-destructive"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </Badge>
-        )}
-
-        {hasPendingChanges && (
-          <Badge variant="outline" className="text-amber-600 border-amber-600">
-            ⚠️ Filtros não aplicados
-          </Badge>
-        )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

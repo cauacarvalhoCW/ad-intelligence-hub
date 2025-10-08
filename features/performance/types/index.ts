@@ -7,6 +7,8 @@ export type Product = "POS" | "TAP" | "LINK" | "JIM";
 export type Perspective = "default" | "cloudwalk" | "infinitepay" | "jim";
 export type RangePreset = "yesterday" | "7d" | "30d" | "custom";
 export type ViewGranularity = "day" | "week" | "month" | "alltime";
+export type ViewMode = "ad" | "campaign"; // View: Ad (padrão) ou Campaign
+export type DimensionMode = "total" | "daily"; // Dimensão: Soma Total (padrão) ou Diarizada
 export type KPIContext = "overview" | "pos" | "tap" | "link" | "jim";
 
 // Date range for custom filters
@@ -157,7 +159,11 @@ export interface ProductTableRow {
 export interface PerformanceFilters {
   platforms: Platform[];
   range: RangePreset;
-  view: ViewGranularity;
+  dateRange?: DateRangeFilter; // For custom date range
+  searchQuery?: string; // For searching ads/campaigns
+  view?: ViewGranularity; // For chart granularity (optional)
+  viewMode?: ViewMode; // View: Ad (default) or Campaign
+  dimension?: DimensionMode; // Dimension: total (default) or daily
   product?: Product; // For drilldown pages
 }
 

@@ -3,9 +3,11 @@
 import { useEffect, useMemo } from "react";
 import { ProductTabs } from "./ProductTabs";
 import { PerfFilters } from "./PerfFilters";
+import { FiltersSummary } from "./FiltersSummary";
 import { KpiRow } from "./KpiRow";
 import { WinnersSection } from "./WinnersSection";
 import { EfficiencyChart, CostByPlatformChart, CostByProductChart, FunnelChart } from "./charts";
+import { AdsCountChart } from "./charts/AdsCountChart";
 import { EmptyState, ErrorState } from "./shared";
 import { usePerformanceDataAPI, usePerformanceUrlFilters } from "../hooks";
 import { debugPerformanceData } from "../utils/debug-data";
@@ -133,13 +135,27 @@ export function OverviewContent({ perspective }: OverviewContentProps) {
           </p>
         </div>
 
-        {/* Filters */}
-        <PerfFilters value={filters} onChange={setFilters} />
+        {/* Filters - Hide View/Dimension (only for drilldown) */}
+        <PerfFilters value={filters} onChange={setFilters} hideViewMode={true} />
       </div>
 
       {/* Product Tabs - Navigate to drilldown (no selection) */}
       <div className="flex justify-center">
         <ProductTabs perspective={perspective} />
+      </div>
+
+      {/* Resumo dos filtros aplicados */}
+      <FiltersSummary filters={filters} />
+
+      {/* Título explicativo dos KPIs */}
+      <div className="bg-primary/5 border-l-4 border-primary rounded-r-lg p-4">
+        <h3 className="text-lg font-semibold mb-1">
+          📊 Métricas Consolidadas de Todos os Produtos
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Os números abaixo representam a <strong>soma total</strong> de todos os produtos 
+          (POS, TAP, LINK, JIM) no período e filtros selecionados. Cada card mostra o valor agregado.
+        </p>
       </div>
 
       {/* KPI Row - Aggregated metrics */}
@@ -150,11 +166,15 @@ export function OverviewContent({ perspective }: OverviewContentProps) {
         ads={rawData} 
         mode="overview"
         isLoading={isLoading}
+        filters={filters}
       />
+
+      {/* Ads Count - Big Numbers + Evolution Chart */}
+      <AdsCountChart data={rawData} isLoading={isLoading} products={products} />
 
       {/* Charts Row 1: Efficiency + Cost by Platform */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <EfficiencyChart data={efficiencyData} isLoading={isLoading} />
+        <EfficiencyChart data={efficiencyData} isLoading={isLoading} product={undefined} />
         <CostByPlatformChart data={costByPlatformData} isLoading={isLoading} />
       </div>
 

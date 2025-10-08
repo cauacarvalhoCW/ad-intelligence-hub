@@ -3,10 +3,14 @@
 import { useRouter } from "next/navigation";
 import { ProductTabs } from "./ProductTabs";
 import { PerfFilters } from "./PerfFilters";
+import { FiltersSummary } from "./FiltersSummary";
 import { KpiRow } from "./KpiRow";
 import { PerformanceTable } from "./PerformanceTable";
+import { CreativeTable } from "./CreativeTable";
+import { CreativeCampaignTable } from "./CreativeCampaignTable";
 import { WinnersSection } from "./WinnersSection";
 import { EfficiencyChart, CostByPlatformChart, FunnelChart } from "./charts";
+import { TaxonomyCharts } from "./charts/TaxonomyCharts";
 import { EmptyState, ErrorState } from "./shared";
 import { usePerformanceDataAPI, usePerformanceUrlFilters } from "../hooks";
 import { Button } from "@/shared/ui/button";
@@ -113,29 +117,87 @@ export function DrilldownContent({ perspective, product }: DrilldownContentProps
     <div className="flex-1 space-y-8 px-4 py-8 md:px-8">
       <HeaderSection />
 
+      {/* Resumo dos filtros aplicados */}
+      <FiltersSummary filters={filters} product={product} />
+
+      {/* Título explicativo dos KPIs */}
+      <div className="bg-primary/5 border-l-4 border-primary rounded-r-lg p-4">
+        <h3 className="text-lg font-semibold mb-1">
+          📊 Métricas Agregadas do Período
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Os números abaixo representam a <strong>soma total</strong> de todas as métricas 
+          no período e filtros selecionados acima. Cada card mostra o valor acumulado.
+        </p>
+      </div>
+
       {/* 1. KPI Row */}
-      <KpiRow metrics={kpiMetrics} isLoading={isLoading} showInstalls={showInstalls} />
+      <KpiRow metrics={kpiMetrics} isLoading={isLoading} showInstalls={showInstalls} product={product} />
 
-      {/* 2. Performance Table (moved up, after KPIs) */}
-      <PerformanceTable
-        product={product}
-        data={rawData}
-        isLoading={isLoading}
-        searchQuery={filters.searchQuery}
-      />
-
-      {/* 3. Main Chart (Performance over time) */}
-      <EfficiencyChart data={efficiencyData} isLoading={isLoading} />
-
-      {/* 4. Top 5 Winners por Plataforma */}
+      {/* 2. Winners - MOVIDO PARA CIMA */}
       <WinnersSection 
         ads={rawData} 
         mode="drilldown"
         product={product}
         isLoading={isLoading}
+        filters={filters}
       />
 
-      {/* 5. Other Charts */}
+      {/* 3. New Tables based on View Mode and Dimension */}
+      {filters.viewMode === "ad" && (
+        <>
+          {/* Table 1: Creative-only aggregation */}
+          <CreativeTable 
+            data={rawData}
+            isLoading={isLoading}
+            product={product}
+            dimension={filters.dimension || "total"}
+            filters={filters}
+          />
+          
+          {/* Taxonomy Charts after Table 1 (only for Soma Total) */}
+          <TaxonomyCharts
+            data={rawData}
+            isLoading={isLoading}
+            dimension={filters.dimension || "total"}
+            position="after-table1"
+            product={product}
+          />
+          
+          {/* Table 2: Creative + Campaign aggregation */}
+          <CreativeCampaignTable
+            data={rawData}
+            isLoading={isLoading}
+            product={product}
+            dimension={filters.dimension || "total"}
+            filters={filters}
+          />
+          
+          {/* Taxonomy Charts after Table 2 (only for Soma Total) */}
+          <TaxonomyCharts
+            data={rawData}
+            isLoading={isLoading}
+            dimension={filters.dimension || "total"}
+            position="after-table2"
+            product={product}
+          />
+        </>
+      )}
+
+      {/* 4. Original Performance Table (keeping for now, hidden) */}
+      {false && (
+        <PerformanceTable
+          product={product}
+          data={rawData}
+          isLoading={isLoading}
+          searchQuery={filters.searchQuery}
+        />
+      )}
+
+      {/* 5. Main Chart (Performance over time) */}
+      <EfficiencyChart data={efficiencyData} isLoading={isLoading} product={product} />
+
+      {/* 6. Other Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CostByPlatformChart data={costByPlatformData} isLoading={isLoading} />
         <FunnelChart data={funnelData} isLoading={isLoading} />

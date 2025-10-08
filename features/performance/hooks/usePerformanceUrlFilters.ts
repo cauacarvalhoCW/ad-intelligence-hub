@@ -9,6 +9,8 @@ export interface PerformanceFilters {
   range: RangePreset;
   dateRange?: DateRangeFilter;
   searchQuery?: string;
+  viewMode?: "ad" | "campaign"; // View: Ad (default) or Campaign
+  dimension?: "total" | "daily"; // Dimension: total (default) or daily
 }
 
 interface UsePerformanceUrlFiltersOptions {
@@ -28,6 +30,8 @@ const DEFAULT_FILTERS: PerformanceFilters = {
   range: "7d",
   dateRange: undefined,
   searchQuery: "",
+  viewMode: "ad", // Default: View = Ad
+  dimension: "total", // Default: Dimension = Soma Total
 };
 
 /**
@@ -64,6 +68,8 @@ export function usePerformanceUrlFilters({
     const fromParam = searchParams.get("from");
     const toParam = searchParams.get("to");
     const searchParam = searchParams.get("search");
+    const viewModeParam = searchParams.get("viewMode") as "ad" | "campaign";
+    const dimensionParam = searchParams.get("dimension") as "total" | "daily";
 
     const platforms = platformsParam
       ? (platformsParam.split(",") as Platform[])
@@ -80,12 +86,16 @@ export function usePerformanceUrlFilters({
     }
 
     const searchQuery = searchParam || "";
+    const viewMode = viewModeParam || DEFAULT_FILTERS.viewMode || "ad";
+    const dimension = dimensionParam || DEFAULT_FILTERS.dimension || "total";
 
     return {
       platforms,
       range,
       dateRange,
       searchQuery,
+      viewMode,
+      dimension,
       ...initialFilters,
     };
   }, [searchParams, initialFilters]);

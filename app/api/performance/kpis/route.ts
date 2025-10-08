@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
     const range = (searchParams.get("range") as RangePreset) || "7d";
     const dateFrom = searchParams.get("from");
     const dateTo = searchParams.get("to");
+    const search = searchParams.get("search"); // 🔍 ADICIONADO: Filtro de busca
     
     // Validate required params
     if (!perspective) {
@@ -72,6 +73,7 @@ export async function GET(request: NextRequest) {
       range,
       dateFrom: dateFrom || undefined,
       dateTo: dateTo || undefined,
+      search: search || undefined, // 🔍 ADICIONADO: Passa o filtro de busca
     };
     
     // Fetch raw data from Supabase

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { 
@@ -10,12 +10,14 @@ import {
   type ChartConfig 
 } from "@/shared/ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import type { ChartDataPoint } from "../../types";
+import type { ChartDataPoint, Product } from "../../types";
+import { getProductColor } from "../../utils/chart-colors";
 import { TrendingUp } from "lucide-react";
 
 interface EfficiencyChartProps {
   data: ChartDataPoint[];
   isLoading?: boolean;
+  product?: Product; // Para cores dinâmicas
 }
 
 type MetricType = "cac" | "cpm" | "cpa" | "ctr" | "hookRate";
@@ -28,31 +30,49 @@ const METRICS: { value: MetricType; label: string }[] = [
   { value: "hookRate", label: "Hook Rate (%)" },
 ];
 
-const chartConfig = {
-  cac: {
-    label: "CAC",
-    color: "hsl(var(--chart-1))",
-  },
-  cpm: {
-    label: "CPM",
-    color: "hsl(var(--chart-2))",
-  },
-  cpa: {
-    label: "CPA",
-    color: "hsl(var(--chart-3))",
-  },
-  ctr: {
-    label: "CTR",
-    color: "hsl(var(--chart-4))",
-  },
-  hookRate: {
-    label: "Hook Rate",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig;
-
-export function EfficiencyChart({ data, isLoading }: EfficiencyChartProps) {
+export function EfficiencyChart({ data, isLoading, product }: EfficiencyChartProps) {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>("cac");
+
+  // Cor baseada no produto - usa CSS variables com fallback
+  const getColor = () => {
+    if (!product) return "hsl(142 71% 45%)"; // Verde padrão (InfinitePay) para overview
+    
+    switch (product) {
+      case "JIM":
+        return "hsl(270 70% 60%)"; // Roxo
+      case "POS":
+      case "TAP":
+      case "LINK":
+        return "hsl(142 71% 50%)"; // Verde InfinitePay
+      default:
+        return "hsl(142 71% 45%)";
+    }
+  };
+
+  const chartColor = getColor();
+
+  const chartConfig = {
+    cac: {
+      label: "CAC",
+      color: chartColor,
+    },
+    cpm: {
+      label: "CPM",
+      color: chartColor,
+    },
+    cpa: {
+      label: "CPA",
+      color: chartColor,
+    },
+    ctr: {
+      label: "CTR",
+      color: chartColor,
+    },
+    hookRate: {
+      label: "Hook Rate",
+      color: chartColor,
+    },
+  } satisfies ChartConfig;
 
   const currentMetric = METRICS.find((m) => m.value === selectedMetric)!;
 

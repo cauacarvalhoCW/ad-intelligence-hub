@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { ExternalLink, TrendingUp, Maximize2, Loader2 } from "lucide-react";
-import { AdData, Platform } from "../types";
+import { AdData, Platform, PerformanceFilters } from "../types";
 import { formatCurrency, formatPercentage, formatNumber } from "../utils";
 import { WinnerModal } from "./WinnerModal";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 // ============================================
 // WINNER CARD V2 - RICH UI SIMILAR TO COMPETITORS
@@ -23,6 +25,7 @@ interface WinnerCardProps {
   creativeLink?: string | null;
   previewImage?: string | null;
   loadingCreative?: boolean;
+  filters?: PerformanceFilters; // Para mostrar período correto
 }
 
 export function WinnerCard({ 
@@ -32,8 +35,31 @@ export function WinnerCard({
   creativeLink,
   previewImage,
   loadingCreative,
+  filters,
 }: WinnerCardProps) {
   const [showModal, setShowModal] = useState(false);
+
+  // Formatar período dos filtros
+  const getPeriodText = () => {
+    if (!filters) return null;
+    
+    if (filters.range === "custom" && filters.dateRange?.from && filters.dateRange?.to) {
+      const from = format(filters.dateRange.from, "dd/MM/yyyy", { locale: ptBR });
+      const to = format(filters.dateRange.to, "dd/MM/yyyy", { locale: ptBR });
+      return `${from} a ${to}`;
+    }
+    
+    const rangeLabels: Record<string, string> = {
+      "7d": "Últimos 7 dias",
+      "30d": "Últimos 30 dias",
+      "90d": "Últimos 90 dias",
+      "ytd": "Ano até hoje",
+    };
+    
+    return rangeLabels[filters.range] || filters.range;
+  };
+
+  const periodText = getPeriodText();
 
   const platformColors: Record<Platform, string> = {
     META: "border-blue-500/30 bg-blue-500/5",
@@ -145,13 +171,18 @@ export function WinnerCard({
 
           {/* Ad Info */}
           <div className="p-4 space-y-3">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="font-semibold">
                 {ad.platform}
               </Badge>
               {ad.product && (
                 <Badge variant="outline" className="text-xs">
                   {ad.product}
+                </Badge>
+              )}
+              {periodText && (
+                <Badge variant="secondary" className="text-xs">
+                  📅 {periodText}
                 </Badge>
               )}
             </div>
@@ -163,6 +194,16 @@ export function WinnerCard({
               <p className="text-xs text-muted-foreground line-clamp-1" title={ad.campaign_name || ""}>
                 {ad.campaign_name || "—"}
               </p>
+            </div>
+
+            {/* Explicação de por que é Winner */}
+            <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded border border-border/50">
+              🏆 <strong>Winner</strong> por alto investimento e bom CAC
+              {periodText && (
+                <span className="block mt-0.5 text-[10px]">
+                  📊 Período: {periodText}
+                </span>
+              )}
             </div>
 
             {/* Key Metrics Grid */}
@@ -212,6 +253,7 @@ export function WinnerCard({
         onClose={() => setShowModal(false)}
         creativeLink={creativeLink}
         previewImage={previewImage}
+        filters={filters}
       />
     </>
   );
