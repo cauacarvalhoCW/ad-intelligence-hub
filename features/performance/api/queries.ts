@@ -21,9 +21,17 @@ export function calculateDateRange(range: string = "7d"): { from: string; to: st
   let from: Date;
   switch (range) {
     case "yesterday":
+      // Yesterday = apenas ontem (from = to = yesterday)
       from = new Date(now);
       from.setDate(now.getDate() - 1);
-      break;
+      const yesterday = from.toISOString().split("T")[0];
+      
+      console.log(`📅 [calculateDateRange] range="yesterday" | FROM: ${yesterday} | TO: ${yesterday}`);
+      
+      return {
+        from: yesterday,
+        to: yesterday,
+      };
     case "7d":
       from = new Date(now);
       from.setDate(now.getDate() - 7);
@@ -40,10 +48,15 @@ export function calculateDateRange(range: string = "7d"): { from: string; to: st
       from.setDate(now.getDate() - 7);
   }
   
-  return {
+  const result = {
     from: from.toISOString().split("T")[0],
     to,
   };
+  
+  // 🔍 DEBUG: Log das datas calculadas
+  console.log(`📅 [calculateDateRange] range="${range}" | FROM: ${result.from} | TO: ${result.to}`);
+  
+  return result;
 }
 
 /**
@@ -121,6 +134,13 @@ export async function fetchPerformanceData(params: PerformanceQueryParams) {
       hasMore = false;
     }
   }
+  
+  // 🔍 DEBUG: Mostrar datas únicas retornadas do banco
+  const uniqueDates = new Set(allData.map(row => row.date).filter(Boolean));
+  const sortedDates = Array.from(uniqueDates).sort();
+  
+  console.log(`📊 [fetchPerformanceData] Retornou ${allData.length} linhas`);
+  console.log(`📅 [fetchPerformanceData] Datas únicas no resultado (${uniqueDates.size}):`, sortedDates.slice(0, 10).join(", ") + (sortedDates.length > 10 ? "..." : ""));
   
   // Cast to our type (Supabase returns generic Record<string, any>)
   return {
