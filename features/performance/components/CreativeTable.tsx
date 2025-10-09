@@ -7,7 +7,9 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
-import { Eye, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+import { Checkbox } from "@/shared/ui/checkbox";
+import { Eye, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
 import { aggregateByCreative, type AggregatedRow } from "../utils/aggregation-v2";
 import { getProductMetrics, formatMetricValue, type MetricKey } from "../utils/product-metrics";
 import { AdPreviewModal } from "./AdPreviewModal";
@@ -37,6 +39,23 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
   const productMetrics = useMemo(() => {
     return getProductMetrics(product);
   }, [product]);
+
+  // Column visibility state (default: todas visíveis)
+  const [visibleColumns, setVisibleColumns] = useState<Set<MetricKey>>(
+    new Set(productMetrics.map(m => m.key))
+  );
+
+  const toggleColumn = (columnKey: MetricKey) => {
+    setVisibleColumns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(columnKey)) {
+        newSet.delete(columnKey);
+      } else {
+        newSet.add(columnKey);
+      }
+      return newSet;
+    });
+  };
 
   // Aggregate data by creative
   const aggregatedData = useMemo(() => {
@@ -150,7 +169,7 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
       id: `agg-${row.ad_id}`,
       ad_id: row.ad_id || 0,
       ad_name: (row.ad_name || null) as string | null,
-      campaign_id: (row.campaign_id || null) as string | null,
+      campaign_id: (row.campaign_id as any) || null,
       campaign_name: (row.campaign_name || null) as string | null,
       platform: row.platform as any,
       product: row.product as any,
@@ -221,6 +240,13 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
     );
   }
 
+  // Platform logo mapping
+  const platformLogos: Record<string, { src: string; alt: string; color: string }> = {
+    meta: { src: "/logos/meta.svg", alt: "Meta", color: "text-blue-600" },
+    google: { src: "/logos/google.svg", alt: "Google", color: "text-red-600" },
+    tiktok: { src: "/logos/tiktok.svg", alt: "TikTok", color: "text-pink-600" },
+  };
+
   // Build table headers based on dimension and product metrics
   const headers: { key: SortKey; label: string; align?: "left" | "center" | "right" }[] = [
     { key: "ad_name", label: "Anúncio (Criativo)", align: "left" },
@@ -248,9 +274,9 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
     metricsToShow = ["cost", "impressions", "clicks", "signups", "activations", "ctr", "hook_rate", "cpc", "cpm", "cvr", "cac"];
   }
 
-  // Filter to only valid metrics for this product
+  // Filter to only valid metrics for this product AND visible columns
   const validMetrics = metricsToShow.filter(m => 
-    productMetrics.some(pm => pm.key === m)
+    productMetrics.some(pm => pm.key === m) && visibleColumns.has(m)
   );
 
   // Add metric headers
@@ -278,6 +304,62 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
               }
             </CardDescription>
           </div>
+          
+          {/* Column Selector */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="ml-2">
+                <Settings2 className="h-4 w-4 mr-2" />
+                Colunas ({visibleColumns.size}/{productMetrics.length})
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="end">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Selecionar Colunas</h4>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Escolha quais métricas deseja visualizar na tabela
+                  </p>
+                </div>
+                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                  {productMetrics.map((metric) => (
+                    <div key={metric.key} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`col-${metric.key}`}
+                        checked={visibleColumns.has(metric.key)}
+                        onCheckedChange={() => toggleColumn(metric.key)}
+                      />
+                      <label
+                        htmlFor={`col-${metric.key}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {metric.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2 pt-2 border-t">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setVisibleColumns(new Set(productMetrics.map(m => m.key)))}
+                  >
+                    Selecionar Todas
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setVisibleColumns(new Set())}
+                  >
+                    Limpar
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
           {/* 🔍 DEBUG BADGE - Mostra dimensão ativa */}
           <Badge variant={dimension === "daily" ? "default" : "secondary"} className="text-xs font-mono">
             {dimension === "daily" ? "📅 DIARIZADA" : "📊 SOMA TOTAL"}
@@ -290,6 +372,7 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[60px] text-center">Preview</TableHead>
+                <TableHead className="w-[100px] text-center">Plataforma</TableHead>
                 {headers.map(header => (
                   <TableHead 
                     key={header.key}
@@ -324,6 +407,27 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
                       <Eye className="h-4 w-4" />
                     </Button>
                   </TableCell>
+                  <TableCell className="text-center">
+                    {(() => {
+                      const platform = (row.platform || "").toLowerCase();
+                      const logoInfo = platformLogos[platform];
+                      if (logoInfo) {
+                        return (
+                          <div className="flex flex-col items-center gap-1">
+                            <img 
+                              src={logoInfo.src} 
+                              alt={logoInfo.alt} 
+                              className="w-6 h-6 object-contain"
+                            />
+                            <span className={`text-[10px] font-medium ${logoInfo.color}`}>
+                              {logoInfo.alt}
+                            </span>
+                          </div>
+                        );
+                      }
+                      return <span className="text-xs text-muted-foreground">{row.platform}</span>;
+                    })()}
+                  </TableCell>
                   <TableCell>
                     <div className="min-w-[200px] whitespace-normal break-words" title={row.ad_name}>
                       {row.ad_name}
@@ -332,7 +436,12 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
                   
                   {dimension === "daily" ? (
                     <TableCell>
-                      {row.date ? new Date(row.date).toLocaleDateString("pt-BR") : "—"}
+                      {row.date ? (() => {
+                        // ✅ CORREÇÃO: Formatar data sem conversão de timezone
+                        // row.date = "2025-10-08" → "08/10/2025"
+                        const [year, month, day] = row.date.split("-");
+                        return `${day}/${month}/${year}`;
+                      })() : "—"}
                     </TableCell>
                   ) : (
                     <TableCell className="text-center">
@@ -356,7 +465,7 @@ export function CreativeTable({ data, isLoading, product, dimension, filters }: 
             </TableBody>
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={2} className="font-bold">
+                <TableCell colSpan={3} className="font-bold">
                   TOTAL (página atual)
                 </TableCell>
                 {dimension === "daily" ? (

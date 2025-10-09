@@ -29,26 +29,44 @@ function enrichAdData(row: MktAdsLookerRow): AdData {
   const video_3s = row.video_3s || 0;
   const cost = row.cost || 0;
 
-  // Calculate signups (aggregate from different sources)
-  const signups =
-    (row["tap signup"] || 0) +
-    (row.signup_web || 0) +
-    (row.link_signup || 0);
+  // 🎯 CORREÇÃO: POS não tem signups/activations diretos, usa pos_sales
+  let signups = 0;
+  let activations = 0;
+  let cac: number | null = null;
+  let cpa: number | null = null;
 
-  // Calculate activations
-  const activations =
-    (row["tap activations"] || 0) +
-    (row.activation_app || 0) +
-    (row.activation_web || 0) +
-    (row.link_activations || 0);
+  if (row.product === "POS") {
+    // POS: não tem signups/activations tradicionais
+    signups = 0;
+    activations = 0;
+    // CAC para POS = custo / vendas POS
+    const pos_sales = row.pos_sales || 0;
+    cac = pos_sales > 0 ? cost / pos_sales : null;
+    cpa = null;
+  } else {
+    // TAP, LINK, JIM: Calculate signups and activations
+    if (row.product === "TAP") {
+      signups = (row["tap signup"] || 0) + (row["tap cnpj signups"] || 0);
+      activations = row["tap activations"] || 0;
+    } else if (row.product === "LINK") {
+      signups = row.link_signup || 0;
+      activations = row.link_activations || 0;
+    } else if (row.product === "JIM") {
+      signups = row.signup_web || 0;
+      activations = (row.activation_app || 0) + (row.activation_web || 0);
+    }
+    
+    cpa = signups > 0 ? cost / signups : null;
+    cac = activations > 0 ? cost / activations : null;
+  }
 
   const enriched = {
     ...row,
     ctr: impressions > 0 ? (clicks / impressions) * 100 : 0,
     hook_rate: impressions > 0 ? (video_3s / impressions) * 100 : 0,
     cpm: impressions > 0 ? (cost / impressions) * 1000 : 0,
-    cpa: signups > 0 ? cost / signups : null,
-    cac: activations > 0 ? cost / activations : null,
+    cpa,
+    cac,
     signups,
     activations,
   };

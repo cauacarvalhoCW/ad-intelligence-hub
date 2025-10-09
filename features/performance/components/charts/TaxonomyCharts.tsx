@@ -11,7 +11,7 @@ import { getProductColor } from "../../utils/chart-colors";
 import type { AdData, DimensionMode, Product } from "../../types";
 
 // Tipos de métricas disponíveis
-type MetricType = "cost" | "signups" | "activations" | "installs" | "cac";
+type MetricType = "cost" | "signups" | "activations" | "installs" | "cac" | "pos_sales" | "piselli_percentage";
 
 interface MetricConfig {
   label: string;
@@ -34,6 +34,7 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
   const [funnelMetric, setFunnelMetric] = useState<MetricType>("cost");
   const [destinationMetric, setDestinationMetric] = useState<MetricType>("cost");
   const [scaleMetric, setScaleMetric] = useState<MetricType>("cost");
+  const [platformMetric, setPlatformMetric] = useState<MetricType>("cost");
 
   // Configuração de métricas (helper function)
   const getMetricConfig = (metricType: MetricType): MetricConfig => {
@@ -76,6 +77,22 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
           }).format(value),
         aggregationType: "calculated",
       },
+      pos_sales: {
+        label: "Vendas POS",
+        getValue: (row) => row.pos_sales || 0,
+        format: (value) => new Intl.NumberFormat("pt-BR").format(Math.round(value)),
+        aggregationType: "sum",
+      },
+      piselli_percentage: {
+        label: "% Piselli",
+        getValue: (row) => {
+          const pos_sales = row.pos_sales || 0;
+          const piselli_sales = row.piselli_sales || 0;
+          return pos_sales > 0 ? (piselli_sales / pos_sales) * 100 : 0;
+        },
+        format: (value) => `${value.toFixed(2)}%`,
+        aggregationType: "calculated",
+      },
     };
     return metricConfigs[metricType];
   };
@@ -101,16 +118,33 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
   // Helper function para agregar valores baseado na métrica
   const aggregateMetric = useCallback((rows: AdData[], metricType: MetricType): number => {
     const metricConfig = getMetricConfig(metricType);
+    
     if (metricType === "cac") {
-      // CAC = cost total / activations total
+      // 🎯 CAC específico por produto
       const totalCost = rows.reduce((sum, r) => sum + (r.cost || 0), 0);
+      
+      // Para POS: CAC = cost / pos_sales
+      if (product === "POS") {
+        const totalPosSales = rows.reduce((sum, r) => sum + (r.pos_sales || 0), 0);
+        return totalPosSales > 0 ? totalCost / totalPosSales : 0;
+      }
+      
+      // Para outros produtos: CAC = cost / activations
       const totalActivations = rows.reduce((sum, r) => sum + (r.activations || 0), 0);
       return totalActivations > 0 ? totalCost / totalActivations : 0;
+    } else if (metricType === "piselli_percentage") {
+      // % Piselli = (piselli_sales / pos_sales) * 100
+      const totalPosSales = rows.reduce((sum, r) => sum + (r.pos_sales || 0), 0);
+      const totalPiselliSales = rows.reduce((sum, r) => sum + (r.piselli_sales || 0), 0);
+      return totalPosSales > 0 ? (totalPiselliSales / totalPosSales) * 100 : 0;
+    } else if (metricType === "activations" && product === "POS") {
+      // 🎯 Para POS: "Ativações" = pos_sales
+      return rows.reduce((sum, r) => sum + (r.pos_sales || 0), 0);
     } else {
-      // Soma direta para cost, signups, activations
+      // Soma direta para outras métricas
       return rows.reduce((sum, r) => sum + metricConfig.getValue(r), 0);
     }
-  }, []);
+  }, [product]);
 
   // Calculate aggregations baseado em MÚLTIPLAS métricas (uma para cada chart)
   const { 
@@ -118,6 +152,7 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
     companyData, 
     funnelData, 
     destinationData,
+    platformData,
     scaledAds,
     uniqueCombinations 
   } = useMemo(() => {
@@ -127,6 +162,7 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
         companyData: [],
         funnelData: [],
         destinationData: [],
+        platformData: [],
         scaledAds: [],
         uniqueCombinations: 0,
       };
@@ -146,6 +182,7 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
     const companyMap = new Map<string, AdData[]>();
     const funnelMap = new Map<string, AdData[]>();
     const destinationMap = new Map<string, AdData[]>();
+    const platformMap = new Map<string, AdData[]>();
     const adMetricMap = new Map<string, AdData[]>();
 
     data.forEach(row => {
@@ -165,6 +202,11 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
       const dest = taxonomy.destination;
       if (!destinationMap.has(dest)) destinationMap.set(dest, []);
       destinationMap.get(dest)!.push(row);
+
+      // Platform (META, GOOGLE, TIKTOK)
+      const platform = (row.platform || "UNKNOWN").toUpperCase();
+      if (!platformMap.has(platform)) platformMap.set(platform, []);
+      platformMap.get(platform)!.push(row);
 
       // Ad (for scale ranking)
       const adName = row.ad_name || "UNKNOWN";
@@ -212,6 +254,20 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
       })
       .sort((a, b) => b.value - a.value);
 
+    // Platform data (META, GOOGLE, TIKTOK)
+    const platformTotalValue = aggregateMetric(data, platformMetric);
+    const platformData = Array.from(platformMap.entries())
+      .filter(([key]) => key !== "UNKNOWN")
+      .map(([name, rows]) => {
+        const value = aggregateMetric(rows, platformMetric);
+        return {
+          name,
+          value,
+          percentage: platformTotalValue > 0 ? (value / platformTotalValue) * 100 : 0,
+        };
+      })
+      .sort((a, b) => b.value - a.value);
+
     // Top scaled ads (highest metric value) - MANTÉM NOME COMPLETO
     const scaledAds = Array.from(adMetricMap.entries())
       .map(([name, rows]) => ({ 
@@ -226,10 +282,11 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
       companyData,
       funnelData,
       destinationData,
+      platformData,
       scaledAds,
       uniqueCombinations,
     };
-  }, [data, companyMetric, funnelMetric, destinationMetric, scaleMetric, aggregateMetric]);
+  }, [data, companyMetric, funnelMetric, destinationMetric, platformMetric, scaleMetric, aggregateMetric]);
 
   // Only show charts in "total" dimension mode (EARLY RETURN AFTER ALL HOOKS)
   if (dimension !== "total") {
@@ -288,6 +345,8 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
                       <SelectItem value="signups">📝 Signups</SelectItem>
                       <SelectItem value="activations">✅ Ativações</SelectItem>
                       {product === "JIM" && <SelectItem value="installs">📱 Installs</SelectItem>}
+                      {product === "POS" && <SelectItem value="pos_sales">🛒 Vendas POS</SelectItem>}
+                      {product === "POS" && <SelectItem value="piselli_percentage">🍕 % Piselli</SelectItem>}
                       <SelectItem value="cac">🎯 CAC</SelectItem>
                     </SelectContent>
                   </Select>
@@ -356,6 +415,8 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
                       <SelectItem value="signups">📝 Signups</SelectItem>
                       <SelectItem value="activations">✅ Ativações</SelectItem>
                       {product === "JIM" && <SelectItem value="installs">📱 Installs</SelectItem>}
+                      {product === "POS" && <SelectItem value="pos_sales">🛒 Vendas POS</SelectItem>}
+                      {product === "POS" && <SelectItem value="piselli_percentage">🍕 % Piselli</SelectItem>}
                       <SelectItem value="cac">🎯 CAC</SelectItem>
                     </SelectContent>
                   </Select>
@@ -406,6 +467,91 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
             </Card>
           )}
 
+          {/* Platform Chart (META, GOOGLE, TIKTOK) */}
+          {platformData.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Plataformas</CardTitle>
+                    <CardDescription>Distribuição por {getMetricConfig(platformMetric).label}</CardDescription>
+                  </div>
+                  <Select value={platformMetric} onValueChange={(value) => setPlatformMetric(value as MetricType)}>
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cost">💰 Custo</SelectItem>
+                      <SelectItem value="signups">📝 Signups</SelectItem>
+                      <SelectItem value="activations">✅ Ativações</SelectItem>
+                      {product === "JIM" && <SelectItem value="installs">📱 Installs</SelectItem>}
+                      {product === "POS" && <SelectItem value="pos_sales">🛒 Vendas POS</SelectItem>}
+                      {product === "POS" && <SelectItem value="piselli_percentage">🍕 % Piselli</SelectItem>}
+                      <SelectItem value="cac">🎯 CAC</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={platformData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {platformData.map((entry, index) => {
+                        // Cores específicas por plataforma
+                        const platformColors: Record<string, string> = {
+                          META: "hsl(221 83% 53%)", // Azul
+                          GOOGLE: "hsl(4 90% 58%)",  // Vermelho
+                          TIKTOK: "hsl(338 100% 48%)", // Rosa
+                        };
+                        return (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={platformColors[entry.name] || "hsl(var(--chart-1))"} 
+                          />
+                        );
+                      })}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number) => getMetricConfig(platformMetric).format(value, product)}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="mt-4 space-y-2">
+                  {platformData.map((item) => {
+                    const platformColors: Record<string, string> = {
+                      META: "hsl(221 83% 53%)",
+                      GOOGLE: "hsl(4 90% 58%)",
+                      TIKTOK: "hsl(338 100% 48%)",
+                    };
+                    return (
+                      <div key={item.name} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-3 h-3 rounded-full" 
+                            style={{ backgroundColor: platformColors[item.name] || "hsl(var(--chart-1))" }}
+                          />
+                          <span className="font-medium">{item.name}</span>
+                        </div>
+                        <span className="text-muted-foreground">
+                          {item.percentage.toFixed(1)}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Scale Ranking - GRÁFICO DE BARRAS HORIZONTAL */}
           {scaledAds.length > 0 && (
             <Card className="lg:col-span-3">
@@ -424,6 +570,8 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
                       <SelectItem value="signups">📝 Signups</SelectItem>
                       <SelectItem value="activations">✅ Ativações</SelectItem>
                       {product === "JIM" && <SelectItem value="installs">📱 Installs</SelectItem>}
+                      {product === "POS" && <SelectItem value="pos_sales">🛒 Vendas POS</SelectItem>}
+                      {product === "POS" && <SelectItem value="piselli_percentage">🍕 % Piselli</SelectItem>}
                       <SelectItem value="cac">🎯 CAC</SelectItem>
                     </SelectContent>
                   </Select>
@@ -474,17 +622,18 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
                       radius={[0, 4, 4, 0]}
                       label={{ 
                         position: 'right', 
-                        formatter: (value: number) => {
+                        formatter: (value: any) => {
+                          const numValue = typeof value === 'number' ? value : 0;
                           if (scaleMetric === "cost" || scaleMetric === "cac") {
                             return new Intl.NumberFormat("pt-BR", {
                               style: "currency",
                               currency: product === "JIM" ? "USD" : "BRL",
                               notation: "compact",
-                            }).format(value);
+                            }).format(numValue);
                           } else {
                             return new Intl.NumberFormat("pt-BR", {
                               notation: "compact",
-                            }).format(value);
+                            }).format(numValue);
                           }
                         },
                         fontSize: 11,
@@ -536,6 +685,8 @@ export function TaxonomyCharts({ data, isLoading, dimension, position, product }
                       <SelectItem value="signups">📝 Signups</SelectItem>
                       <SelectItem value="activations">✅ Ativações</SelectItem>
                       {product === "JIM" && <SelectItem value="installs">📱 Installs</SelectItem>}
+                      {product === "POS" && <SelectItem value="pos_sales">🛒 Vendas POS</SelectItem>}
+                      {product === "POS" && <SelectItem value="piselli_percentage">🍕 % Piselli</SelectItem>}
                       <SelectItem value="cac">🎯 CAC</SelectItem>
                     </SelectContent>
                   </Select>

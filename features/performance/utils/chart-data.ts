@@ -67,9 +67,13 @@ export function prepareEfficiencyChartData(
       // Calculate signups and activations
       let signups = 0;
       let activations = 0;
+      let pos_sales = 0; // Para POS
 
       bucketRows.forEach((r) => {
-        if (r.product === "TAP") {
+        if (r.product === "POS") {
+          // POS usa pos_sales ao invés de activations
+          pos_sales += r.pos_sales || 0;
+        } else if (r.product === "TAP") {
           signups += (r["tap signup"] || 0) + (r["tap cnpj signups"] || 0);
           activations += r["tap activations"] || 0;
         } else if (r.product === "LINK") {
@@ -81,9 +85,12 @@ export function prepareEfficiencyChartData(
         }
       });
 
+      // 🎯 CAC: Se tiver pos_sales, usa eles; senão usa activations
+      const totalConversions = pos_sales > 0 ? pos_sales : activations;
+
       data.push({
         date,
-        cac: calculateCAC(cost, activations) || 0,
+        cac: calculateCAC(cost, totalConversions) || 0,
         cpm: calculateCPM(cost, impressions),
         cpa: calculateCPA(cost, signups) || 0,
         ctr: calculateCTR(clicks, impressions),
@@ -157,6 +164,7 @@ export function prepareCostByProductData(
 
 /**
  * Prepare funnel chart data
+ * 🎯 POS usa pos_sales ao invés de signups/activations
  */
 export function prepareFunnelData(rows: MktAdsLookerRow[]): FunnelStage[] {
   const impressions = rows.reduce((sum, r) => sum + (r.impressions || 0), 0);
@@ -164,9 +172,16 @@ export function prepareFunnelData(rows: MktAdsLookerRow[]): FunnelStage[] {
 
   let signups = 0;
   let activations = 0;
+  let pos_sales = 0;
+
+  // Detectar se é exclusivamente POS
+  const isPosOnly = rows.length > 0 && rows.every(r => r.product === "POS");
 
   rows.forEach((r) => {
-    if (r.product === "TAP") {
+    if (r.product === "POS") {
+      // POS: usa pos_sales como métrica final
+      pos_sales += r.pos_sales || 0;
+    } else if (r.product === "TAP") {
       signups += (r["tap signup"] || 0) + (r["tap cnpj signups"] || 0);
       activations += r["tap activations"] || 0;
     } else if (r.product === "LINK") {
@@ -178,6 +193,28 @@ export function prepareFunnelData(rows: MktAdsLookerRow[]): FunnelStage[] {
     }
   });
 
+  // Se for POS exclusivamente, usar funil adaptado
+  if (isPosOnly) {
+    return [
+      {
+        name: "Impressões",
+        value: impressions,
+        percentage: 100,
+      },
+      {
+        name: "Clicks",
+        value: clicks,
+        percentage: impressions > 0 ? (clicks / impressions) * 100 : 0,
+      },
+      {
+        name: "Vendas POS",
+        value: pos_sales,
+        percentage: clicks > 0 ? (pos_sales / clicks) * 100 : 0,
+      },
+    ];
+  }
+
+  // Funil padrão para outros produtos
   return [
     {
       name: "Impressões",
